@@ -1,14 +1,11 @@
-import { Theme } from "@rneui/themed";
 import React from "react";
 import {
    Dimensions,
-   KeyboardAvoidingView,
    StyleSheet,
    Text,
-   View,
+   View
 } from "react-native";
 import { Button, TextInput, useTheme } from "react-native-paper";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type LoginFormProps = {
    navigation: any;
@@ -19,6 +16,10 @@ const { width, height } = Dimensions.get("window");
 const LoginForm = ({ navigation }: LoginFormProps) => {
    let theme = useTheme();
    const [showPassword, setShowPassword] = React.useState<boolean>(false);
+
+   const handleLogin =()=>{
+      navigation.navigate("HomeStack",{screen:"HomeScreen"})
+   }
 
    return (
       <View>
@@ -46,7 +47,7 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                         setShowPassword(!showPassword)
                      }></TextInput.Icon>
                }></TextInput>
-            <Button mode="contained" style={{ marginTop: 15 }}>
+            <Button onPress={handleLogin} mode="contained" style={{ marginTop: 15 }}>
                LOGIN
             </Button>
          </View>

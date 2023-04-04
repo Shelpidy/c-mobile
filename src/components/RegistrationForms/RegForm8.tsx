@@ -29,6 +29,7 @@ const Form8 = ({ navigation, setActiveTab }: Form8Props) => {
 
    const verifyEmailCode = () => {
       Alert.alert("Email verified", "You have successfully verified");
+      navigation.navigate("HomeStack",{screen:"HomeScreen"})
    };
 
    const submitForm8 = (n: number) => {
