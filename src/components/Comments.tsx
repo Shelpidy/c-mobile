@@ -10,13 +10,14 @@ type CommentsProps = {
 }
 
 const Comments = ({comments,posterId,navigation}:CommentsProps) => {
+
   return (
     <View>
         <Divider style={{marginTop:10}}/>
       {/* <Text>Comments</Text> */}
        <Button onPress={()=> navigation.navigate("CommentsViewerScreen",{comments,posterId})}>Show All Comments</Button>
        {comments?.map(comment =>{
-                return <Comment posterId={posterId} {...comment}/>
+                return <Comment key={String(comment.id)} posterId={posterId} {...comment}/>
             })}
     </View>
   )
