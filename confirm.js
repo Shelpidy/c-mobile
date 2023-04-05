@@ -1,8 +1,3 @@
-let positions = Array.from(
-   {
-      length: 10,
-   },
-   (item, index) => index
-);
+numbers = [1,2,3,4,5,6,7,8,9,10]
 
-console.log(positions);
+console.log(numbers.slice(5,100))

@@ -41,17 +41,17 @@ const Form1 = ({ navigation, setActiveTab }: Form1Props) => {
                mode="outlined"
                style={styles.input}
                label="FirstName"
-               inputMode="text"></TextInput>
+              ></TextInput>
             <TextInput
                mode="outlined"
                style={styles.input}
                label="MiddleName"
-               inputMode="text"></TextInput>
+              ></TextInput>
             <TextInput
                mode="outlined"
                style={styles.input}
                label="LastName"
-               inputMode="text"></TextInput>
+              ></TextInput>
             <View style={styles.buttonGroup}>
                <Button
                   mode="contained"
@@ -64,13 +64,7 @@ const Form1 = ({ navigation, setActiveTab }: Form1Props) => {
                </Button>
             </View>
             <View
-               style={{
-                  flexDirection: "row",
-                  gap: 5,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginTop: 20,
-               }}>
+               style={styles.signInCon}>
                <Text style={{ fontFamily: "Poppins_300Light_Italic" }}>
                   Already have an account ?
                </Text>
@@ -106,4 +100,11 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       gap: 10,
    },
+   signInCon:{
+         flexDirection: "row",
+         gap: 5,
+         alignItems: "center",
+         justifyContent: "center",
+         marginTop: 20,
+      }
 });

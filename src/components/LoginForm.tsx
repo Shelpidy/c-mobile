@@ -28,7 +28,7 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                mode="outlined"
                style={styles.input}
                label="Email"
-               inputMode="email"
+               // inputMode="email"
                right={
                   <TextInput.Icon
                      color={theme.colors.primary}
@@ -38,7 +38,7 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                mode="outlined"
                style={styles.input}
                label="Password"
-               inputMode="text"
+               // inputMode="text"
                secureTextEntry={!showPassword}
                right={
                   <TextInput.Icon
@@ -52,13 +52,7 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
             </Button>
          </View>
          <View
-            style={{
-               flexDirection: "row",
-               marginTop: 15,
-               gap: 5,
-               alignItems: "center",
-               justifyContent: "center",
-            }}>
+            style={styles.signinCon}>
             <Text style={{ fontFamily: "Poppins_300Light_Italic" }}>
                Don't have an account ?
             </Text>
@@ -69,13 +63,7 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
             </Button>
          </View>
          <View
-            style={{
-               flexDirection: "row",
-               marginTop: 15,
-               gap: 5,
-               alignItems: "center",
-               justifyContent: "center",
-            }}>
+            style={styles.signinCon}>
             <Text style={{ fontFamily: "Poppins_300Light_Italic" }}>
                Forget Password ?
             </Text>
@@ -101,4 +89,11 @@ const styles = StyleSheet.create({
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
    },
+   signinCon:{
+         flexDirection: "row",
+         gap: 5,
+         alignItems: "center",
+         justifyContent: "center",
+         marginTop: 15,
+      }
 });

@@ -1,4 +1,3 @@
-import { Theme } from "@rneui/themed";
 import React from "react";
 import {
    Dimensions,
@@ -47,7 +46,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                mode="outlined"
                style={styles.input}
                label="Password"
-               inputMode="text"
+               // inputMode="text"
                secureTextEntry={!showPassword}
                right={
                   <TextInput.Icon
@@ -60,7 +59,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                mode="outlined"
                style={styles.input}
                label="Confirm Password"
-               inputMode="text"
+               // inputMode="text"
                secureTextEntry={!showConPassword}
                right={
                   <TextInput.Icon
@@ -73,7 +72,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                mode="outlined"
                style={styles.input}
                label="Pincode"
-               inputMode="text"
+               // inputMode="text"
                secureTextEntry={!showPincode}
                right={
                   <TextInput.Icon
@@ -86,7 +85,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                mode="outlined"
                style={styles.input}
                label="Confirm Pincode"
-               inputMode="text"
+               // inputMode="text"
                secureTextEntry={!showConPincode}
                right={
                   <TextInput.Icon

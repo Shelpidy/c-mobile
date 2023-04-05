@@ -50,7 +50,6 @@ const ProfileScreen = ({navigation }: ProfileScreenProps) => {
             <View style={styles.navLink}><MaterialCommunityIcons name='cog'/><Text style={{fontFamily:"Poppins_500Medium"}}>Send Money</Text><Button mode='contained-tonal'><Entypo name="chevron-thin-right"/></Button></View>
             <View style={styles.navLink}><MaterialCommunityIcons name='cog'/><Text style={{fontFamily:"Poppins_500Medium"}}>Transferees</Text><Button mode='contained-tonal'><Entypo name="chevron-thin-right"/></Button></View>
             <View style={styles.navLink}><MaterialCommunityIcons name='cog'/><Text style={{fontFamily:"Poppins_500Medium"}}>Logout</Text><Button mode='contained-tonal'><Entypo name="chevron-thin-right"/></Button></View>
-
          </View>
             </LinearGradient>
       </ScrollView>

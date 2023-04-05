@@ -11,13 +11,16 @@ import UserProfileScreen from "../screens/UserProfileScreen";
 import TransferMoneyScreen from "../screens/TransferMoneyScreen";
 import NotificationScreen from "../screens/NotificationScreen";
 import TransfereesScreen from "../screens/TransfereesScreen";
+import CommentsViewerScreen from "../screens/CommentsViewerScreen";
 
 
 const Stack = createNativeStackNavigator();
-
-const HomeStack = () => {
+type HomeStackProps = {
+   navigation:any
+}
+const HomeStack = (props:HomeStackProps) => {
    return (
-      <Stack.Navigator screenOptions={{ header: () => <CustomHeader /> }}>
+      <Stack.Navigator screenOptions={{ header: () => <CustomHeader {...props} /> }}>
          <Stack.Screen name="HomeScreen" component={HomeScreen}></Stack.Screen>
          <Stack.Screen
             name="ProfileScreen"
@@ -46,6 +49,9 @@ const HomeStack = () => {
          <Stack.Screen
             name="UserProfileScreen"
             component={UserProfileScreen}></Stack.Screen>
+         <Stack.Screen
+            name="CommentsViewerScreen"
+            component={CommentsViewerScreen}></Stack.Screen>
    
       </Stack.Navigator>
    );
