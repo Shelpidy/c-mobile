@@ -30,6 +30,5 @@ export default HomeScreen;
 const styles = StyleSheet.create({
    container: {
       backgroundColor: "#f9f9f9",
-      alignItems: "center",
    },
 });

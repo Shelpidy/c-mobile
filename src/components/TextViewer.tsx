@@ -8,11 +8,16 @@ type TextViewerProps = {
 const TextViewer = ({text}:TextViewerProps) => {
   return (
     <View>
-      <Text>TextViewer</Text>
+      <Text style={styles.text}>{text}</Text>
     </View>
   )
 }
 
 export default TextViewer
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    text:{
+        fontFamily:"Poppins_300Light",
+        fontSize:15
+    }
+})

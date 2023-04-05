@@ -14,6 +14,11 @@ declare type CommentProps = {
     updatedAt?:Date
 }
 
+declare type Action = {
+    type:string
+    payload?:any
+}
+
 declare type Like = {
     id?:number,
     postId?:number,
@@ -23,12 +28,12 @@ declare type Like = {
 }
 
 declare type PostComponentProps = {
-    id?:number,
-    text?:string,
-    title?:string,
-    images?:string[],
-    video?:string,
-    userId?:number,
-    createdAt?:Date,
-    updatedAt?:Date
+    id:number,
+    text:string,
+    title:string | null,
+    images:string[] | null,
+    video:string | null,
+    userId:number,
+    createdAt:Date,
+    updatedAt:Date
 }
