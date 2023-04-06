@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View,ScrollView } from 'react-native'
 import React,{useState,useEffect} from 'react'
 import Comment from '../components/Comment'
 import { Button } from 'react-native-paper'
+import { FontAwesome5 } from '@expo/vector-icons'
 
 type CommentsViewerScreenProps = {
     navigation:any,
@@ -18,29 +19,36 @@ const CommentsViewerScreen = ({navigation,route}:CommentsViewerScreenProps) => {
 
   useEffect(()=>{
     let {comments:fetchedComments,posterId} = route.params
-    setComments(comments)
+    setComments(fetchedComments)
     setPosterId(posterId)
+    // console.log(fetchedComments)
     let numOfPageLinks = Math.ceil(fetchedComments.length/numberOfCommentsPerPage)
     setNumberOfPageLinks(numOfPageLinks)
-  },[])
+  },[route.params])
 
-  useEffect(()=>{
-     const currentIndex = numberOfCommentsPerPage * (pageNumber - 1)
-     const lastIndex = currentIndex + numberOfCommentsPerPage
-     setComments(comments.slice(currentIndex,lastIndex))
-  },[pageNumber])
+//   useEffect(()=>{
+//      const currentIndex = numberOfCommentsPerPage * (pageNumber - 1)
+//      const lastIndex = currentIndex + numberOfCommentsPerPage
+//      setComments(comments.slice(currentIndex,lastIndex))
+//   },[pageNumber])
 
   return (
-     <View>
-      <Text>Comments</Text>
-       <Button onPress={()=> navigation.goBack()}>Back</Button>
+     <ScrollView style={styles.container}>
+      <Text style={{fontFamily:"Poppins_400Regular",marginHorizontal:20,fontSize:16}}><FontAwesome5 size={25} name='comments'/> {comments.length}</Text>
+      
        {comments?.map(comment =>{
-                return <Comment posterId={posterId} {...comment}/>
+                return <Comment key={String(comment.id)} posterId={posterId} {...comment}/>
             })}
-    </View>
+    </ScrollView>
   )
 }
 
 export default CommentsViewerScreen
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    container:{
+        backgroundColor:"#fff",
+        paddingVertical:10,
+        paddingHorizontal:15
+    }
+})

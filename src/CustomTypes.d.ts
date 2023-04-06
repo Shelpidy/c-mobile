@@ -37,3 +37,20 @@ declare type PostComponentProps = {
     createdAt:Date,
     updatedAt:Date
 }
+
+declare type User = {
+    id:number,
+    firstName:string,
+    middleName:string,
+    lastName:string,
+    fullName:string,
+    profileImage:string,
+    password:string,
+    pinCode:string,
+    gender:string,
+    accountNumber:string,
+    email:string,
+    dob:string,
+    createdAt:Date,
+    updatedAt:Date
+}

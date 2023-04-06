@@ -64,16 +64,19 @@ const PostComponent = (props:NPostComponentProps) => {
 
   return (
     <View style={styles.postContainer}>
-     <Modal visible={openModal}>
-        <View>
-            <Text>Post Editor</Text>
-        </View>
-      </Modal>
+    <Modal visible={openModal}>
+            <View style={{flex:1,backgroundColor:"#ffffff88",justifyContent:"center",alignItems:"center"}}>
+                <View style={{backgroundColor:"#ffffff",padding:5,borderRadius:4}}>
+                   <Button onPress={()=>setOpenModal(false)}>Back</Button>
+                   <Text>Comment Editor</Text>
+                </View>
+            </View>
+        </Modal>
       {poster && <View style={{flexDirection:"row",alignItems:"center",padding:8}}>
         <Image style={styles.profileImage} source={{uri:poster.profileImage}}/>
         <Text style={{fontFamily:"Poppins_700Bold",margin:5}}>{poster.firstName} {poster.middleName} {poster.lastName}</Text>
         <View style={{flex:1,justifyContent:"flex-end",alignItems:"flex-end",marginBottom:2,paddingHorizontal:1,borderRadius:3}}>
-                {currentUser.id == props?.userId &&  <View><Button><Feather name='edit'/> Edit Post</Button></View>}
+                {currentUser.id == props?.userId &&  <View><Button onPress={()=> setOpenModal(true)}><Feather name='edit'/> Edit Post</Button></View>}
         </View>
         </View>}
       <View>

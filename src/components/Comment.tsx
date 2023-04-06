@@ -18,14 +18,16 @@ const Comment = (props:CommentProps) => {
   return (
     <View  style={styles.container}>
         <Modal visible={openModal}>
-            <View>
-                <Text>Comment Editor</Text>
+            <View style={{flex:1,backgroundColor:"#00000099",justifyContent:"center",alignItems:"center"}}>
+                <View style={{backgroundColor:"#ffffff",padding:5,borderRadius:4}}>
+                   <Button onPress={()=>setOpenModal(false)}>Back</Button>
+                   <Text>Comment Editor</Text>
+                </View>
             </View>
         </Modal>
         {
             commentor && 
-            <View >
-               
+            <View > 
               <View style={styles.commentorMedia}>
                 <Image style={styles.profileImage} source={{uri:commentor.profileImage}}/>
                 <View style={{backgroundColor:"#f9f9f9",flex:1,borderRadius:5,paddingHorizontal:4,paddingVertical:6}}>
@@ -33,12 +35,10 @@ const Comment = (props:CommentProps) => {
                       <Text style={{fontFamily:"Poppins_300Light"}}>{props.text}</Text>
                      {/* <Text>Comment Likes</Text>  */}
                      <View style={{justifyContent:"flex-end",alignItems:"flex-end",marginTop:2,paddingHorizontal:5,borderRadius:3}}>
-                       {currentUser.id == props?.userId || currentUser.id == props?.posterId &&  <View><Button mode='contained-tonal'><Feather name='edit'/>Edit</Button></View>}
+                       {currentUser.id == props?.userId || currentUser.id == props?.posterId &&  <View><Button onPress={()=>setOpenModal(true)} ><Feather name='edit'/> Edit</Button></View>}
                 </View>
                 </View>
                 </View>
-                 
-                
             </View>
       }
     </View>
