@@ -1,10 +1,5 @@
 import React from "react";
-import {
-   Dimensions,
-   StyleSheet,
-   Text,
-   View
-} from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { Button, TextInput, useTheme } from "react-native-paper";
 
 type LoginFormProps = {
@@ -17,9 +12,9 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
    let theme = useTheme();
    const [showPassword, setShowPassword] = React.useState<boolean>(false);
 
-   const handleLogin =()=>{
-      navigation.navigate("HomeStack",{screen:"HomeScreen"})
-   }
+   const handleLogin = () => {
+      navigation.navigate("HomeStack", { screen: "HomeScreen" });
+   };
 
    return (
       <View>
@@ -47,12 +42,14 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                         setShowPassword(!showPassword)
                      }></TextInput.Icon>
                }></TextInput>
-            <Button onPress={handleLogin} mode="contained" style={{ marginTop: 15 }}>
+            <Button
+               onPress={handleLogin}
+               mode="contained"
+               style={{ marginTop: 15 }}>
                LOGIN
             </Button>
          </View>
-         <View
-            style={styles.signinCon}>
+         <View style={styles.signinCon}>
             <Text style={{ fontFamily: "Poppins_300Light_Italic" }}>
                Don't have an account ?
             </Text>
@@ -62,8 +59,7 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                Sign Up
             </Button>
          </View>
-         <View
-            style={styles.signinCon}>
+         <View style={styles.signinCon}>
             <Text style={{ fontFamily: "Poppins_300Light_Italic" }}>
                Forget Password ?
             </Text>
@@ -89,11 +85,11 @@ const styles = StyleSheet.create({
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
    },
-   signinCon:{
-         flexDirection: "row",
-         gap: 5,
-         alignItems: "center",
-         justifyContent: "center",
-         marginTop: 15,
-      }
+   signinCon: {
+      flexDirection: "row",
+      gap: 5,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 15,
+   },
 });

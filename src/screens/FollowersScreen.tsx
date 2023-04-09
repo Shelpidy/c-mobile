@@ -1,14 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
 
 const FollowersScreen = () => {
-  return (
-    <View>
-      <Text>Followers</Text>
-    </View>
-  )
-}
+   return (
+      <View>
+         <Text>Followers</Text>
+      </View>
+   );
+};
 
-export default FollowersScreen
+export default FollowersScreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

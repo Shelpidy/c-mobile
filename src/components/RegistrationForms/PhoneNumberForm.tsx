@@ -1,12 +1,5 @@
 import React from "react";
-import {
-    Dimensions,
-    Image,
-    Modal,
-    StyleSheet,
-    Text,
-    View
-} from "react-native";
+import { Dimensions, Image, Modal, StyleSheet, Text, View } from "react-native";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { Button, useTheme } from "react-native-paper";
 import PhoneInput from "react-native-phone-number-input";
@@ -27,7 +20,6 @@ const PhoneNumberForm = ({
    logo,
    formPosition,
 }: PhoneNumberFormProps) => {
-    
    const [phoneNumber, setPhoneNumber] = React.useState<string>("");
    const [country, setCountry] = React.useState<any>("");
    const [modalVisibility, setModalVisibility] = React.useState<boolean>(false);
@@ -40,7 +32,6 @@ const PhoneNumberForm = ({
          setActiveTab(formPosition);
       }
    };
-
 
    return (
       <View>

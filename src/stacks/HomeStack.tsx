@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ProfileScreen from "../screens/ProfileScreen";
 import HomeScreen from "../screens/HomeScreen";
 import SettingsScreen from "../screens/SettingsScreen";
-import FollowingsScreen from "../screens/FollowingsScreen"
+import FollowingsScreen from "../screens/FollowingsScreen";
 import CustomHeader from "../components/CustomHeader";
 import PostScreen from "../screens/PostScreen";
 import FollowersScreen from "../screens/FollowersScreen";
@@ -13,14 +13,14 @@ import NotificationScreen from "../screens/NotificationScreen";
 import TransfereesScreen from "../screens/TransfereesScreen";
 import CommentsViewerScreen from "../screens/CommentsViewerScreen";
 
-
 const Stack = createNativeStackNavigator();
 type HomeStackProps = {
-   navigation:any
-}
-const HomeStack = (props:HomeStackProps) => {
+   navigation: any;
+};
+const HomeStack = (props: HomeStackProps) => {
    return (
-      <Stack.Navigator screenOptions={{ header: () => <CustomHeader {...props} /> }}>
+      <Stack.Navigator
+         screenOptions={{ header: () => <CustomHeader {...props} /> }}>
          <Stack.Screen name="HomeScreen" component={HomeScreen}></Stack.Screen>
          <Stack.Screen
             name="ProfileScreen"
@@ -28,9 +28,7 @@ const HomeStack = (props:HomeStackProps) => {
          <Stack.Screen
             name="SettingsScreen"
             component={SettingsScreen}></Stack.Screen>
-         <Stack.Screen
-            name="PostScreen"
-            component={PostScreen}></Stack.Screen>
+         <Stack.Screen name="PostScreen" component={PostScreen}></Stack.Screen>
          <Stack.Screen
             name="TransferMoneyScreen"
             component={TransferMoneyScreen}></Stack.Screen>
@@ -52,7 +50,6 @@ const HomeStack = (props:HomeStackProps) => {
          <Stack.Screen
             name="CommentsViewerScreen"
             component={CommentsViewerScreen}></Stack.Screen>
-   
       </Stack.Navigator>
    );
 };

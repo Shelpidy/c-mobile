@@ -14,10 +14,13 @@ type HomeScreenProps = {
 const HomeScreen = ({ theme, navigation }: HomeScreenProps) => {
    return (
       <ScrollView style={styles.container}>
-         <FindFriendsComponent/>
-         <PostsComponent navigation={navigation}/>
+         <FindFriendsComponent />
+         <PostsComponent navigation={navigation} />
          <Button onPress={() => navigation.navigate("ProfileScreen")}>
             Profile
+         </Button>
+         <Button onPress={() => navigation.navigate("PostScreen")}>
+            Post Screen
          </Button>
          <Button onPress={() => navigation.navigate("SettingsScreen")}>
             Settings

@@ -1,43 +1,85 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React,{useEffect, useState} from 'react'
-import PostComponent from './PostComponent'
-import {posts as _fetchedPost} from '../data'
+import { StyleSheet, Text, View,Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import PostComponent from "./PostComponent";
+import axios from "axios"
+import { posts as _fetchedPost } from "../data";
 
 type PostsComponentProps = {
-    navigation?:any
-}
+   navigation?: any;
+};
 
-const PostsComponent = ({navigation}:PostsComponentProps) => {
+const PostsComponent = ({ navigation }: PostsComponentProps) => {
+   const [posts, setPosts] = useState<PostComponentProps[]>(_fetchedPost);
+   const [pageNumber, setPageNumber] = useState<number>(1);
+   const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
+   const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
+   const [loading,setLoading] = useState<boolean>(false)
 
-  const [posts,setPosts] = useState<PostComponentProps[]>(_fetchedPost)
-  const [pageNumber,setPageNumber] = useState<number>(1)
-  const [numberOfPostsPerPage,setNumberOfPostsPerPage] = useState<number>(20)
-  const [numberOfPageLinks,setNumberOfPageLinks] = useState<number>(0)
+   
+   useEffect(function(){
+      let fetchData = async ()=>{
+          let activeUserId = 1
+            try{
+               let {data} = await axios.get(`http://127.0.0.1:5000/api/media/posts/${activeUserId}`)
+               if(data.status == 'success'){
+                  // console.log(data.data)
+                  // setPosts(data.data);
+                  let fetchedPost: PostComponentProps[] = data.data;
+                  let numOfPageLinks = Math.ceil(fetchedPost.length / numberOfPostsPerPage);
+                  console.log(fetchedPost);
+                  setPosts(fetchedPost);
+                  setNumberOfPageLinks(numOfPageLinks);
+                  const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
+                  const lastIndex = currentIndex + numberOfPostsPerPage;
+                  setPosts(data.data.slice(currentIndex, lastIndex));
+                  Alert.alert("Success",data.message)
+               }else{
+                  Alert.alert("Failed",data.message)
+               }
+               setLoading(false)
 
-  useEffect(()=>{
-    let fetchedPost:PostComponentProps[] = _fetchedPost
-    let numOfPageLinks = Math.ceil(fetchedPost.length/numberOfPostsPerPage)
-    console.log(fetchedPost)
-    setPosts(fetchedPost)
-    setNumberOfPageLinks(numOfPageLinks)
-  },[])
+            }catch(err){
+               Alert.alert("Failed",String(err))
+               setLoading(false)
+            }
+            fetchData() }
+         }, []);
 
-  useEffect(()=>{
-     const currentIndex = numberOfPostsPerPage * (pageNumber - 1)
-     const lastIndex = currentIndex + numberOfPostsPerPage
-     setPosts(posts.slice(currentIndex,lastIndex))
-  },[pageNumber])
+   // useEffect(() => {
+   //    let fetchedPost: PostComponentProps[] = _fetchedPost;
+   //    let numOfPageLinks = Math.ceil(fetchedPost.length / numberOfPostsPerPage);
+   //    console.log(fetchedPost);
+   //    setPosts(fetchedPost);
+   //    setNumberOfPageLinks(numOfPageLinks);
+   // }, []);
 
-  return (
-    <View>
-      {/* <Text>PostsComponent {posts.length}</Text> */}
-      {posts.map(post=>{
-        return(<PostComponent key={String(post.id)} {...post} navigation={navigation}/>)
-      })}
-   </View>
-  )
-    }
+   useEffect(() => {
+      const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
+      const lastIndex = currentIndex + numberOfPostsPerPage;
+      setPosts(posts.slice(currentIndex, lastIndex));
+   }, [pageNumber]);
 
-export default PostsComponent
+ if(loading) { return (
+       <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
+         <Text>Loading Posts...</Text>
+      </View>)}
 
-const styles = StyleSheet.create({})
+   return (
+      <View>
+         {/* <Text>PostsComponent {posts.length}</Text> */}
+         {posts.map((post) => {
+            return (
+               <PostComponent
+                  key={String(post.id)}
+                  {...post}
+                  navigation={navigation}
+               />
+            );
+         })}
+      </View>
+   );
+};
+
+export default PostsComponent;
+
+const styles = StyleSheet.create({});
