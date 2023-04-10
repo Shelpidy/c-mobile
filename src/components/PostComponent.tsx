@@ -71,29 +71,90 @@ const PostComponent = (props: NPostComponentProps) => {
       });
    }, []);
 
+  useEffect(function(){
+      let fetchData = async ()=>{
+          let activeUserId = currentUser.id
+            try{
+               let {data} = await axios.get(`http://192.168.242.183:5000/api/media/posts/cl/${props.id}`)
+               if(data.status == 'success'){
+                  console.log(data.data)
+                  setComments(data.data.comments);
+                  setLikes(data.data.likes);
+                  if(likes.map(like => like.userId).includes(activeUserId)){
+                      setLiked(true)
+                  }
+                  // Alert.alert("Success",data.message)
+               }else{
+                  Alert.alert("Failed",data.message)
+               }
+               setLoading(false)
 
+            }catch(err){
+               Alert.alert("Failed",String(err))
+               setLoading(false)
+            }
+            }
+             fetchData()
+         }, []);
 
-   useEffect(() => {
-      setLikes(postLikes.filter((like) => like.postId === props.id));
-      setComments(
-         postComments.filter((comment) => comment.postId === props.id)
-      );
+   useEffect(function(){
+      console.log("Fetching user")
+      setLoading(true)
+      let fetchData = async ()=>{
+               // console.log("Fetching user")
+         //  let activeUserId = 1
+            try{
+               let response = await fetch(`http://192.168.242.183:5000/api/auth/users/${props.userId}`,{method:"GET"})
+               let data = await response.json()
+               if(data.status == 'success'){
+                  console.log("Users-----",data.data)
+                   SetPoster(data.data.personal)
+                  // Alert.alert("Success",data.message)
+                  setLoading(false)
+               }else{
+                  Alert.alert("Failed",data.message)
+                  
+               }
+               setLoading(false)
 
-      // GET COMMENTS AND LIKES
-   }, [users, postComments, postLikes]);
+            }catch(err){
+               console.log(err)
+               Alert.alert("Failed",String(err))
+               setLoading(false)
+            }
+             }
+         fetchData()
+         }, []);
 
-   useEffect(() => {
-      SetPoster(users.find((user) => user.id === props.userId));
-   }, [users]);
+   // useEffect(() => {
+   //    setLikes(postLikes.filter((like) => like.postId === props.id));
+   //    setComments(
+   //       postComments.filter((comment) => comment.postId === props.id)
+   //    );
+
+   //    // GET COMMENTS AND LIKES
+   // }, [users, postComments, postLikes]);
+
+   // useEffect(() => {
+   //    SetPoster(users.find((user) => user.id === props.userId));
+   // }, [users]);
 
 
    const handleLike = async(postId:number)=>{
+      console.log(postId)
       try{
          let activeUserId = 1
-         let {data} = await axios.put(`http://127.0.0.1:5000/api/media/posts/likes/`,{userId:activeUserId,postId:postId})
+         let {data} = await axios.put(`http://192.168.242.183:5000/api/media/posts/likes/`,{userId:activeUserId,postId:postId})
          if(data.status == 'success'){
                console.log(data.data)
-               setLiked(!liked)
+               if(liked){
+                   setLikes(likes.slice(0,likes.length - 1))
+                   setLiked(!liked)
+               }else{
+                   setLikes([...likes,{id:likes.length,postId:likes[0].postId,userId:currentUser.id,createdAt:new Date(),updatedAt:new Date()}])
+                   setLiked(!liked)
+               }
+               
                Alert.alert("Success",data.message)
          }else{
             Alert.alert("Failed",data.message)
@@ -140,7 +201,7 @@ const PostComponent = (props: NPostComponentProps) => {
                   style={styles.profileImage}
                   source={{ uri: poster.profileImage }}
                />
-               <Text style={{ fontFamily: "Poppins_700Bold", margin: 5 }}>
+               <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
                   {poster.firstName} {poster.middleName} {poster.lastName}
                </Text>
                <View
@@ -176,7 +237,7 @@ const PostComponent = (props: NPostComponentProps) => {
                      alignItems: "center",
                      justifyContent: "flex-start",
                   }}>
-                  <IconButton mode="outlined" size={20} icon="heart-outline" />
+                  <IconButton disabled={loading} onPress={()=> handleLike(props.id)} mode='contained-tonal' size={20} icon={liked?"heart":"heart-outline"} />
                   <Text style={styles.commentAmountText}>{likes.length}</Text>
                </View>
                <View
@@ -186,7 +247,7 @@ const PostComponent = (props: NPostComponentProps) => {
                      justifyContent: "flex-start",
                   }}>
                   <IconButton
-                     mode="outlined"
+                     mode='contained-tonal'
                      size={20}
                      icon="comment-outline"
                   />
@@ -208,7 +269,7 @@ const PostComponent = (props: NPostComponentProps) => {
                />
                <Entypo size={26} name="emoji-neutral" />
             </View>
-            <View>
+            <View style={{padding:5}}>
                <Comments
                   posterId={props.userId}
                   navigation={props?.navigation}
@@ -237,11 +298,13 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       alignItems: "center",
       gap: 5,
-      // paddingHorizontal:5
+      paddingHorizontal:15
    },
    title: {
       fontFamily: "Poppins_700Bold",
       fontSize: 16,
+      marginHorizontal:10,
+      marginTop:6
    },
    commentInputField: {
       flex: 1,
@@ -249,8 +312,9 @@ const styles = StyleSheet.create({
    },
    likeCommentAmountCon: {
       flexDirection: "row",
-      justifyContent: "space-between",
-      // padding:5
+      // justifyContent: "space-between",
+      gap:15,
+      paddingHorizontal:5
    },
    commentAmountText: {
       fontFamily: "Poppins_400Regular",

@@ -44,8 +44,9 @@ const PostForm = () => {
       setLoading(true);
       let postObj = postState
       try{
-        let response = await axios.post("http://127.0.0.1:5000/api/media/posts/",postObj)
+        let response = await axios.post("http://192.168.242.183:5000/api/media/posts/",postObj)
         if(response.status === 201){
+               console.log(response.data)
                setLoading(false)
                Alert.alert("Successful","Post successfully")
         }else{
@@ -57,25 +58,9 @@ const PostForm = () => {
         console.log(err)
       }
      
-   
+
       console.log(postState);
    };
-
-   const getColor = (selected: boolean): string => {
-      return selected ? "red" : "black";
-   };
-
-   // const getActionMap = (): ActionMap => {
-   //     return {
-   //         [ActionKey.bold]: ({ selected }) => (
-   //             <MaterialIcons
-   //                 name="format-bold"
-   //                 size={14}
-   //                 color={getColor(selected)}
-   //             />
-   //         ),
-   //     };
-   // };
 
    const chooseImage = () => {};
 

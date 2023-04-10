@@ -2,16 +2,17 @@ import { StyleSheet, Text, View, Image } from "react-native";
 import React from "react";
 
 type ImageViewerProps = {
-   images: string[];
+   images: any;
 };
 
 const ImagesViewer: any = ({ images }: ImageViewerProps) => {
+   console.log(JSON.parse(images)[0])
    return (
       <View>
          <Image
             resizeMode="stretch"
             style={styles.image}
-            source={{ uri: images[0] }}
+            source={{ uri: JSON.parse(images)[0] }}
          />
       </View>
    );

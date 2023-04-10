@@ -19,5 +19,7 @@ const styles = StyleSheet.create({
    text: {
       fontFamily: "Poppins_300Light",
       fontSize: 15,
+      marginHorizontal:10
+
    },
 });

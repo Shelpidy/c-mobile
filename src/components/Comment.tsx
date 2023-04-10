@@ -9,19 +9,52 @@ const Comment = (props: CommentProps) => {
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [commentor, setCommentor] = useState<any>(null);
+   const [loading,setLoading] = useState<any>(false)
 
+   useEffect(function(){
+      console.log("Fetching user")
+      setLoading(true)
+      let fetchData = async ()=>{
+               // console.log("Fetching user")
+         //  let activeUserId = 1
+            try{
+               let response = await fetch(`http://192.168.242.183:5000/api/auth/users/${props.userId}`,{method:"GET"})
+               let data = await response.json()
+               if(data.status == 'success'){
+                  console.log("Users-----",data.data)
+                   setCommentor(data.data.personal)
+                  Alert.alert("Success",data.message)
+                  setLoading(false)
+               }else{
+                  Alert.alert("Failed",data.message)
+                  
+               }
+               setLoading(false)
 
-
-   useEffect(() => {
-      setCommentor(users.find((user) => user.id === props.userId));
-      // console.log(commentor)
-      setCurrentUser({
+            }catch(err){
+               console.log(err)
+               Alert.alert("Failed",String(err))
+               setLoading(false)
+            }
+             }
+         fetchData()
+         setCurrentUser({
          id: props?.id,
          email: "mexu.company@gmail.com",
          accountNumber: "1COM30000000000",
       });
-   }, [users]);
+         }, []);
 
+
+   // useEffect(() => {
+   //    setCommentor(users.find((user) => user.id === props.userId));
+   //    // console.log(commentor)
+   //    setCurrentUser({
+   //       id: props?.id,
+   //       email: "mexu.company@gmail.com",
+   //       accountNumber: "1COM30000000000",
+   //    });
+   // }, [users]);
 
    return (
       <View style={styles.container}>

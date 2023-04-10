@@ -14,7 +14,9 @@ const Comments = ({ comments, posterId, navigation }: CommentsProps) => {
 
    useEffect(() => {
       setCommentsToShow(comments.slice(0, 1));
-   }, [comments]);
+      console.log(comments)
+
+   }, []);
 
    return (
       <View>
@@ -30,7 +32,9 @@ const Comments = ({ comments, posterId, navigation }: CommentsProps) => {
                />
             );
          })}
-         <Button
+         {
+            comments.length > 1 &&
+            <Button
             onPress={() =>
                navigation.navigate("CommentsViewerScreen", {
                   comments,
@@ -39,6 +43,8 @@ const Comments = ({ comments, posterId, navigation }: CommentsProps) => {
             }>
             Show more comments...
          </Button>
+         }
+         
       </View>
    );
 };

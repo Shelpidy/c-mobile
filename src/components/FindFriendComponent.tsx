@@ -13,7 +13,7 @@ const FindFriendComponent = (user: User) => {
 
    const handleFollow = async(userId:number)=>{
       try{
-         let {data} = await axios.put(`http://127.0.0.1:5000/api/media/follows/`,{followerId:1,followingId:userId})
+         let {data} = await axios.put(`http://192.168.242.183:5000/api/media/follows/`,{followerId:1,followingId:userId},{headers:{Accept: 'application/json'}})
          if(data.status == 'success'){
                console.log(data.data)
                setFollowed(!followed)
@@ -36,10 +36,12 @@ const FindFriendComponent = (user: User) => {
             style={styles.profileImage}
             source={{ uri: user.profileImage }}
          />
-         <Text style={styles.nameText}>{user.fullName}</Text>
+         <Text style={styles.nameText}>{user.firstName} {user.lastName}</Text>
+         {/* <Text style={styles.nameText}>{user.lastName}</Text> */}
          <View style={styles.followerContainer}>
             <Button
                loading={loading}
+               disabled={loading}
                onPress={()=>handleFollow(user.id)}
                mode={followed?'contained-tonal':"outlined"}
                style={{ borderColor: theme.colors.primary }}>
@@ -47,9 +49,8 @@ const FindFriendComponent = (user: User) => {
                <Text
                   style={{
                      fontFamily: "Poppins_500Medium",
-                     marginHorizontal: 4,
                   }}>
-                  Follow
+                  {followed ? ' Unfollow':" Follow"}
                </Text>
             </Button>
          </View>
@@ -62,11 +63,11 @@ export default FindFriendComponent;
 const styles = StyleSheet.create({
    profileImage: {
       width: "100%",
-      height: 180,
-      borderRadius: 10,
+      height: 250,
+      borderRadius: 2,
    },
    container: {
-      width: width / 2,
+      width: width / 1.5,
       borderRadius: 5,
       backgroundColor: "#fff",
       margin: 5,

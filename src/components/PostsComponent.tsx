@@ -17,10 +17,12 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
 
    
    useEffect(function(){
+      setLoading(true)
       let fetchData = async ()=>{
           let activeUserId = 1
             try{
-               let {data} = await axios.get(`http://127.0.0.1:5000/api/media/posts/${activeUserId}`)
+               let response = await fetch(`http://192.168.242.183:5000/api/media/posts/${activeUserId}`)
+               let data = await response.json()
                if(data.status == 'success'){
                   // console.log(data.data)
                   // setPosts(data.data);
@@ -32,7 +34,7 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
                   const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
                   const lastIndex = currentIndex + numberOfPostsPerPage;
                   setPosts(data.data.slice(currentIndex, lastIndex));
-                  Alert.alert("Success",data.message)
+                  // Alert.alert("Success",data.message)
                }else{
                   Alert.alert("Failed",data.message)
                }
@@ -42,7 +44,8 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
                Alert.alert("Failed",String(err))
                setLoading(false)
             }
-            fetchData() }
+            }
+            fetchData() 
          }, []);
 
    // useEffect(() => {
