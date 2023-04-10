@@ -22,7 +22,7 @@ const FindFriendsComponent = () => {
                if(data.status == 'success'){
                   console.log("Users-----",data.data)
                   setUsers(data.data?.sort(() => 0.5 - Math.random()));
-                  Alert.alert("Success",data.message)
+                  // Alert.alert("Success",data.message)
                   setLoading(false)
                }else{
                   Alert.alert("Failed",data.message)

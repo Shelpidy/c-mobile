@@ -20,7 +20,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
             colors={["#ffffff", "#f9f9f9", "#f3f3f3", "#f3f3f3", "#f3f3f3"]}>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
                <Image
-                  source={require("../../assets/Illustrators/signin.png")}
+                  source={{uri:"file:///storage/emulated/0/Pictures/facebook/1680605776562.jpg"}}
                   style={[
                      styles.profileImage,
                      { borderColor: theme.colors.primary },

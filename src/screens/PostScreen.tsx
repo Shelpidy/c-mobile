@@ -1,16 +1,21 @@
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import PostForm from "../components/PostForm";
 
 const PostScreen = () => {
    return (
-      <View>
-         <Text>PostScreen</Text>
+      <ScrollView style={styles.container}>
+         {/* <Text>PostScreen</Text> */}
          <PostForm />
-      </View>
+      </ScrollView>
    );
 };
 
 export default PostScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+   container:{
+      backgroundColor:"#ffffff",
+      flex:1
+   }
+});

@@ -12,6 +12,7 @@ import TransferMoneyScreen from "../screens/TransferMoneyScreen";
 import NotificationScreen from "../screens/NotificationScreen";
 import TransfereesScreen from "../screens/TransfereesScreen";
 import CommentsViewerScreen from "../screens/CommentsViewerScreen";
+import FullPostComponent from "../screens/FullPostViewScreen";
 
 const Stack = createNativeStackNavigator();
 type HomeStackProps = {
@@ -50,6 +51,9 @@ const HomeStack = (props: HomeStackProps) => {
          <Stack.Screen
             name="CommentsViewerScreen"
             component={CommentsViewerScreen}></Stack.Screen>
+         <Stack.Screen
+            name="FullPostViewScreen"
+            component={FullPostComponent}></Stack.Screen>
       </Stack.Navigator>
    );
 };

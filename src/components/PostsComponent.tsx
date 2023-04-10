@@ -9,7 +9,8 @@ type PostsComponentProps = {
 };
 
 const PostsComponent = ({ navigation }: PostsComponentProps) => {
-   const [posts, setPosts] = useState<PostComponentProps[]>(_fetchedPost);
+   const [posts, setPosts] = useState<PostComponentProps[]>([]);
+   const [allPosts, setAllPosts] = useState<PostComponentProps[]>([]);
    const [pageNumber, setPageNumber] = useState<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
@@ -28,8 +29,8 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
                   // setPosts(data.data);
                   let fetchedPost: PostComponentProps[] = data.data;
                   let numOfPageLinks = Math.ceil(fetchedPost.length / numberOfPostsPerPage);
-                  console.log(fetchedPost);
-                  setPosts(fetchedPost);
+                  // console.log(fetchedPost);
+                  setAllPosts(fetchedPost);
                   setNumberOfPageLinks(numOfPageLinks);
                   const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
                   const lastIndex = currentIndex + numberOfPostsPerPage;
@@ -62,7 +63,7 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
       setPosts(posts.slice(currentIndex, lastIndex));
    }, [pageNumber]);
 
- if(loading) { return (
+ if(posts.length === 0 || loading){ return (
        <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
          <Text>Loading Posts...</Text>
       </View>)}

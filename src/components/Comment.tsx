@@ -21,9 +21,9 @@ const Comment = (props: CommentProps) => {
                let response = await fetch(`http://192.168.242.183:5000/api/auth/users/${props.userId}`,{method:"GET"})
                let data = await response.json()
                if(data.status == 'success'){
-                  console.log("Users-----",data.data)
+                  // console.log("Users-----",data.data)
                    setCommentor(data.data.personal)
-                  Alert.alert("Success",data.message)
+                  // Alert.alert("Success",data.message)
                   setLoading(false)
                }else{
                   Alert.alert("Failed",data.message)
@@ -39,12 +39,16 @@ const Comment = (props: CommentProps) => {
              }
          fetchData()
          setCurrentUser({
-         id: props?.id,
+         id: 1,
          email: "mexu.company@gmail.com",
          accountNumber: "1COM30000000000",
       });
          }, []);
 
+
+      const handleEditComment = ()=>{
+
+      }
 
    // useEffect(() => {
    //    setCommentor(users.find((user) => user.id === props.userId));
@@ -108,14 +112,17 @@ const Comment = (props: CommentProps) => {
                            paddingHorizontal: 5,
                            borderRadius: 3,
                         }}>
-                        {currentUser.id == props?.userId ||
-                           (currentUser.id == props?.posterId && (
-                              <View>
+                        {(currentUser.id == props?.userId ||
+                           currentUser.id == props?.posterId) && 
+                              <View style={{flexDirection:'row'}}>
                                  <Button onPress={() => setOpenModal(true)}>
                                     <Feather name="edit" /> Edit
                                  </Button>
+                                  <Button onPress={() => setOpenModal(true)}>
+                                    <Feather name='trash' /> Delete
+                                 </Button>
                               </View>
-                           ))}
+                           }
                      </View>
                   </View>
                </View>

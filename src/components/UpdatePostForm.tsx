@@ -28,6 +28,8 @@ const postReducer = (state: Post = initialState, action: Action) => {
          return { ...state, video: action.payload };
       case "IMAGES":
          return { ...state, images: action.payload };
+      case "ID":
+         return { ...state, id: action.payload };
       case "USERID":
          return { ...state, userId: action.payload };
       default:
@@ -35,7 +37,9 @@ const postReducer = (state: Post = initialState, action: Action) => {
    }
 };
 
-const PostForm = () => {
+type NPostComponentProps = PostComponentProps & { navigation: any };
+
+const UpdatePostForm = (post:NPostComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const [postState, postDispatch] = useReducer(postReducer, initialState);
    const [imageOpen, setImageOpen] = useState(false)
@@ -44,16 +48,25 @@ const PostForm = () => {
    // const [assets, setAssets] = useState<Asset[]>([])
    const theme = useTheme();
 
-   const handlePost = async () => {
+   useEffect(()=>{
+    postDispatch({type:"TEXT",payload:post.text})
+    postDispatch({type:"TITLE",payload:post.title})
+    postDispatch({type:"TITLE",payload:post.title})
+    postDispatch({type:"IMAGES",payload:post.images})
+    postDispatch({type:"ID",payload:post.id})
+    postDispatch({type:"USERID",payload:post.userId})
+   },[])
+
+   const handleUpdate = async () => {
       setLoading(true);
       let activeUserId = 1
-      let postObj = {...postState,userId:activeUserId}
+      let postObj = {...postState}
       try{
-        let response = await axios.post("http://192.168.242.183:5000/api/media/posts/",postObj)
-        if(response.status === 201){
+        let response = await axios.put("http://192.168.242.183:5000/api/media/posts/",postObj)
+        if(response.status === 202){
                console.log(response.data)
                setLoading(false)
-               Alert.alert("Successful","Post successfully")
+               Alert.alert("Successful","Update successfully.")
         }else{
             setLoading(false)
              Alert.alert("Failed","Post Faile")
@@ -102,7 +115,7 @@ const PostForm = () => {
    };
 
    return (
-      <View style={{borderWidth:2,borderRadius:5,margin:8,borderColor:"#f9f9f9"}}>
+      <View style={{borderRadius:3,margin:8,backgroundColor:"#ffffff"}}>
          <Modal visible={imageOpen}>
             <ImagePicker
             onSave={chooseImage}
@@ -122,19 +135,22 @@ const PostForm = () => {
          />
          </Modal>
          <View style={styles.formContainer}>
+                 <Text style={{textAlign:"center",marginBottom:4,fontFamily:"Poppins_500Medium"}}>Update Post</Text>
                 <TextInput
             onChangeText={onValueChangeTitle}
             mode="outlined"
             label="Title"
+            value={postState.title}
         
          />
-
+     
           <TextInput
             onChangeText={onValueChangeContent}
             mode="outlined"
             label="Content"
             multiline
             numberOfLines={5}
+            value={postState.text}
          />
          <Text style={{textAlign:"center",marginTop:10,fontFamily:"Poppins_300Light"}}>Choose Image or Video</Text>
          <View style={styles.buttonGroup}>
@@ -143,8 +159,8 @@ const PostForm = () => {
            <Button style={styles.button} mode='contained-tonal' onPress={()=>setVideoOpen(true)}><AntDesign size={20} name='videocamera' /></Button>
          </View>
 
-         <Button mode='contained' onPress={handlePost} disabled={loading} loading={loading}>
-            Upload <AntDesign size={20} name="upload" />
+         <Button mode='contained' onPress={handleUpdate} disabled={loading} loading={loading}>
+            Update <AntDesign size={20} name="upload" />
          </Button>
          </View>
         
@@ -153,7 +169,7 @@ const PostForm = () => {
    );
 };
 
-export default PostForm;
+export default UpdatePostForm;
 
 const styles = StyleSheet.create({
  formContainer:{
