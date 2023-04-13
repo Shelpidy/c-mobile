@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View, Modal, Dimensions, Image,Alert } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
-import ImagesViewer from "./ImagesViewer";
-import VideoPlayer from "./VideoPlayer";
-import TextViewer from "./TextViewer";
-import Comments from "./Comments";
-import { postComments, postLikes, users } from "../data";
+import ImagesViewer from "../ImagesViewer";
+import VideoPlayer from "../VideoPlayer";
+import TextViewer from "../TextViewer";
+import ProductComments from "./ProductComments";
+// import { postProductComments, postLikes, users } from "../../data";
 import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
 import {
    AntDesign,
@@ -14,16 +14,16 @@ import {
    Feather,
 } from "@expo/vector-icons";
 import axios from "axios"
-import UpdatePostForm from "./UpdatePostForm";
+// import UpdateProductForm from "./UpdateProduct";
 
-type NPostComponentProps = PostComponentProps & { navigation: any };
-type PostComment = Omit<CommentProps, "posterId">;
-const initialState: PostComment = {};
+type NProductComponentProps = Product & { navigation: any };
+type ProductComment = Omit<CommentProps, "posterId">;
+const initialState: ProductComment = {};
 
 const { width } = Dimensions.get("window");
 
 const postCommentReducer = (
-   state: PostComment = initialState,
+   state: ProductComment = initialState,
    action: Action
 ) => {
    switch (action.type) {
@@ -47,14 +47,14 @@ const postCommentReducer = (
    }
 };
 
-const PostComponent = (props: NPostComponentProps) => {
-   const [postCommentState, dispatchPostComment] = useReducer(
+const ProductComponent = (props: NProductComponentProps) => {
+   const [postProductCommentstate, dispatchPostComment] = useReducer(
       postCommentReducer,
       initialState
    );
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
    const [openModal, setOpenModal] = useState<boolean>(false);
-   const [comments, setComments] = useState<Omit<CommentProps, "posterId">[]>(
+   const [productComments, setProductComments] = useState<Omit<CommentProps, "posterId">[]>(
       []
    );
    const [likes, setLikes] = useState<Like[]|null>(null);
@@ -64,7 +64,7 @@ const PostComponent = (props: NPostComponentProps) => {
    const theme = useTheme();
 
    useEffect(() => {
-      dispatchPostComment({ type: "", payload: "" });
+      // dispatchPostComment({ type: "", payload: "" });
       setCurrentUser({
          id: 1,
          email: "mexu.company@gmail.com",
@@ -76,12 +76,12 @@ const PostComponent = (props: NPostComponentProps) => {
       let fetchData = async ()=>{
           let activeUserId = 1
             try{
-               let {data} = await axios.get(`http://192.168.242.183:5000/api/media/posts/cl/${props.id}`)
+               let {data} = await axios.get(`http://192.168.193.183:5000/api/media/posts/cl/${props.id}`)
                if(data.status == 'success'){
                   console.log(data.data)
                   let ls:any[] = data.data.likes
-                  let cs = data.data.comments
-                  setComments(cs);
+                  let cs = data.data.ProductComments
+                  setProductComments(cs);
                   setLikes(ls);
                   if(ls.map(like => like.userId).includes(activeUserId)){
                       setLiked(true)
@@ -107,7 +107,7 @@ const PostComponent = (props: NPostComponentProps) => {
                // console.log("Fetching user")
          //  let activeUserId = 1
             try{
-               let response = await fetch(`http://192.168.242.183:5000/api/auth/users/${props.userId}`,{method:"GET"})
+               let response = await fetch(`http://192.168.193.183:5000/api/auth/users/${props.userId}`,{method:"GET"})
                let data = await response.json()
                if(data.status == 'success'){
                   console.log("Users-----",data.data)
@@ -130,12 +130,12 @@ const PostComponent = (props: NPostComponentProps) => {
 
    // useEffect(() => {
    //    setLikes(postLikes.filter((like) => like.postId === props.id));
-   //    setComments(
-   //       postComments.filter((comment) => comment.postId === props.id)
+   //    setProductComments(
+   //       postProductComments.filter((comment) => comment.postId === props.id)
    //    );
 
-   //    // GET COMMENTS AND LIKES
-   // }, [users, postComments, postLikes]);
+   //    // GET ProductComments AND LIKES
+   // }, [users, postProductComments, postLikes]);
 
    // useEffect(() => {
    //    SetPoster(users.find((user) => user.id === props.userId));
@@ -146,7 +146,7 @@ const PostComponent = (props: NPostComponentProps) => {
       console.log(postId)
       try{
          let activeUserId = 1
-         let {data} = await axios.put(`http://192.168.242.183:5000/api/media/posts/likes/`,{userId:activeUserId,postId:postId})
+         let {data} = await axios.put(`http://192.168.193.183:5000/api/media/posts/likes/`,{userId:activeUserId,postId:postId})
          if(data.status == 'success'){
                console.log(data.data)
                if(liked){
@@ -195,7 +195,7 @@ const PostComponent = (props: NPostComponentProps) => {
                <View style={{backgroundColor:"#ffffff",paddingTop:10}}>
                {/* <IconButton name='plus'/> */}
                <Button mode='text' onPress={() => setOpenModal(false)}><Feather size={26} name='x'/></Button>
-               <UpdatePostForm {...props}/>
+               {/* <UpdateProductForm {...props}/> */}
                </View>
             </View>
          </Modal>
@@ -236,8 +236,10 @@ const PostComponent = (props: NPostComponentProps) => {
             {props.images && <ImagesViewer images={props.images} />}
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>
-         <Text style={styles.title}>{props?.title}</Text>
-         {props?.text && <TextViewer text={props.text} />}
+         <Text style={styles.title}>{props?.productName}</Text>
+         <Text style={styles.title}>{props?.price}</Text>
+         <Text style={styles.title}>{props?.initialPrice}</Text>
+         {props?.description && <TextViewer text={props.description} />}
          <View>
             <View style={styles.likeCommentAmountCon}>
                <View
@@ -262,10 +264,10 @@ const PostComponent = (props: NPostComponentProps) => {
                      icon="comment-outline"
                   />
                   <Text style={styles.commentAmountText}>
-                     {comments.length}
+                     {ProductComments.length}
                   </Text>
                </View>
-               {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
+               {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='ProductComments-o'/> {ProductComments.length}</Text> */}
             </View>
             {/* <View style={styles.commentBox}>
                <TextInput
@@ -280,10 +282,10 @@ const PostComponent = (props: NPostComponentProps) => {
                <Entypo size={26} name="emoji-neutral" />
             </View> */}
             <View style={{padding:5}}>
-               <Comments
+               <ProductComments
                   posterId={props.userId}
                   navigation={props?.navigation}
-                  comments={comments}
+                  productComments={productComments}
                />
             </View>
          </View>
@@ -291,7 +293,7 @@ const PostComponent = (props: NPostComponentProps) => {
    );
 };
 
-export default PostComponent;
+export default ProductComponent;
 
 const styles = StyleSheet.create({
    postContainer: {

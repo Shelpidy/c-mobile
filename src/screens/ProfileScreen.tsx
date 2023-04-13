@@ -1,9 +1,11 @@
-import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
-import React from "react";
-import { Avatar, useTheme, Button } from "react-native-paper";
+import { Dimensions, ScrollView, StyleSheet, Text, View,Alert} from "react-native";
+import React,{useState,useEffect} from "react";
+import { Avatar, useTheme, Button, Divider } from "react-native-paper";
 import { Image } from "react-native";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import ProfileNavComponent from "../components/ProfileNavComponent";
+import PostComponent from "../components/MediaPosts/PostComponent";
 
 type ProfileScreenProps = {
    navigation: any;
@@ -13,11 +15,54 @@ const { width, height } = Dimensions.get("window");
 
 const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
    const theme = useTheme();
+   const [posts, setPosts] = useState<PostComponentProps[]>([]);
+   const [allPosts, setAllPosts] = useState<PostComponentProps[] | null>(null);
+   const [pageNumber, setPageNumber] = useState<number>(1);
+   const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
+   const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
+   const [loading,setLoading] = useState<boolean>(false)
+   
+   useEffect(function(){
+      setLoading(true)
+      let fetchData = async ()=>{
+          let activeUserId = 1
+            try{
+               let response = await fetch(`http://192.168.193.183:5000/api/media/posts/user/${activeUserId}`)
+               let data = await response.json()
+               if(data.status == 'success'){
+                  // console.log(data.data)
+                  // setPosts(data.data);
+                  let fetchedPost: PostComponentProps[] = data.data;
+                  let numOfPageLinks = Math.ceil(fetchedPost.length / numberOfPostsPerPage);
+                  // console.log(fetchedPost);
+                  setAllPosts(fetchedPost);
+                  setNumberOfPageLinks(numOfPageLinks);
+                  const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
+                  const lastIndex = currentIndex + numberOfPostsPerPage;
+                  setPosts(data.data.slice(currentIndex, lastIndex));
+                  // Alert.alert("Success",data.message)
+               }else{
+                  Alert.alert("Failed",data.message)
+               }
+               setLoading(false)
+
+            }catch(err){
+               Alert.alert("Failed",String(err))
+               setLoading(false)
+            }
+            }
+            fetchData() 
+         }, []);
+
+   useEffect(() => {
+      const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
+      const lastIndex = currentIndex + numberOfPostsPerPage;
+      setPosts(posts.slice(currentIndex, lastIndex));
+   }, [pageNumber]);
+
+   
    return (
-      <ScrollView style={{ flex: 1 }}>
-         <LinearGradient
-            style={[styles.container, { width: width, height: height }]}
-            colors={["#ffffff", "#f9f9f9", "#f3f3f3", "#f3f3f3", "#f3f3f3"]}>
+      <ScrollView style={{ flex: 1,backgroundColor:"#f9f9f9"}}>
             <View style={{ justifyContent: "center", alignItems: "center" }}>
                <Image
                   source={{uri:"file:///storage/emulated/0/Pictures/facebook/1680605776562.jpg"}}
@@ -93,53 +138,18 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                   </Button>
                </View>
             </View>
-            <View></View>
-            <View style={styles.navs}>
-               <View style={styles.navLink}>
-                  <MaterialCommunityIcons name="cog" />
-                  <Text style={{ fontFamily: "Poppins_500Medium" }}>
-                     Settings
-                  </Text>
-                  <Button mode="contained-tonal">
-                     <Entypo name="chevron-thin-right" />
-                  </Button>
-               </View>
-               <View style={styles.navLink}>
-                  <MaterialCommunityIcons name="cog" />
-                  <Text style={{ fontFamily: "Poppins_500Medium" }}>Posts</Text>
-                  <Button mode="contained-tonal">
-                     <Entypo name="chevron-thin-right" />
-                  </Button>
-               </View>
-               <View style={styles.navLink}>
-                  <MaterialCommunityIcons name="cog" />
-                  <Text style={{ fontFamily: "Poppins_500Medium" }}>
-                     Send Money
-                  </Text>
-                  <Button mode="contained-tonal">
-                     <Entypo name="chevron-thin-right" />
-                  </Button>
-               </View>
-               <View style={styles.navLink}>
-                  <MaterialCommunityIcons name="cog" />
-                  <Text style={{ fontFamily: "Poppins_500Medium" }}>
-                     Transferees
-                  </Text>
-                  <Button mode="contained-tonal">
-                     <Entypo name="chevron-thin-right" />
-                  </Button>
-               </View>
-               <View style={styles.navLink}>
-                  <MaterialCommunityIcons name="cog" />
-                  <Text style={{ fontFamily: "Poppins_500Medium" }}>
-                     Logout
-                  </Text>
-                  <Button mode="contained-tonal">
-                     <Entypo name="chevron-thin-right" />
-                  </Button>
-               </View>
+            <View style={{alignItems:"center",marginBottom:5}}>
+               <ProfileNavComponent navigation={navigation} />
             </View>
-         </LinearGradient>
+           {posts.map((post) => {
+            return (
+               <PostComponent
+                  key={String(post.id)}
+                  {...post}
+                  navigation={navigation}
+               />
+            );
+         })}
       </ScrollView>
    );
 };
@@ -169,23 +179,5 @@ const styles = StyleSheet.create({
       borderRadius: 100,
       borderWidth: 4,
    },
-   navs: {
-      backgroundColor: "#fff",
-      // flex:1,
-      width: width - 40,
-      borderRadius: 45,
-      // marginBottom:120,
-      padding: 20,
-      // alignItems:'center'
-   },
-   navLink: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginVertical: 1,
-      // backgroundColor:"#f9f9f9",
-      paddingVertical: 6,
-      paddingHorizontal: 25,
-      borderRadius: 20,
-   },
+  
 });

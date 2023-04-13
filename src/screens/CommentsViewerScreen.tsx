@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react";
-import Comment from "../components/Comment";
+import Comment from "../components/MediaPosts/Comment";
 import { Button } from "react-native-paper";
 import { FontAwesome5 } from "@expo/vector-icons";
 

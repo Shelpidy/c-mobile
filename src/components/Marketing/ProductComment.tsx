@@ -1,6 +1,6 @@
 import { Modal, StyleSheet, Text, View, Image,Alert} from "react-native";
 import React, { useEffect, useState} from "react";
-import { users } from "../data";
+import { users } from "../../data";
 import { Feather, SimpleLineIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
 import axios from "axios"
@@ -18,7 +18,7 @@ const Comment = (props: CommentProps) => {
                // console.log("Fetching user")
          //  let activeUserId = 1
             try{
-               let response = await fetch(`http://192.168.242.183:5000/api/auth/users/${props.userId}`,{method:"GET"})
+               let response = await fetch(`http://192.168.193.183:5000/api/auth/users/${props.userId}`,{method:"GET"})
                let data = await response.json()
                if(data.status == 'success'){
                   // console.log("Users-----",data.data)

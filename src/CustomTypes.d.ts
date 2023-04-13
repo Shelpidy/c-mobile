@@ -54,3 +54,25 @@ declare type User = {
    createdAt: Date;
    updatedAt: Date;
 };
+
+declare interface PostMarket {
+   id:number
+}
+
+declare type Product =  {
+      id: number
+      productName:string
+      category: string
+      description:string
+      images: string[]
+      price:string
+      initialPrice:string
+      sizes:string[]
+      numberAvailable:string
+      rating:number
+      availability:boolean | string
+      userId:number
+      createdAt:Date
+      updatedAt:Date
+}
+

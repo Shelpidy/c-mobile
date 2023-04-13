@@ -2,7 +2,7 @@ import { StyleSheet, Text, View,Alert } from "react-native";
 import React, { useEffect, useState } from "react";
 import PostComponent from "./PostComponent";
 import axios from "axios"
-import { posts as _fetchedPost } from "../data";
+import { posts as _fetchedPost } from "../../data";
 
 type PostsComponentProps = {
    navigation?: any;
@@ -22,7 +22,7 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
       let fetchData = async ()=>{
           let activeUserId = 1
             try{
-               let response = await fetch(`http://192.168.242.183:5000/api/media/posts/${activeUserId}`)
+               let response = await fetch(`http://192.168.193.183:5000/api/media/posts/${activeUserId}`)
                let data = await response.json()
                if(data.status == 'success'){
                   // console.log(data.data)
@@ -48,15 +48,6 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
             }
             fetchData() 
          }, []);
-
-   // useEffect(() => {
-   //    let fetchedPost: PostComponentProps[] = _fetchedPost;
-   //    let numOfPageLinks = Math.ceil(fetchedPost.length / numberOfPostsPerPage);
-   //    console.log(fetchedPost);
-   //    setPosts(fetchedPost);
-   //    setNumberOfPageLinks(numOfPageLinks);
-   // }, []);
-
    useEffect(() => {
       const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
       const lastIndex = currentIndex + numberOfPostsPerPage;

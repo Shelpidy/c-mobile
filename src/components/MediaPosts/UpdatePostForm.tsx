@@ -62,7 +62,7 @@ const UpdatePostForm = (post:NPostComponentProps) => {
       let activeUserId = 1
       let postObj = {...postState}
       try{
-        let response = await axios.put("http://192.168.242.183:5000/api/media/posts/",postObj)
+        let response = await axios.put("http://192.168.193.183:5000/api/media/posts/",postObj)
         if(response.status === 202){
                console.log(response.data)
                setLoading(false)

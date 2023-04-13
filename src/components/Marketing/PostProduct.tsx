@@ -49,7 +49,7 @@ const PostForm = () => {
       let activeUserId = 1
       let postObj = {...postState,userId:activeUserId}
       try{
-        let response = await axios.post("http://192.168.242.183:5000/api/media/posts/",postObj)
+        let response = await axios.post("http://192.168.193.183:5000/api/media/posts/",postObj)
         if(response.status === 201){
                console.log(response.data)
                setLoading(false)

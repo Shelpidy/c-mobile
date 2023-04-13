@@ -17,7 +17,7 @@ const FindFriendsComponent = () => {
                // console.log("Fetching user")
           let activeUserId = 1
             try{
-               let response = await fetch(`http://192.168.242.183:5000/api/media/unfollowing/${activeUserId}`,{method:"GET"})
+               let response = await fetch(`http://192.168.193.183:5000/api/media/unfollowing/${activeUserId}`,{method:"GET"})
                let data = await response.json()
                if(data.status == 'success'){
                   console.log("Users-----",data.data)

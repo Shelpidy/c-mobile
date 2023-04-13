@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Button } from "react-native-paper";
-import PostsComponent from "../components/PostsComponent";
+import PostsComponent from "../components/MediaPosts/PostsComponent";
 import FindFriendsComponent from "../components/FindFriendsComponent";
 // import { withTheme,Button,Theme } from "@rneui/themed";
 // import { Theme, Button } from "@rneui/base";

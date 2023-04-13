@@ -13,7 +13,7 @@ const FindFriendComponent = (user: User) => {
 
    const handleFollow = async(userId:number)=>{
       try{
-         let {data} = await axios.put(`http://192.168.242.183:5000/api/media/follows/`,{followerId:1,followingId:userId},{headers:{Accept: 'application/json'}})
+         let {data} = await axios.put(`http://192.168.193.183:5000/api/media/follows/`,{followerId:1,followingId:userId},{headers:{Accept: 'application/json'}})
          if(data.status == 'success'){
                console.log(data.data)
                setFollowed(!followed)
