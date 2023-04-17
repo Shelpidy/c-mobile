@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React from "react";
-import PersonalInfoRegistrationForm from "../components/RegistrationFormPersonal";
+import PersonalInfoRegistrationForm from "../components/MediaPosts/RegistrationFormPersonal";
 import { Button } from "react-native-paper";
 import Form1 from "../components/RegistrationForms/RegForm1";
 import PositionIndicator from "../components/PositionIndicator";

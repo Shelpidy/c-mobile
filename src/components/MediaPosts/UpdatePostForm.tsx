@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View,Alert,Modal} from "react-native";
+import { StyleSheet, Text, View, Alert, Modal } from "react-native";
 import React, { useState, useEffect, useReducer, useMemo } from "react";
-import { Button,TextInput, useTheme } from "react-native-paper";
+import { Button, TextInput, useTheme } from "react-native-paper";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 // import {
 //    RichTextEditor,
@@ -39,69 +39,71 @@ const postReducer = (state: Post = initialState, action: Action) => {
 
 type NPostComponentProps = PostComponentProps & { navigation: any };
 
-const UpdatePostForm = (post:NPostComponentProps) => {
+const UpdatePostForm = (post: NPostComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const [postState, postDispatch] = useReducer(postReducer, initialState);
-   const [imageOpen, setImageOpen] = useState(false)
-   const [videoOpen, setVideoOpen] = useState(false)
+   const [imageOpen, setImageOpen] = useState(false);
+   const [videoOpen, setVideoOpen] = useState(false);
    // const [album, setAlbum] = useState<Album | undefined>()
    // const [assets, setAssets] = useState<Asset[]>([])
    const theme = useTheme();
 
-   useEffect(()=>{
-    postDispatch({type:"TEXT",payload:post.text})
-    postDispatch({type:"TITLE",payload:post.title})
-    postDispatch({type:"TITLE",payload:post.title})
-    postDispatch({type:"IMAGES",payload:post.images})
-    postDispatch({type:"ID",payload:post.id})
-    postDispatch({type:"USERID",payload:post.userId})
-   },[])
+   useEffect(() => {
+      postDispatch({ type: "TEXT", payload: post.text });
+      postDispatch({ type: "TITLE", payload: post.title });
+      postDispatch({ type: "TITLE", payload: post.title });
+      postDispatch({ type: "IMAGES", payload: post.images });
+      postDispatch({ type: "ID", payload: post.id });
+      postDispatch({ type: "USERID", payload: post.userId });
+   }, []);
 
    const handleUpdate = async () => {
       setLoading(true);
-      let activeUserId = 1
-      let postObj = {...postState}
-      try{
-        let response = await axios.put("http://192.168.193.183:5000/api/media/posts/",postObj)
-        if(response.status === 202){
-               console.log(response.data)
-               setLoading(false)
-               Alert.alert("Successful","Update successfully.")
-        }else{
-            setLoading(false)
-             Alert.alert("Failed","Post Faile")
-        }
-      }catch(err){
-        setLoading(false)
-        console.log(err)
+      let activeUserId = 1;
+      let postObj = { ...postState };
+      try {
+         let response = await axios.put(
+            "http://192.168.0.104:5000/api/media/posts/",
+            postObj
+         );
+         if (response.status === 202) {
+            console.log(response.data);
+            setLoading(false);
+            Alert.alert("Successful", "Update successfully.");
+         } else {
+            setLoading(false);
+            Alert.alert("Failed", "Post Faile");
+         }
+      } catch (err) {
+         setLoading(false);
+         console.log(err);
       }
-     
 
       // console.log(postState);
    };
 
-   const chooseImage = (assets:any[]) => {
-      let imageSrcs = assets.map(asset => asset.uri)
-      console.log(imageSrcs)
-      postDispatch({type:"IMAGES",payload:imageSrcs})
-      setImageOpen(false)
+   const chooseImage = (assets: any[]) => {
+      let imageSrcs = assets.map((asset) => asset.uri);
+      console.log(imageSrcs);
+      postDispatch({ type: "IMAGES", payload: imageSrcs });
+      setImageOpen(false);
    };
 
    const cancelImage = () => {
-      console.log("No permission, canceling image picker")
-      setImageOpen(false)
+      console.log("No permission, canceling image picker");
+      setImageOpen(false);
    };
 
-    const chooseVideo = (assets:any[]) => {
-      let videoSrc = assets[0]['uri']
-      postDispatch({type:"VIDEO",payload:videoSrc})
-      console.log(videoSrc)
-      setVideoOpen(false)
+   const chooseVideo = (assets: any[]) => {
+      let videoSrc = assets[0]["uri"];
+      postDispatch({ type: "VIDEO", payload: videoSrc });
+      console.log(videoSrc);
+      setVideoOpen(false);
    };
 
    const cancelVideo = () => {
-      console.log("No permission, canceling image picker")
-      setImageOpen(false)
+      console.log("No permission, canceling image picker");
+      setImageOpen(false);
    };
 
    const onValueChangeContent = (v: string): void => {
@@ -115,56 +117,79 @@ const UpdatePostForm = (post:NPostComponentProps) => {
    };
 
    return (
-      <View style={{borderRadius:3,margin:8,backgroundColor:"#ffffff"}}>
+      <View style={{ borderRadius: 3, margin: 8, backgroundColor: "#ffffff" }}>
          <Modal visible={imageOpen}>
             <ImagePicker
-            onSave={chooseImage}
-            onCancel={cancelImage}
-            multiple
-            limit={8}
-         />
-
+               onSave={chooseImage}
+               onCancel={cancelImage}
+               multiple
+               limit={8}
+            />
          </Modal>
-          <Modal visible={videoOpen}>
-         <ImagePicker
-            onSave={chooseVideo}
-            onCancel={cancelVideo}
-            video
-            timeSlider
-            image={false}
-         />
+         <Modal visible={videoOpen}>
+            <ImagePicker
+               onSave={chooseVideo}
+               onCancel={cancelVideo}
+               video
+               timeSlider
+               image={false}
+            />
          </Modal>
          <View style={styles.formContainer}>
-                 <Text style={{textAlign:"center",marginBottom:4,fontFamily:"Poppins_500Medium"}}>Update Post</Text>
-                <TextInput
-            onChangeText={onValueChangeTitle}
-            mode="outlined"
-            label="Title"
-            value={postState.title}
-        
-         />
-     
-          <TextInput
-            onChangeText={onValueChangeContent}
-            mode="outlined"
-            label="Content"
-            multiline
-            numberOfLines={5}
-            value={postState.text}
-         />
-         <Text style={{textAlign:"center",marginTop:10,fontFamily:"Poppins_300Light"}}>Choose Image or Video</Text>
-         <View style={styles.buttonGroup}>
-            
-           <Button style={styles.button} mode='contained-tonal' onPress={()=>setImageOpen(true)}><AntDesign size={20} name="picture" /></Button>
-           <Button style={styles.button} mode='contained-tonal' onPress={()=>setVideoOpen(true)}><AntDesign size={20} name='videocamera' /></Button>
-         </View>
+            <Text
+               style={{
+                  textAlign: "center",
+                  marginBottom: 4,
+                  fontFamily: "Poppins_500Medium",
+               }}>
+               Update Post
+            </Text>
+            <TextInput
+               onChangeText={onValueChangeTitle}
+               mode="outlined"
+               label="Title"
+               value={postState.title}
+            />
 
-         <Button mode='contained' onPress={handleUpdate} disabled={loading} loading={loading}>
-            Update <AntDesign size={20} name="upload" />
-         </Button>
+            <TextInput
+               onChangeText={onValueChangeContent}
+               mode="outlined"
+               label="Content"
+               multiline
+               numberOfLines={5}
+               value={postState.text}
+            />
+            <Text
+               style={{
+                  textAlign: "center",
+                  marginTop: 10,
+                  fontFamily: "Poppins_300Light",
+               }}>
+               Choose Image or Video
+            </Text>
+            <View style={styles.buttonGroup}>
+               <Button
+                  style={styles.button}
+                  mode="contained-tonal"
+                  onPress={() => setImageOpen(true)}>
+                  <AntDesign size={20} name="picture" />
+               </Button>
+               <Button
+                  style={styles.button}
+                  mode="contained-tonal"
+                  onPress={() => setVideoOpen(true)}>
+                  <AntDesign size={20} name="videocamera" />
+               </Button>
+            </View>
+
+            <Button
+               mode="contained"
+               onPress={handleUpdate}
+               disabled={loading}
+               loading={loading}>
+               Update <AntDesign size={20} name="upload" />
+            </Button>
          </View>
-        
-       
       </View>
    );
 };
@@ -172,17 +197,17 @@ const UpdatePostForm = (post:NPostComponentProps) => {
 export default UpdatePostForm;
 
 const styles = StyleSheet.create({
- formContainer:{
-   padding:15,
-   gap:5
- },
- buttonGroup:{
-   flexDirection:"row",
-   justifyContent:"space-evenly",
-   marginVertical:10
- },
- button:{
-   flex:1,
-   marginHorizontal:3
- }
+   formContainer: {
+      padding: 15,
+      gap: 5,
+   },
+   buttonGroup: {
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      marginVertical: 10,
+   },
+   button: {
+      flex: 1,
+      marginHorizontal: 3,
+   },
 });

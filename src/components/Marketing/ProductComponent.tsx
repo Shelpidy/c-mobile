@@ -1,4 +1,12 @@
-import { StyleSheet, Text, View, Modal, Dimensions, Image,Alert } from "react-native";
+import {
+   StyleSheet,
+   Text,
+   View,
+   Modal,
+   Dimensions,
+   Image,
+   Alert,
+} from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../ImagesViewer";
 import VideoPlayer from "../VideoPlayer";
@@ -13,11 +21,10 @@ import {
    MaterialCommunityIcons,
    Feather,
 } from "@expo/vector-icons";
-import axios from "axios"
+import axios from "axios";
 // import UpdateProductForm from "./UpdateProduct";
 
-type NProductComponentProps = Product & { navigation: any };
-type ProductComment = Omit<CommentProps, "posterId">;
+// type ProductComment = Omit<CommentProps, "posterId">;
 const initialState: ProductComment = {};
 
 const { width } = Dimensions.get("window");
@@ -27,7 +34,7 @@ const postCommentReducer = (
    action: Action
 ) => {
    switch (action.type) {
-      case "POSTID":
+      case "PRODUCTID":
          return {
             ...state,
             posterId: action.payload,
@@ -47,20 +54,18 @@ const postCommentReducer = (
    }
 };
 
-const ProductComponent = (props: NProductComponentProps) => {
+const ProductComponent = (props: ProductComponentProps) => {
    const [postProductCommentstate, dispatchPostComment] = useReducer(
       postCommentReducer,
       initialState
    );
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
    const [openModal, setOpenModal] = useState<boolean>(false);
-   const [productComments, setProductComments] = useState<Omit<CommentProps, "posterId">[]>(
-      []
-   );
-   const [likes, setLikes] = useState<Like[]|null>(null);
+   const [productComments, setProductComments] = useState<ProductComment[]>([]);
+   const [likes, setLikes] = useState<ProductLike[] | null>(null);
    const [poster, SetPoster] = useState<any>();
-   const [liked,setLiked] = useState<boolean>(false)
-   const [loading,setLoading] = useState<boolean>(false)
+   const [liked, setLiked] = useState<boolean>(false);
+   const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
    useEffect(() => {
@@ -72,61 +77,64 @@ const ProductComponent = (props: NProductComponentProps) => {
       });
    }, []);
 
-  useEffect(function(){
-      let fetchData = async ()=>{
-          let activeUserId = 1
-            try{
-               let {data} = await axios.get(`http://192.168.193.183:5000/api/media/posts/cl/${props.id}`)
-               if(data.status == 'success'){
-                  console.log(data.data)
-                  let ls:any[] = data.data.likes
-                  let cs = data.data.ProductComments
-                  setProductComments(cs);
-                  setLikes(ls);
-                  if(ls.map(like => like.userId).includes(activeUserId)){
-                      setLiked(true)
-                  }
-                  // Alert.alert("Success",data.message)
-               }else{
-                  Alert.alert("Failed",data.message)
+   useEffect(function () {
+      let fetchData = async () => {
+         let activeUserId = 1;
+         try {
+            let { data } = await axios.get(
+               `http://192.168.0.104:5000/api/marketing/products/cl/${props.id}`
+            );
+            if (data.status == "success") {
+               console.log("Comments and Likes -----", data.data);
+               let ls: any[] = data.data.likes;
+               let cs = data.data.comments;
+               setProductComments(cs);
+               setLikes(ls);
+               if (ls.map((like) => like.userId).includes(activeUserId)) {
+                  setLiked(true);
                }
-               setLoading(false)
-
-            }catch(err){
-               Alert.alert("Failed",String(err))
-               setLoading(false)
+               // Alert.alert("Success",data.message)
+            } else {
+               Alert.alert("Failed", data.message);
             }
-            }
-             fetchData()
-         }, []);
+            setLoading(false);
+         } catch (err) {
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      };
+      fetchData();
+   }, []);
 
-   useEffect(function(){
-      console.log("Fetching user")
-      setLoading(true)
-      let fetchData = async ()=>{
-               // console.log("Fetching user")
+   useEffect(function () {
+      console.log("Fetching user");
+      setLoading(true);
+      let fetchData = async () => {
+         // console.log("Fetching user")
          //  let activeUserId = 1
-            try{
-               let response = await fetch(`http://192.168.193.183:5000/api/auth/users/${props.userId}`,{method:"GET"})
-               let data = await response.json()
-               if(data.status == 'success'){
-                  console.log("Users-----",data.data)
-                   SetPoster(data.data.personal)
-                  // Alert.alert("Success",data.message)
-                  setLoading(false)
-               }else{
-                  Alert.alert("Failed",data.message)
-               }
-               setLoading(false)
-
-            }catch(err){
-               console.log(err)
-               Alert.alert("Failed",String(err))
-               setLoading(false)
+         try {
+            let response = await fetch(
+               `http://192.168.0.104:5000/api/auth/users/${props.userId}`,
+               { method: "GET" }
+            );
+            let data = await response.json();
+            if (data.status == "success") {
+               console.log("Users-----", data.data);
+               SetPoster(data.data.personal);
+               // Alert.alert("Success",data.message)
+               setLoading(false);
+            } else {
+               Alert.alert("Failed", data.message);
             }
-             }
-         fetchData()
-         }, []);
+            setLoading(false);
+         } catch (err) {
+            console.log(err);
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      };
+      fetchData();
+   }, []);
 
    // useEffect(() => {
    //    setLikes(postLikes.filter((like) => like.postId === props.id));
@@ -141,44 +149,46 @@ const ProductComponent = (props: NProductComponentProps) => {
    //    SetPoster(users.find((user) => user.id === props.userId));
    // }, [users]);
 
-
-   const handleLike = async(postId:number)=>{
-      console.log(postId)
-      try{
-         let activeUserId = 1
-         let {data} = await axios.put(`http://192.168.193.183:5000/api/media/posts/likes/`,{userId:activeUserId,postId:postId})
-         if(data.status == 'success'){
-               console.log(data.data)
-               if(liked){
-                  if(likes){
-                      setLikes(likes.slice(0,likes.length - 1))
-                      setLiked(!liked)
-                  }
-                  
-               }else{
-                  if(likes){
-                      setLikes([...likes,data.data])
-                      setLiked(!liked)
-                  }
+   const handleLike = async (productId: number) => {
+      console.log(productId);
+      try {
+         let activeUserId = 1;
+         let { data } = await axios.put(
+            `http://192.168.0.104:5000/api/marketing/products/likes/`,
+            { userId: activeUserId, productId: productId }
+         );
+         if (data.status == "success") {
+            console.log(data.data);
+            if (liked) {
+               if (likes) {
+                  setLikes(likes.slice(0, likes.length - 1));
+                  setLiked(!liked);
                }
-               
-               Alert.alert("Success",data.message)
-         }else{
-            Alert.alert("Failed",data.message)
+            } else {
+               if (likes) {
+                  setLikes([...likes, data.data]);
+                  setLiked(!liked);
+               }
+            }
+
+            Alert.alert("Success", data.message);
+         } else {
+            Alert.alert("Failed", data.message);
          }
-         setLoading(false)
-
-      }catch(err){
-         console.log(err)
-          Alert.alert("Failed",String(err))
-         setLoading(false)
+         setLoading(false);
+      } catch (err) {
+         console.log(err);
+         Alert.alert("Failed", String(err));
+         setLoading(false);
       }
-      
-   }
+   };
 
-
-   if(!likes){
-      return <View><Text>Loading post</Text></View>
+   if (!likes) {
+      return (
+         <View>
+            <Text>Loading products</Text>
+         </View>
+      );
    }
 
    return (
@@ -190,12 +200,14 @@ const ProductComponent = (props: NProductComponentProps) => {
                   backgroundColor: "#00000068",
                   justifyContent: "center",
                   alignItems: "center",
-                  paddingVertical:4
+                  paddingVertical: 4,
                }}>
-               <View style={{backgroundColor:"#ffffff",paddingTop:10}}>
-               {/* <IconButton name='plus'/> */}
-               <Button mode='text' onPress={() => setOpenModal(false)}><Feather size={26} name='x'/></Button>
-               {/* <UpdateProductForm {...props}/> */}
+               <View style={{ backgroundColor: "#ffffff", paddingTop: 10 }}>
+                  {/* <IconButton name='plus'/> */}
+                  <Button mode="text" onPress={() => setOpenModal(false)}>
+                     <Feather size={26} name="x" />
+                  </Button>
+                  {/* <UpdateProductForm {...props}/> */}
                </View>
             </View>
          </Modal>
@@ -236,20 +248,74 @@ const ProductComponent = (props: NProductComponentProps) => {
             {props.images && <ImagesViewer images={props.images} />}
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>
-         <Text style={styles.title}>{props?.productName}</Text>
-         <Text style={styles.title}>{props?.price}</Text>
-         <Text style={styles.title}>{props?.initialPrice}</Text>
+           <View
+            style={{
+               flexDirection: "row",
+               marginVertical: 5,
+               alignItems: "center",
+            }}>
+            <Text style={styles.productName}>{props?.productName}</Text>
+
+            {props.initialPrice && (
+               <Text
+                  style={[
+                     styles.productInitialPrice,
+                     {
+                        color: theme.colors.secondary,
+                        textDecorationLine: "line-through",
+                     },
+                  ]}>
+                  C{props?.initialPrice}
+               </Text>
+            )}
+            <Text
+               style={[styles.productPrice, { color: theme.colors.primary }]}>
+               C{props?.price}
+            </Text>
+            {/* <Button  mode='contained'>Affiliate</Button> */}
+         </View>
+
          {props?.description && <TextViewer text={props.description} />}
          <View>
             <View style={styles.likeCommentAmountCon}>
-               <View
-                  style={{
-                     flexDirection: "row",
-                     alignItems: "center",
-                     justifyContent: "flex-start",
-                  }}>
-                  <IconButton disabled={loading} onPress={()=> handleLike(props.id)} mode='outlined' size={20} icon={liked?"heart":"heart-outline"} />
-                  <Text style={styles.commentAmountText}>{likes.length}</Text>
+               <View style={styles.likeCommentAmountCon}>
+                  <View
+                     style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        // justifyContent: "flex-start",
+                     }}>
+                     <IconButton
+                        disabled={loading}
+                        onPress={() => handleLike(props.id)}
+                        mode="outlined"
+                        size={20}
+                        icon={liked ? "heart" : "heart-outline"}
+                     />
+                     <Text style={styles.commentAmountText}>
+                        {likes && likes?.length}
+                     </Text>
+                  </View>
+                  <View
+                     style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                     }}>
+                     <IconButton
+                        onPress={() =>
+                           props.navigation.navigate("ProductScreen", {
+                              product: { ...props },
+                           })
+                        }
+                        mode="outlined"
+                        size={20}
+                        icon="comment-outline"
+                     />
+                     <Text style={styles.commentAmountText}>
+                        {productComments?.length}
+                     </Text>
+                  </View>
                </View>
                <View
                   style={{
@@ -257,17 +323,11 @@ const ProductComponent = (props: NProductComponentProps) => {
                      alignItems: "center",
                      justifyContent: "flex-start",
                   }}>
-                  <IconButton
-                     onPress={()=> props.navigation.navigate("FullPostViewScreen",{post:{...props}})}
-                     mode='outlined'
-                     size={20}
-                     icon="comment-outline"
-                  />
-                  <Text style={styles.commentAmountText}>
-                     {ProductComments.length}
-                  </Text>
+                  <Button mode="contained" style={{ marginHorizontal: 8 }}>
+                     Preview
+                  </Button>
                </View>
-               {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='ProductComments-o'/> {ProductComments.length}</Text> */}
+               {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comment-o'/> {productComments.length}</Text> */}
             </View>
             {/* <View style={styles.commentBox}>
                <TextInput
@@ -281,7 +341,7 @@ const ProductComponent = (props: NProductComponentProps) => {
                />
                <Entypo size={26} name="emoji-neutral" />
             </View> */}
-            <View style={{padding:5}}>
+            <View style={{ padding: 5 }}>
                <ProductComments
                   posterId={props.userId}
                   navigation={props?.navigation}
@@ -310,13 +370,31 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       alignItems: "center",
       gap: 5,
-      paddingHorizontal:15
+      paddingHorizontal: 15,
    },
    title: {
       fontFamily: "Poppins_700Bold",
       fontSize: 16,
-      marginHorizontal:10,
-      marginTop:6
+      marginHorizontal: 10,
+      marginTop: 6,
+   },
+  productName: {
+      fontFamily: "Poppins_400Regular",
+      fontSize: 16,
+      marginHorizontal: 10,
+      marginTop: 6,
+   },
+   productPrice: {
+      fontFamily: "Poppins_600SemiBold",
+      fontSize: 16,
+      marginHorizontal: 10,
+      marginTop: 6,
+   },
+   productInitialPrice: {
+      fontFamily: "Poppins_300Light",
+      fontSize: 16,
+      marginHorizontal: 10,
+      marginTop: 6,
    },
    commentInputField: {
       flex: 1,
@@ -324,9 +402,9 @@ const styles = StyleSheet.create({
    },
    likeCommentAmountCon: {
       flexDirection: "row",
-      justifyContent:'space-around',
-      gap:15,
-      paddingHorizontal:5
+      justifyContent: "space-between",
+      gap: 15,
+      paddingHorizontal: 5,
    },
    commentAmountText: {
       fontFamily: "Poppins_400Regular",

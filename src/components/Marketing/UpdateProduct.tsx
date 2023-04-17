@@ -62,7 +62,7 @@
 //       let activeUserId = 1
 //       let postObj = {...productState}
 //       try{
-//         let response = await axios.put("http://192.168.193.183:5000/api/media/posts/",postObj)
+//         let response = await axios.put("http://192.168.0.104:5000/api/media/posts/",postObj)
 //         if(response.status === 202){
 //                console.log(response.data)
 //                setLoading(false)
@@ -75,7 +75,6 @@
 //         setLoading(false)
 //         console.log(err)
 //       }
-     
 
 //       // console.log(postState);
 //    };
@@ -141,9 +140,9 @@
 //             mode="outlined"
 //             label="Title"
 //             value={postState.title}
-        
+
 //          />
-     
+
 //           <TextInput
 //             onChangeText={onValueChangeContent}
 //             mode="outlined"
@@ -154,7 +153,7 @@
 //          />
 //          <Text style={{textAlign:"center",marginTop:10,fontFamily:"Poppins_300Light"}}>Choose Image or Video</Text>
 //          <View style={styles.buttonGroup}>
-            
+
 //            <Button style={styles.button} mode='contained-tonal' onPress={()=>setImageOpen(true)}><AntDesign size={20} name="picture" /></Button>
 //            <Button style={styles.button} mode='contained-tonal' onPress={()=>setVideoOpen(true)}><AntDesign size={20} name='videocamera' /></Button>
 //          </View>
@@ -163,8 +162,7 @@
 //             Update <AntDesign size={20} name="upload" />
 //          </Button>
 //          </View>
-        
-       
+
 //       </View>
 //    );
 // };

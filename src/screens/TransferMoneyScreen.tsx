@@ -10,7 +10,7 @@ import React from "react";
 import { TextInput, Button, useTheme } from "react-native-paper";
 import LoginForm from "../components/LoginForm";
 import { StatusBar } from "expo-status-bar";
-import TransferMoneyForm from "../components/TransferMoneyForm";
+import TransferMoneyForm from "../components/Transactions/TransferMoneyForm";
 
 type TransferMoneyProps = {
    navigation: any;
@@ -32,7 +32,7 @@ const TransferMoneyScreen = (props: TransferMoneyProps) => {
                paddingBottom: 0,
             }}
             source={require("../../assets/Illustrators/signin.png")}></Image>
-        <TransferMoneyForm navigation={props.navigation}/>
+         <TransferMoneyForm navigation={props.navigation} />
       </KeyboardAvoidingView>
    );
 };

@@ -13,6 +13,9 @@ import NotificationScreen from "../screens/NotificationScreen";
 import TransfereesScreen from "../screens/TransfereesScreen";
 import CommentsViewerScreen from "../screens/CommentsViewerScreen";
 import FullPostComponent from "../screens/FullPostViewScreen";
+import ProductCommentsViewerScreen from "../screens/ProductCommentsViewerScreen";
+import MarketingScreen from "../screens/MarketingScreen";
+import ProductScreen from "../screens/ProductScreen";
 
 const Stack = createNativeStackNavigator();
 type HomeStackProps = {
@@ -54,6 +57,15 @@ const HomeStack = (props: HomeStackProps) => {
          <Stack.Screen
             name="FullPostViewScreen"
             component={FullPostComponent}></Stack.Screen>
+         <Stack.Screen
+            name="MarketingScreen"
+            component={MarketingScreen}></Stack.Screen>
+         <Stack.Screen
+            name="ProductScreen"
+            component={ProductScreen}></Stack.Screen>
+         <Stack.Screen
+            name="ProductCommentsViewerScreen"
+            component={ProductCommentsViewerScreen}></Stack.Screen>
       </Stack.Navigator>
    );
 };

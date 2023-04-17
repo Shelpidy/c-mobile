@@ -1,4 +1,12 @@
-import { StyleSheet, Text, View, Modal, Dimensions, Image,Alert } from "react-native";
+import {
+   StyleSheet,
+   Text,
+   View,
+   Modal,
+   Dimensions,
+   Image,
+   Alert,
+} from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../ImagesViewer";
 import VideoPlayer from "../VideoPlayer";
@@ -13,7 +21,7 @@ import {
    MaterialCommunityIcons,
    Feather,
 } from "@expo/vector-icons";
-import axios from "axios"
+import axios from "axios";
 import UpdatePostForm from "./UpdatePostForm";
 
 type NPostComponentProps = PostComponentProps & { navigation: any };
@@ -57,14 +65,14 @@ const PostComponent = (props: NPostComponentProps) => {
    const [comments, setComments] = useState<Omit<CommentProps, "posterId">[]>(
       []
    );
-   const [likes, setLikes] = useState<Like[]|null>(null);
+   const [likes, setLikes] = useState<Like[] | null>(null);
    const [poster, SetPoster] = useState<any>();
-   const [liked,setLiked] = useState<boolean>(false)
-   const [loading,setLoading] = useState<boolean>(false)
+   const [liked, setLiked] = useState<boolean>(false);
+   const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
    useEffect(() => {
-      dispatchPostComment({ type: "", payload: "" });
+      // dispatchPostComment({ type: "", payload: "" });
       setCurrentUser({
          id: 1,
          email: "mexu.company@gmail.com",
@@ -72,61 +80,64 @@ const PostComponent = (props: NPostComponentProps) => {
       });
    }, []);
 
-  useEffect(function(){
-      let fetchData = async ()=>{
-          let activeUserId = 1
-            try{
-               let {data} = await axios.get(`http://192.168.193.183:5000/api/media/posts/cl/${props.id}`)
-               if(data.status == 'success'){
-                  console.log(data.data)
-                  let ls:any[] = data.data.likes
-                  let cs = data.data.comments
-                  setComments(cs);
-                  setLikes(ls);
-                  if(ls.map(like => like.userId).includes(activeUserId)){
-                      setLiked(true)
-                  }
-                  // Alert.alert("Success",data.message)
-               }else{
-                  Alert.alert("Failed",data.message)
+   useEffect(function () {
+      let fetchData = async () => {
+         let activeUserId = 1;
+         try {
+            let { data } = await axios.get(
+               `http://192.168.0.104:5000/api/media/posts/cl/${props.id}`
+            );
+            if (data.status == "success") {
+               console.log(data.data);
+               let ls: any[] = data.data.likes;
+               let cs = data.data.comments;
+               setComments(cs);
+               setLikes(ls);
+               if (ls.map((like) => like.userId).includes(activeUserId)) {
+                  setLiked(true);
                }
-               setLoading(false)
-
-            }catch(err){
-               Alert.alert("Failed",String(err))
-               setLoading(false)
+               // Alert.alert("Success",data.message)
+            } else {
+               Alert.alert("Failed", data.message);
             }
-            }
-             fetchData()
-         }, []);
+            setLoading(false);
+         } catch (err) {
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      };
+      fetchData();
+   }, []);
 
-   useEffect(function(){
-      console.log("Fetching user")
-      setLoading(true)
-      let fetchData = async ()=>{
-               // console.log("Fetching user")
+   useEffect(function () {
+      console.log("Fetching user");
+      setLoading(true);
+      let fetchData = async () => {
+         // console.log("Fetching user")
          //  let activeUserId = 1
-            try{
-               let response = await fetch(`http://192.168.193.183:5000/api/auth/users/${props.userId}`,{method:"GET"})
-               let data = await response.json()
-               if(data.status == 'success'){
-                  console.log("Users-----",data.data)
-                   SetPoster(data.data.personal)
-                  // Alert.alert("Success",data.message)
-                  setLoading(false)
-               }else{
-                  Alert.alert("Failed",data.message)
-               }
-               setLoading(false)
-
-            }catch(err){
-               console.log(err)
-               Alert.alert("Failed",String(err))
-               setLoading(false)
+         try {
+            let response = await fetch(
+               `http://192.168.0.104:5000/api/auth/users/${props.userId}`,
+               { method: "GET" }
+            );
+            let data = await response.json();
+            if (data.status == "success") {
+               console.log("Users-----", data.data);
+               SetPoster(data.data.personal);
+               // Alert.alert("Success",data.message)
+               setLoading(false);
+            } else {
+               Alert.alert("Failed", data.message);
             }
-             }
-         fetchData()
-         }, []);
+            setLoading(false);
+         } catch (err) {
+            console.log(err);
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      };
+      fetchData();
+   }, []);
 
    // useEffect(() => {
    //    setLikes(postLikes.filter((like) => like.postId === props.id));
@@ -141,44 +152,46 @@ const PostComponent = (props: NPostComponentProps) => {
    //    SetPoster(users.find((user) => user.id === props.userId));
    // }, [users]);
 
-
-   const handleLike = async(postId:number)=>{
-      console.log(postId)
-      try{
-         let activeUserId = 1
-         let {data} = await axios.put(`http://192.168.193.183:5000/api/media/posts/likes/`,{userId:activeUserId,postId:postId})
-         if(data.status == 'success'){
-               console.log(data.data)
-               if(liked){
-                  if(likes){
-                      setLikes(likes.slice(0,likes.length - 1))
-                      setLiked(!liked)
-                  }
-                  
-               }else{
-                  if(likes){
-                      setLikes([...likes,data.data])
-                      setLiked(!liked)
-                  }
+   const handleLike = async (postId: number) => {
+      console.log(postId);
+      try {
+         let activeUserId = 1;
+         let { data } = await axios.put(
+            `http://192.168.0.104:5000/api/media/posts/likes/`,
+            { userId: activeUserId, postId: postId }
+         );
+         if (data.status == "success") {
+            console.log(data.data);
+            if (liked) {
+               if (likes) {
+                  setLikes(likes.slice(0, likes.length - 1));
+                  setLiked(!liked);
                }
-               
-               Alert.alert("Success",data.message)
-         }else{
-            Alert.alert("Failed",data.message)
+            } else {
+               if (likes) {
+                  setLikes([...likes, data.data]);
+                  setLiked(!liked);
+               }
+            }
+
+            Alert.alert("Success", data.message);
+         } else {
+            Alert.alert("Failed", data.message);
          }
-         setLoading(false)
-
-      }catch(err){
-         console.log(err)
-          Alert.alert("Failed",String(err))
-         setLoading(false)
+         setLoading(false);
+      } catch (err) {
+         console.log(err);
+         Alert.alert("Failed", String(err));
+         setLoading(false);
       }
-      
-   }
+   };
 
-
-   if(!likes){
-      return <View><Text>Loading post</Text></View>
+   if (!likes) {
+      return (
+         <View>
+            <Text>Loading post</Text>
+         </View>
+      );
    }
 
    return (
@@ -190,12 +203,14 @@ const PostComponent = (props: NPostComponentProps) => {
                   backgroundColor: "#00000068",
                   justifyContent: "center",
                   alignItems: "center",
-                  paddingVertical:4
+                  paddingVertical: 4,
                }}>
-               <View style={{backgroundColor:"#ffffff",paddingTop:10}}>
-               {/* <IconButton name='plus'/> */}
-               <Button mode='text' onPress={() => setOpenModal(false)}><Feather size={26} name='x'/></Button>
-               <UpdatePostForm {...props}/>
+               <View style={{ backgroundColor: "#ffffff", paddingTop: 10 }}>
+                  {/* <IconButton name='plus'/> */}
+                  <Button mode="text" onPress={() => setOpenModal(false)}>
+                     <Feather size={26} name="x" />
+                  </Button>
+                  <UpdatePostForm {...props} />
                </View>
             </View>
          </Modal>
@@ -246,7 +261,13 @@ const PostComponent = (props: NPostComponentProps) => {
                      alignItems: "center",
                      justifyContent: "flex-start",
                   }}>
-                  <IconButton disabled={loading} onPress={()=> handleLike(props.id)} mode='outlined' size={20} icon={liked?"heart":"heart-outline"} />
+                  <IconButton
+                     disabled={loading}
+                     onPress={() => handleLike(props.id)}
+                     mode="outlined"
+                     size={20}
+                     icon={liked ? "heart" : "heart-outline"}
+                  />
                   <Text style={styles.commentAmountText}>{likes.length}</Text>
                </View>
                <View
@@ -256,8 +277,12 @@ const PostComponent = (props: NPostComponentProps) => {
                      justifyContent: "flex-start",
                   }}>
                   <IconButton
-                     onPress={()=> props.navigation.navigate("FullPostViewScreen",{post:{...props}})}
-                     mode='outlined'
+                     onPress={() =>
+                        props.navigation.navigate("FullPostViewScreen", {
+                           post: { ...props },
+                        })
+                     }
+                     mode="outlined"
                      size={20}
                      icon="comment-outline"
                   />
@@ -279,7 +304,7 @@ const PostComponent = (props: NPostComponentProps) => {
                />
                <Entypo size={26} name="emoji-neutral" />
             </View> */}
-            <View style={{padding:5}}>
+            <View style={{ padding: 5 }}>
                <Comments
                   posterId={props.userId}
                   navigation={props?.navigation}
@@ -308,13 +333,13 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       alignItems: "center",
       gap: 5,
-      paddingHorizontal:15
+      paddingHorizontal: 15,
    },
    title: {
       fontFamily: "Poppins_700Bold",
       fontSize: 16,
-      marginHorizontal:10,
-      marginTop:6
+      marginHorizontal: 10,
+      marginTop: 6,
    },
    commentInputField: {
       flex: 1,
@@ -322,9 +347,9 @@ const styles = StyleSheet.create({
    },
    likeCommentAmountCon: {
       flexDirection: "row",
-      justifyContent:'space-around',
-      gap:15,
-      paddingHorizontal:5
+      justifyContent: "space-around",
+      gap: 15,
+      paddingHorizontal: 5,
    },
    commentAmountText: {
       fontFamily: "Poppins_400Regular",

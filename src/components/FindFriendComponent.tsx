@@ -8,27 +8,29 @@ const { width, height } = Dimensions.get("window");
 
 const FindFriendComponent = (user: User) => {
    const theme = useTheme();
-   const [followed,setFollowed] = useState<boolean>(false)
-   const [loading,setLoading] = useState<boolean>(false)
+   const [followed, setFollowed] = useState<boolean>(false);
+   const [loading, setLoading] = useState<boolean>(false);
 
-   const handleFollow = async(userId:number)=>{
-      try{
-         let {data} = await axios.put(`http://192.168.193.183:5000/api/media/follows/`,{followerId:1,followingId:userId},{headers:{Accept: 'application/json'}})
-         if(data.status == 'success'){
-               console.log(data.data)
-               setFollowed(!followed)
-               Alert.alert("Success",data.message)
-         }else{
-            Alert.alert("Failed",data.message)
+   const handleFollow = async (userId: number) => {
+      try {
+         let { data } = await axios.put(
+            `http://192.168.0.104:5000/api/media/follows/`,
+            { followerId: 1, followingId: userId },
+            { headers: { Accept: "application/json" } }
+         );
+         if (data.status == "success") {
+            console.log(data.data);
+            setFollowed(!followed);
+            Alert.alert("Success", data.message);
+         } else {
+            Alert.alert("Failed", data.message);
          }
-         setLoading(false)
-
-      }catch(err){
-          Alert.alert("Failed",String(err))
-         setLoading(false)
+         setLoading(false);
+      } catch (err) {
+         Alert.alert("Failed", String(err));
+         setLoading(false);
       }
-      
-   }
+   };
    return (
       <View style={styles.container}>
          <Image
@@ -36,21 +38,25 @@ const FindFriendComponent = (user: User) => {
             style={styles.profileImage}
             source={{ uri: user.profileImage }}
          />
-         <Text style={styles.nameText}>{user.firstName} {user.lastName}</Text>
+         <Text style={styles.nameText}>
+            {user.firstName} {user.lastName}
+         </Text>
          {/* <Text style={styles.nameText}>{user.lastName}</Text> */}
          <View style={styles.followerContainer}>
             <Button
                loading={loading}
                disabled={loading}
-               onPress={()=>handleFollow(user.id)}
-               mode={followed?'contained-tonal':"outlined"}
+               onPress={() => handleFollow(user.id)}
+               mode={followed ? "contained-tonal" : "outlined"}
                style={{ borderColor: theme.colors.primary }}>
-               <SimpleLineIcons name={followed?"user-following":"user-follow"} />
+               <SimpleLineIcons
+                  name={followed ? "user-following" : "user-follow"}
+               />
                <Text
                   style={{
                      fontFamily: "Poppins_500Medium",
                   }}>
-                  {followed ? ' Unfollow':" Follow"}
+                  {followed ? " Unfollow" : " Follow"}
                </Text>
             </Button>
          </View>

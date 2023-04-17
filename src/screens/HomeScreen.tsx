@@ -25,6 +25,9 @@ const HomeScreen = ({ theme, navigation }: HomeScreenProps) => {
          <Button onPress={() => navigation.navigate("SettingsScreen")}>
             Settings
          </Button>
+         <Button onPress={() => navigation.navigate("MarketingScreen")}>
+            Market
+         </Button>
          <Text>HomeScreen</Text>
       </ScrollView>
    );

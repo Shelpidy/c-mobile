@@ -12,8 +12,8 @@ import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../components/ImagesViewer";
 import VideoPlayer from "../components/VideoPlayer";
 import TextViewer from "../components/TextViewer";
-import Comments from "../components/MediaPosts/Comments";
-import { postComments, postLikes, users } from "../data";
+// import Comments from "../components/marketingproducts/Comments";
+// import { productComments, productLikes, users } from "../data";
 import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
 import {
    AntDesign,
@@ -23,22 +23,21 @@ import {
    Feather,
 } from "@expo/vector-icons";
 import axios from "axios";
+import ProductComments from "../components/Marketing/ProductComments";
 
-type FullPostComponentpost = { navigation: any; route: any };
-type PostComment = Omit<CommentProps, "posterId">;
-const initialState: PostComment = {};
+const initialState: ProductComment = {};
 
 const { width } = Dimensions.get("window");
 
-const postCommentReducer = (
-   state: PostComment = initialState,
+const productCommentReducer = (
+   state: ProductComment = initialState,
    action: Action
 ) => {
    switch (action.type) {
-      case "POSTID":
+      case "productID":
          return {
             ...state,
-            posterId: action.payload,
+            producterId: action.payload,
          };
       case "USERID":
          return {
@@ -55,47 +54,45 @@ const postCommentReducer = (
    }
 };
 
-const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
-   const [postCommentState, dispatchPostComment] = useReducer(
-      postCommentReducer,
+const ProductScreen = ({ navigation, route }: any) => {
+   const [productCommentState, dispatchproductComment] = useReducer(
+      productCommentReducer,
       initialState
    );
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
-   const [post, setPost] = useState<PostComponentProps>();
+   const [product, setproduct] = useState<ProductComponentProps | null>(null);
    const [openModal, setOpenModal] = useState<boolean>(false);
-   const [comments, setComments] = useState<Omit<CommentProps, "posterId">[]>(
-      []
-   );
-   const [likes, setLikes] = useState<Like[]>([]);
-   const [poster, SetPoster] = useState<any>();
+   const [comments, setComments] = useState<ProductComment[]>([]);
+   const [likes, setLikes] = useState<ProductLike[]>([]);
+   const [producter, Setproducter] = useState<any>();
    const [liked, setLiked] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
    useEffect(() => {
-      dispatchPostComment({ type: "", payload: "" });
+      dispatchproductComment({ type: "", payload: "" });
       setCurrentUser({
          id: 1,
          email: "mexu.company@gmail.com",
-         accountNumber: "1COM30000000000",
+         accountNumber: "1COM10000000000",
       });
    }, []);
 
    useEffect(() => {
-      setPost(route.params.post);
-      console.log("Post", route.params.post);
+      setproduct(route.params.product);
+      console.log("product",route.params.product);
    }, []);
 
    useEffect(function () {
       let fetchData = async () => {
          let activeUserId = 1;
-         let postId = route.params.post.id;
+         let productId = route.params.product.id;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.104:5000/api/media/posts/cl/${postId}`
+               `http://192.168.0.104:5000/api/marketing/products/cl/${productId}`
             );
             if (data.status == "success") {
-               console.log(data.data);
+            //    console.log(data.data);
                let ls: any[] = data.data.likes;
                setComments(data.data.comments);
                setLikes(data.data.likes);
@@ -118,7 +115,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
    useEffect(function () {
       console.log("Fetching user");
       setLoading(true);
-      let userId = route.params.post.userId;
+      let userId = route.params.product.userId;
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
@@ -130,7 +127,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
             let data = await response.json();
             if (data.status == "success") {
                // console.log("Users-----",data.data)
-               SetPoster(data.data.personal);
+               Setproducter(data.data.personal);
                // Alert.alert("Success",data.message)
                setLoading(false);
             } else {
@@ -147,36 +144,36 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
    }, []);
 
    // useEffect(() => {
-   //    setLikes(postLikes.filter((like) => like.postId === post.id));
+   //    setLikes(productLikes.filter((like) => like.productId === product.id));
    //    setComments(
-   //       postComments.filter((comment) => comment.postId === post.id)
+   //       productComments.filter((comment) => comment.productId === product.id)
    //    );
 
    //    // GET COMMENTS AND LIKES
-   // }, [users, postComments, postLikes]);
+   // }, [users, productComments, productLikes]);
 
    // useEffect(() => {
-   //    SetPoster(users.find((user) => user.id === post.userId));
+   //    Setproducter(users.find((user) => user.id === product.userId));
    // }, [users]);
 
    const handleComment = async () => {
       setLoading(true);
       let activeUserId = 1;
       let commentObj = {
-         ...postCommentState,
-         postId: post?.id,
+         ...productCommentState,
+         productId: product?.id,
          userId: activeUserId,
       };
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.104:5000/api/media/posts/comments/`,
+            `http://192.168.0.104:5000/api/marketing/products/comments/`,
             commentObj
          );
          if (data.status == "success") {
             console.log(data.data);
             setComments([...comments, data.data]);
-            dispatchPostComment({ type: "TEXT", payload: "" });
+            dispatchproductComment({ type: "TEXT", payload: "" });
             // Alert.alert("Success",data.message)
          } else {
             Alert.alert("Failed", data.message);
@@ -188,13 +185,13 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       }
    };
 
-   const handleLike = async (postId: number) => {
-      console.log(postId);
+   const handleLike = async (productId: number) => {
+      console.log(productId);
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.0.104:5000/api/media/posts/likes/`,
-            { userId: activeUserId, postId: postId }
+            `http://192.168.0.104:5000/api/marketing/products/likes/`,
+            { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
             console.log(data.data);
@@ -207,7 +204,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                   ...likes,
                   {
                      id: likes.length,
-                     postId: likes[0].postId,
+                     productId: likes[0].productId,
                      userId: currentUser.id,
                      createdAt: new Date(),
                      updatedAt: new Date(),
@@ -227,7 +224,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       }
    };
 
-   if ((likes.length === 0 && comments.length === 0) || !post) {
+   if (!product) {
       return (
          <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -237,7 +234,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
    }
 
    return (
-      <ScrollView style={styles.postContainer}>
+      <ScrollView style={styles.productContainer}>
          <Modal visible={openModal}>
             <View
                style={{
@@ -257,7 +254,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                </View>
             </View>
          </Modal>
-         {poster && (
+         {producter && (
             <View
                style={{
                   flexDirection: "row",
@@ -266,10 +263,11 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                }}>
                <Image
                   style={styles.profileImage}
-                  source={{ uri: poster.profileImage }}
+                  source={{ uri: producter.profileImage }}
                />
                <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
-                  {poster.firstName} {poster.middleName} {poster.lastName}
+                  {producter.firstName} {producter.middleName}{" "}
+                  {producter.lastName}
                </Text>
                <View
                   style={{
@@ -280,22 +278,50 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                      paddingHorizontal: 1,
                      borderRadius: 3,
                   }}>
-                  {currentUser.id == post?.userId && (
+                  {currentUser.id == product?.userId && (
                      <View>
                         <Button onPress={() => setOpenModal(true)}>
-                           <Feather name="edit" /> Edit Post
+                           <Feather name="edit" /> Edit product
                         </Button>
                      </View>
                   )}
                </View>
             </View>
          )}
-         <View>
-            {post?.images && <ImagesViewer images={post?.images} />}
-            {/* {post?.video && <VideoPlayer video={post?.video}/>} */}
+         {product.images && (
+            <View>
+               <ImagesViewer images={product?.images} />
+               {/* {product?.video && <VideoPlayer video={product?.video}/>} */}
+            </View>
+         )}
+         <View
+            style={{
+               flexDirection: "row",
+               marginVertical: 5,
+               justifyContent:"space-evenly",
+               alignItems: "center",
+            }}>
+            <Text style={styles.productName}>{product?.productName}</Text>
+
+            {product.initialPrice && (
+               <Text
+                  style={[
+                     styles.productInitialPrice,
+                     {
+                        color: theme.colors.secondary,
+                        textDecorationLine: "line-through",
+                     },
+                  ]}>
+                  C{product?.initialPrice}
+               </Text>
+            )}
+            <Text
+               style={[styles.productPrice, { color: theme.colors.primary }]}>
+               C{product?.price}
+            </Text>
+            <Button  mode='outlined'>Affiliate</Button>
          </View>
-         <Text style={styles.title}>{post?.title}</Text>
-         {post?.text && <TextViewer text={post.text} />}
+         {product?.description && <TextViewer text={product.description} />}
          <View>
             <View style={styles.likeCommentAmountCon}>
                <View
@@ -306,9 +332,9 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                   }}>
                   <IconButton
                      disabled={loading}
-                     onPress={() => handleLike(post.id)}
+                     onPress={() => handleLike(product!.id)}
                      mode="outlined"
-                     size={20}
+                     size={18}
                      icon={liked ? "heart" : "heart-outline"}
                   />
                   <Text style={styles.commentAmountText}>{likes.length}</Text>
@@ -321,20 +347,31 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                   }}>
                   <IconButton
                      mode="outlined"
-                     size={20}
+                     size={18}
                      icon="comment-outline"
                   />
                   <Text style={styles.commentAmountText}>
                      {comments.length}
                   </Text>
                </View>
+               <View>
+                  <Button style={{backgroundColor:"#f9f9ff"}} mode='contained-tonal'>Request</Button>
+               </View>
                {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
+            </View>
+             <View style={styles.productContents}>
+                <View>
+                    <View><Text>SIZES</Text></View>
+                    {product.sizes !== undefined && product.sizes && 
+                    <Text style={{borderWidth:2}}>{JSON.parse(product.sizes+'').map((size:any)=><Text>{size}</Text>)}</Text>}
+                </View>
+                <View><Text>Number Available</Text></View>
             </View>
             <View style={styles.commentBox}>
                <TextInput
-                  value={postCommentState.text}
+                  value={productCommentState.text}
                   onChangeText={(v) =>
-                     dispatchPostComment({ type: "TEXT", payload: v })
+                     dispatchproductComment({ type: "TEXT", payload: v })
                   }
                   style={[
                      styles.commentInputField,
@@ -352,11 +389,12 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                />
                <Entypo size={26} name="emoji-neutral" />
             </View>
+           
             <View style={{ padding: 5, marginBottom: 10 }}>
-               <Comments
-                  posterId={post?.userId}
+               <ProductComments
+                  posterId={product?.userId}
                   navigation={navigation}
-                  comments={comments}
+                  productComments={comments}
                />
             </View>
          </View>
@@ -364,10 +402,10 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
    );
 };
 
-export default FullPostComponent;
+export default ProductScreen;
 
 const styles = StyleSheet.create({
-   postContainer: {
+   productContainer: {
       backgroundColor: "#ffffff",
       // marginHorizontal:6,
       marginTop: 3,
@@ -399,7 +437,8 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       // justifyContent: "space-between",
       gap: 15,
-      paddingHorizontal: 5,
+      paddingHorizontal: 15,
+      marginVertical: 5,
    },
    commentAmountText: {
       fontFamily: "Poppins_400Regular",
@@ -410,4 +449,29 @@ const styles = StyleSheet.create({
       height: 35,
       borderRadius: 20,
    },
+   productName: {
+      fontFamily: "Poppins_400Regular",
+      fontSize: 16,
+      marginHorizontal: 10,
+      marginTop: 6,
+   },
+   productPrice: {
+      fontFamily: "Poppins_600SemiBold",
+      fontSize: 16,
+      marginHorizontal: 10,
+      marginTop: 6,
+   },
+   productInitialPrice: {
+      fontFamily: "Poppins_300Light",
+      fontSize: 16,
+      marginHorizontal: 10,
+      marginTop: 6,
+   },
+   productContents:{
+     borderRadius:2,
+     backgroundColor:"#f9f9ff",
+     margin:5,
+     padding:10,
+     height:60
+   }
 });

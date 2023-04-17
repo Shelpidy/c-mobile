@@ -1,54 +1,52 @@
-import { Modal, StyleSheet, Text, View, Image,Alert} from "react-native";
-import React, { useEffect, useState} from "react";
+import { Modal, StyleSheet, Text, View, Image, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
 import { users } from "../../data";
 import { Feather, SimpleLineIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
-import axios from "axios"
+import axios from "axios";
 
 const Comment = (props: CommentProps) => {
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [commentor, setCommentor] = useState<any>(null);
-   const [loading,setLoading] = useState<any>(false)
+   const [loading, setLoading] = useState<any>(false);
 
-   useEffect(function(){
-      console.log("Fetching user")
-      setLoading(true)
-      let fetchData = async ()=>{
-               // console.log("Fetching user")
+   useEffect(function () {
+      console.log("Fetching user");
+      setLoading(true);
+      let fetchData = async () => {
+         // console.log("Fetching user")
          //  let activeUserId = 1
-            try{
-               let response = await fetch(`http://192.168.193.183:5000/api/auth/users/${props.userId}`,{method:"GET"})
-               let data = await response.json()
-               if(data.status == 'success'){
-                  // console.log("Users-----",data.data)
-                   setCommentor(data.data.personal)
-                  // Alert.alert("Success",data.message)
-                  setLoading(false)
-               }else{
-                  Alert.alert("Failed",data.message)
-                  
-               }
-               setLoading(false)
-
-            }catch(err){
-               console.log(err)
-               Alert.alert("Failed",String(err))
-               setLoading(false)
+         try {
+            let response = await fetch(
+               `http://192.168.0.104:5000/api/auth/users/${props.userId}`,
+               { method: "GET" }
+            );
+            let data = await response.json();
+            if (data.status == "success") {
+               // console.log("Users-----",data.data)
+               setCommentor(data.data.personal);
+               // Alert.alert("Success",data.message)
+               setLoading(false);
+            } else {
+               Alert.alert("Failed", data.message);
             }
-             }
-         fetchData()
-         setCurrentUser({
+            setLoading(false);
+         } catch (err) {
+            console.log(err);
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      };
+      fetchData();
+      setCurrentUser({
          id: 1,
          email: "mexu.company@gmail.com",
          accountNumber: "1COM30000000000",
       });
-         }, []);
+   }, []);
 
-
-      const handleEditComment = ()=>{
-
-      }
+   const handleEditComment = () => {};
 
    // useEffect(() => {
    //    setCommentor(users.find((user) => user.id === props.userId));
@@ -113,16 +111,16 @@ const Comment = (props: CommentProps) => {
                            borderRadius: 3,
                         }}>
                         {(currentUser.id == props?.userId ||
-                           currentUser.id == props?.posterId) && 
-                              <View style={{flexDirection:'row'}}>
-                                 <Button onPress={() => setOpenModal(true)}>
-                                    <Feather name="edit" /> Edit
-                                 </Button>
-                                  <Button onPress={() => setOpenModal(true)}>
-                                    <Feather name='trash' /> Delete
-                                 </Button>
-                              </View>
-                           }
+                           currentUser.id == props?.posterId) && (
+                           <View style={{ flexDirection: "row" }}>
+                              <Button onPress={() => setOpenModal(true)}>
+                                 <Feather name="edit" /> Edit
+                              </Button>
+                              <Button onPress={() => setOpenModal(true)}>
+                                 <Feather name="trash" /> Delete
+                              </Button>
+                           </View>
+                        )}
                      </View>
                   </View>
                </View>

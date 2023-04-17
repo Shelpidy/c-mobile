@@ -1,5 +1,12 @@
-import { Dimensions, ScrollView, StyleSheet, Text, View,Alert} from "react-native";
-import React,{useState,useEffect} from "react";
+import {
+   Dimensions,
+   ScrollView,
+   StyleSheet,
+   Text,
+   View,
+   Alert,
+} from "react-native";
+import React, { useState, useEffect } from "react";
 import { Avatar, useTheme, Button, Divider } from "react-native-paper";
 import { Image } from "react-native";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -20,39 +27,42 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
    const [pageNumber, setPageNumber] = useState<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
-   const [loading,setLoading] = useState<boolean>(false)
-   
-   useEffect(function(){
-      setLoading(true)
-      let fetchData = async ()=>{
-          let activeUserId = 1
-            try{
-               let response = await fetch(`http://192.168.193.183:5000/api/media/posts/user/${activeUserId}`)
-               let data = await response.json()
-               if(data.status == 'success'){
-                  // console.log(data.data)
-                  // setPosts(data.data);
-                  let fetchedPost: PostComponentProps[] = data.data;
-                  let numOfPageLinks = Math.ceil(fetchedPost.length / numberOfPostsPerPage);
-                  // console.log(fetchedPost);
-                  setAllPosts(fetchedPost);
-                  setNumberOfPageLinks(numOfPageLinks);
-                  const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
-                  const lastIndex = currentIndex + numberOfPostsPerPage;
-                  setPosts(data.data.slice(currentIndex, lastIndex));
-                  // Alert.alert("Success",data.message)
-               }else{
-                  Alert.alert("Failed",data.message)
-               }
-               setLoading(false)
+   const [loading, setLoading] = useState<boolean>(false);
 
-            }catch(err){
-               Alert.alert("Failed",String(err))
-               setLoading(false)
+   useEffect(function () {
+      setLoading(true);
+      let fetchData = async () => {
+         let activeUserId = 1;
+         try {
+            let response = await fetch(
+               `http://192.168.0.104:5000/api/media/posts/user/${activeUserId}`
+            );
+            let data = await response.json();
+            if (data.status == "success") {
+               // console.log(data.data)
+               // setPosts(data.data);
+               let fetchedPost: PostComponentProps[] = data.data;
+               let numOfPageLinks = Math.ceil(
+                  fetchedPost.length / numberOfPostsPerPage
+               );
+               // console.log(fetchedPost);
+               setAllPosts(fetchedPost);
+               setNumberOfPageLinks(numOfPageLinks);
+               const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
+               const lastIndex = currentIndex + numberOfPostsPerPage;
+               setPosts(data.data.slice(currentIndex, lastIndex));
+               // Alert.alert("Success",data.message)
+            } else {
+               Alert.alert("Failed", data.message);
             }
-            }
-            fetchData() 
-         }, []);
+            setLoading(false);
+         } catch (err) {
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      };
+      fetchData();
+   }, []);
 
    useEffect(() => {
       const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
@@ -60,88 +70,89 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
       setPosts(posts.slice(currentIndex, lastIndex));
    }, [pageNumber]);
 
-   
    return (
-      <ScrollView style={{ flex: 1,backgroundColor:"#f9f9f9"}}>
-            <View style={{ justifyContent: "center", alignItems: "center" }}>
-               <Image
-                  source={{uri:"file:///storage/emulated/0/Pictures/facebook/1680605776562.jpg"}}
-                  style={[
-                     styles.profileImage,
-                     { borderColor: theme.colors.primary },
-                  ]}></Image>
+      <ScrollView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
+         <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <Image
+               source={{
+                  uri: "file:///storage/emulated/0/Pictures/facebook/1680605776562.jpg",
+               }}
+               style={[
+                  styles.profileImage,
+                  { borderColor: theme.colors.primary },
+               ]}></Image>
+            <Text
+               style={{
+                  textAlign: "center",
+                  marginVertical: 10,
+                  fontFamily: "Poppins_600SemiBold",
+               }}>
+               Mohamed Shelpidy Kamara
+            </Text>
+         </View>
+         <View style={styles.mediaContainer}>
+            <View style={{ alignItems: "center" }}>
                <Text
                   style={{
                      textAlign: "center",
-                     marginVertical: 10,
-                     fontFamily: "Poppins_600SemiBold",
+                     fontFamily: "Poppins_500Medium",
                   }}>
-                  Mohamed Shelpidy Kamara
+                  5.2k
                </Text>
-            </View>
-            <View style={styles.mediaContainer}>
-               <View style={{ alignItems: "center" }}>
+               <Button mode="contained-tonal">
                   <Text
                      style={{
+                        fontWeight: "bold",
                         textAlign: "center",
                         fontFamily: "Poppins_500Medium",
                      }}>
-                     5.2k
+                     Followers
                   </Text>
-                  <Button mode="contained-tonal">
-                     <Text
-                        style={{
-                           fontWeight: "bold",
-                           textAlign: "center",
-                           fontFamily: "Poppins_500Medium",
-                        }}>
-                        Followers
-                     </Text>
-                  </Button>
-               </View>
-               <View style={{ alignItems: "center" }}>
+               </Button>
+            </View>
+            <View style={{ alignItems: "center" }}>
+               <Text
+                  style={{
+                     textAlign: "center",
+                     fontFamily: "Poppins_500Medium",
+                  }}>
+                  220
+               </Text>
+               <Button mode="contained-tonal">
                   <Text
                      style={{
+                        fontWeight: "bold",
                         textAlign: "center",
-                        fontFamily: "Poppins_500Medium",
+                        fontFamily: "Poppins_300Light",
                      }}>
-                     220
+                     Follows
                   </Text>
-                  <Button mode="contained-tonal">
-                     <Text
-                        style={{
-                           fontWeight: "bold",
-                           textAlign: "center",
-                           fontFamily: "Poppins_300Light",
-                        }}>
-                        Follows
-                     </Text>
-                  </Button>
-               </View>
-               <View style={{ alignItems: "center" }}>
+               </Button>
+            </View>
+            <View style={{ alignItems: "center" }}>
+               <Text
+                  style={{
+                     textAlign: "center",
+                     fontFamily: "Poppins_500Medium",
+                  }}>
+                  200
+               </Text>
+               <Button mode="contained-tonal">
                   <Text
                      style={{
+                        fontWeight: "bold",
                         textAlign: "center",
-                        fontFamily: "Poppins_500Medium",
+                        fontFamily: "Poppins_300Light",
                      }}>
-                     200
+                     Posts
                   </Text>
-                  <Button mode="contained-tonal">
-                     <Text
-                        style={{
-                           fontWeight: "bold",
-                           textAlign: "center",
-                           fontFamily: "Poppins_300Light",
-                        }}>
-                        Posts
-                     </Text>
-                  </Button>
-               </View>
+               </Button>
             </View>
-            <View style={{alignItems:"center",marginBottom:5}}>
-               <ProfileNavComponent navigation={navigation} />
-            </View>
-           {posts.map((post) => {
+         </View>
+         <View style={{ alignItems: "center", marginBottom: 5 }}>
+            <ProfileNavComponent navigation={navigation} />
+         </View>
+         {posts.map((post) => {
             return (
                <PostComponent
                   key={String(post.id)}
@@ -179,5 +190,4 @@ const styles = StyleSheet.create({
       borderRadius: 100,
       borderWidth: 4,
    },
-  
 });
