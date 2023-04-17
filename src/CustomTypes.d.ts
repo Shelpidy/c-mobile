@@ -1,7 +1,8 @@
 declare type CurrentUser = {
-   id?: number;
-   email?: string;
-   accountNumber?: string;
+   id?: number
+   email?: string
+   accountNumber?: string
+   followingIds?:number[]
 };
 
 declare type CommentProps = {

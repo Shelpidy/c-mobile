@@ -1,41 +1,70 @@
+import React, { useEffect, useState } from "react";
 import {
+   Alert,
    Dimensions,
+   Image,
    ScrollView,
    StyleSheet,
    Text,
    View,
-   Alert,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { Avatar, useTheme, Button, Divider } from "react-native-paper";
-import { Image } from "react-native";
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import ProfileNavComponent from "../components/ProfileNavComponent";
+import { ActivityIndicator, Button, useTheme } from "react-native-paper";
 import PostComponent from "../components/MediaPosts/PostComponent";
+import ProfileNavComponent from "../components/ProfileNavComponent";
 
-type ProfileScreenProps = {
-   navigation: any;
-};
+
 
 const { width, height } = Dimensions.get("window");
 
-const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
+const ProfileScreen = ({ navigation,route }:any) => {
    const theme = useTheme();
-   const [posts, setPosts] = useState<PostComponentProps[]>([]);
-   const [allPosts, setAllPosts] = useState<PostComponentProps[] | null>(null);
+   const [posts, setPosts] = useState<PostComponentProps[] | null>(null);
+   const [allPosts, setAllPosts] = useState<PostComponentProps[]>([]);
+   const [user,setUser] = useState<any>(null)
    const [pageNumber, setPageNumber] = useState<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
 
+   
+   useEffect(function () {
+      console.log("Fetching user");
+      setLoading(true);
+      let fetchData = async () => {
+         // console.log("Fetching user")
+         //  let activeUserId = 1
+         try {
+            let response = await fetch(
+               `http://192.168.0.104:5000/api/auth/users/${route.params.userId}`,
+               { method: "GET" }
+            );
+            let data = await response.json();
+            if (data.status == "success") {
+               console.log("Users-----", data.data);
+               setUser(data.data);
+               // Alert.alert("Success",data.message)
+               setLoading(false);
+            } else {
+               Alert.alert("Failed", data.message);
+            }
+            setLoading(false);
+         } catch (err) {
+            console.log(err);
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      };
+      fetchData();
+   }, []);
+
+
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
-         let activeUserId = 1;
+         let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/media/posts/user/${activeUserId}`
+               `http://192.168.0.104:5000/api/media/posts/user/${userId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -67,19 +96,23 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
    useEffect(() => {
       const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
       const lastIndex = currentIndex + numberOfPostsPerPage;
-      setPosts(posts.slice(currentIndex, lastIndex));
+      setPosts(allPosts?.slice(currentIndex, lastIndex));
    }, [pageNumber]);
 
    return (
       <ScrollView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
-         <View style={{ justifyContent: "center", alignItems: "center" }}>
+         {user && <View>
+               <ActivityIndicator/>
+            </View>}
+         {user && <>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
             <Image
                source={{
                   uri: "file:///storage/emulated/0/Pictures/facebook/1680605776562.jpg",
                }}
                style={[
                   styles.profileImage,
-                  { borderColor: theme.colors.primary },
+                  { borderColor: theme.colors.primary},
                ]}></Image>
             <Text
                style={{
@@ -87,7 +120,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                   marginVertical: 10,
                   fontFamily: "Poppins_600SemiBold",
                }}>
-               Mohamed Shelpidy Kamara
+               {user?.personal?.fullName}
             </Text>
          </View>
          <View style={styles.mediaContainer}>
@@ -110,6 +143,8 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                   </Text>
                </Button>
             </View>
+            <View><Button>follow</Button></View>
+
             <View style={{ alignItems: "center" }}>
                <Text
                   style={{
@@ -125,7 +160,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                         textAlign: "center",
                         fontFamily: "Poppins_300Light",
                      }}>
-                     Follows
+                     Following
                   </Text>
                </Button>
             </View>
@@ -147,12 +182,58 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                      Posts
                   </Text>
                </Button>
+               
+            </View>
+             <View style={{ alignItems: "center" }}>
+               <Text
+                  style={{
+                     textAlign: "center",
+                     fontFamily: "Poppins_500Medium",
+                  }}>
+                  200
+               </Text>
+               <Button mode="contained-tonal">
+                  <Text
+                     style={{
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        fontFamily: "Poppins_300Light",
+                     }}>
+                     Sales
+                  </Text>
+               </Button>
+               
+            </View>
+             <View style={{ alignItems: "center" }}>
+               <Text
+                  style={{
+                     textAlign: "center",
+                     fontFamily: "Poppins_500Medium",
+                  }}>
+                  200
+               </Text>
+               <Button mode="contained-tonal">
+                  <Text
+                     style={{
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        fontFamily: "Poppins_300Light",
+                     }}>
+                     Affiliate Product
+                  </Text>
+               </Button>
             </View>
          </View>
+
+         </> }
+        
          <View style={{ alignItems: "center", marginBottom: 5 }}>
             <ProfileNavComponent navigation={navigation} />
          </View>
-         {posts.map((post) => {
+         {!posts && <View>
+                <ActivityIndicator/>
+            </View>}
+         {posts && posts.map((post) => {
             return (
                <PostComponent
                   key={String(post.id)}

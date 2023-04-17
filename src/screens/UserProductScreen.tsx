@@ -3,13 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ProductComponent from "../components/Marketing/ProductComponent";
 
-// import { Products as _fetchedPost } from "../../data";
-
-type ProductsComponentProps = {
-   navigation?: any;
-};
-
-const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
+const UserProductScreen = ({ navigation,route }:any) => {
    const [products, setProducts] = useState<ProductComponentProps[]>([]);
    const [allProducts, setAllProducts] = useState<ProductComponentProps[]>([]);
    const [pageNumber, setPageNumber] = useState<number>(1);
@@ -17,14 +11,16 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
+   const [owner,setOwner] = useState<User>()
 
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
          let activeUserId = 1;
+         setOwner(route.params.user)
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/marketing/products`
+               `http://192.168.0.104:5000/api/marketing/products/user/${route.params.user.id}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -69,10 +65,10 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
 
    return (
       <ScrollView>
-         {/* <Text>ProductsComponent {Products.length}</Text> */}
         <View>
             <Text>Owner and Search</Text>
         </View>
+         {/* <Text>ProductsComponent {Products.length}</Text> */}
          {products.map((product) => {
             return (
                <ProductComponent
@@ -86,6 +82,6 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
    );
 };
 
-export default MarketingScreen;
+export default UserProductScreen;
 
 const styles = StyleSheet.create({});

@@ -3,13 +3,10 @@ import React from "react";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
 
-type ProfileNavComponentProps = {
-   navigation: any;
-};
 
 const { width } = Dimensions.get("window");
 
-const ProfileNavComponent = ({ navigation }: ProfileNavComponentProps) => {
+const ProfileNavComponent = ({ navigation,user }:any) => {
    return (
       <View style={styles.navs}>
          <View style={styles.navLink}>
@@ -23,6 +20,13 @@ const ProfileNavComponent = ({ navigation }: ProfileNavComponentProps) => {
             <MaterialCommunityIcons name="cog" />
             <Text style={{ fontFamily: "Poppins_500Medium" }}>Posts</Text>
             <Button>
+               <Entypo name="chevron-thin-right" />
+            </Button>
+         </View>
+          <View style={styles.navLink}>
+            <MaterialCommunityIcons name="cog" />
+            <Text style={{ fontFamily: "Poppins_500Medium" }}>Products</Text>
+               <Button onPress={() => navigation.navigate("UserProductScreen",{user})}>
                <Entypo name="chevron-thin-right" />
             </Button>
          </View>

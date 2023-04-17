@@ -16,7 +16,9 @@ import FullPostComponent from "../screens/FullPostViewScreen";
 import ProductCommentsViewerScreen from "../screens/ProductCommentsViewerScreen";
 import MarketingScreen from "../screens/MarketingScreen";
 import ProductScreen from "../screens/ProductScreen";
-
+import UserProductScreen from "../screens/UserProductScreen";
+import ProductRequestScreen from "../screens/ProductRequestScreen";
+import UserRequestScreen from "../screens/UserRequestScreen";
 const Stack = createNativeStackNavigator();
 type HomeStackProps = {
    navigation: any;
@@ -66,6 +68,15 @@ const HomeStack = (props: HomeStackProps) => {
          <Stack.Screen
             name="ProductCommentsViewerScreen"
             component={ProductCommentsViewerScreen}></Stack.Screen>
+         <Stack.Screen
+            name="UserProductScreen"
+            component={UserProductScreen}></Stack.Screen>
+          <Stack.Screen
+            name="ProductRequestScreen"
+            component={ProductRequestScreen}></Stack.Screen>
+         <Stack.Screen
+            name="UserRequestScreen"
+            component={UserRequestScreen}></Stack.Screen>
       </Stack.Navigator>
    );
 };
