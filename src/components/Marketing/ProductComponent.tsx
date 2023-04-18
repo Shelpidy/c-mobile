@@ -82,7 +82,7 @@ const ProductComponent = (props: ProductComponentProps) => {
          let activeUserId = 1;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.104:5000/api/marketing/products/cl/${props.id}`
+               `http://192.168.0.106:5000/api/marketing/products/cl/${props.id}`
             );
             if (data.status == "success") {
                console.log("Comments and Likes -----", data.data);
@@ -114,7 +114,7 @@ const ProductComponent = (props: ProductComponentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/auth/users/${props.userId}`,
+               `http://192.168.0.106:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -154,7 +154,7 @@ const ProductComponent = (props: ProductComponentProps) => {
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.0.104:5000/api/marketing/products/likes/`,
+            `http://192.168.0.106:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {

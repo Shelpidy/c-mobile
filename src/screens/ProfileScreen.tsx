@@ -3,14 +3,18 @@ import {
    Alert,
    Dimensions,
    Image,
+   Pressable,
    ScrollView,
    StyleSheet,
    Text,
    View,
+   TextInput
 } from "react-native";
-import { ActivityIndicator, Button, useTheme } from "react-native-paper";
+import { ActivityIndicator, Button,useTheme } from "react-native-paper";
 import PostComponent from "../components/MediaPosts/PostComponent";
 import ProfileNavComponent from "../components/ProfileNavComponent";
+import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import SearchForm from "../components/SearchForm";
 
 
 
@@ -26,7 +30,13 @@ const ProfileScreen = ({ navigation,route }:any) => {
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
 
-   
+   const searchPosts = (_token:string)=>{
+      console.log("From profile",_token)
+      let token = _token.toLowerCase()
+      let newPosts = allPosts?.filter(post => post?.text?.toLowerCase().includes(token) || post?.title?.toLowerCase().includes(token))
+      setPosts(newPosts)
+   }
+
    useEffect(function () {
       console.log("Fetching user");
       setLoading(true);
@@ -35,7 +45,7 @@ const ProfileScreen = ({ navigation,route }:any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.0.106:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -64,7 +74,7 @@ const ProfileScreen = ({ navigation,route }:any) => {
          let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/media/posts/user/${userId}`
+               `http://192.168.0.106:5000/api/media/posts/user/${userId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -101,14 +111,14 @@ const ProfileScreen = ({ navigation,route }:any) => {
 
    return (
       <ScrollView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
-         {user && <View>
+         {!user && <View>
                <ActivityIndicator/>
             </View>}
          {user && <>
           <View style={{ justifyContent: "center", alignItems: "center" }}>
             <Image
                source={{
-                  uri: "file:///storage/emulated/0/Pictures/facebook/1680605776562.jpg",
+                  uri: user?.personal?.profileImage,
                }}
                style={[
                   styles.profileImage,
@@ -123,16 +133,16 @@ const ProfileScreen = ({ navigation,route }:any) => {
                {user?.personal?.fullName}
             </Text>
          </View>
-         <View style={styles.mediaContainer}>
-            <View style={{ alignItems: "center" }}>
+         <ScrollView horizontal style={styles.mediaContainer}>
+            <View style={{ alignItems: "center",margin:4}}>
                <Text
                   style={{
                      textAlign: "center",
                      fontFamily: "Poppins_500Medium",
                   }}>
-                  5.2k
+                  {user?.followers?.count}
                </Text>
-               <Button mode="contained-tonal">
+               <Button onPress={()=> navigation.navigate("FollowersScreen",{user:user?.personal})} mode="contained-tonal">
                   <Text
                      style={{
                         fontWeight: "bold",
@@ -143,17 +153,16 @@ const ProfileScreen = ({ navigation,route }:any) => {
                   </Text>
                </Button>
             </View>
-            <View><Button>follow</Button></View>
 
-            <View style={{ alignItems: "center" }}>
+            <View style={{ alignItems: "center",margin:4}}>
                <Text
                   style={{
                      textAlign: "center",
                      fontFamily: "Poppins_500Medium",
                   }}>
-                  220
+                  {user?.followings?.count}
                </Text>
-               <Button mode="contained-tonal">
+               <Button onPress={()=> navigation.navigate("FollowingsScreen",{user:user?.personal})} mode="contained-tonal">
                   <Text
                      style={{
                         fontWeight: "bold",
@@ -164,7 +173,7 @@ const ProfileScreen = ({ navigation,route }:any) => {
                   </Text>
                </Button>
             </View>
-            <View style={{ alignItems: "center" }}>
+            {/* <View style={{ alignItems: "center",margin:4}}>
                <Text
                   style={{
                      textAlign: "center",
@@ -183,14 +192,14 @@ const ProfileScreen = ({ navigation,route }:any) => {
                   </Text>
                </Button>
                
-            </View>
-             <View style={{ alignItems: "center" }}>
+            </View> */}
+             <View style={{ alignItems: "center",margin:4}}>
                <Text
                   style={{
                      textAlign: "center",
                      fontFamily: "Poppins_500Medium",
                   }}>
-                  200
+                  {user?.sales?.count}
                </Text>
                <Button mode="contained-tonal">
                   <Text
@@ -204,13 +213,13 @@ const ProfileScreen = ({ navigation,route }:any) => {
                </Button>
                
             </View>
-             <View style={{ alignItems: "center" }}>
+             <View style={{ alignItems: "center",margin:4}}>
                <Text
                   style={{
                      textAlign: "center",
                      fontFamily: "Poppins_500Medium",
                   }}>
-                  200
+                 {user?.affiliates?.count}
                </Text>
                <Button mode="contained-tonal">
                   <Text
@@ -223,13 +232,14 @@ const ProfileScreen = ({ navigation,route }:any) => {
                   </Text>
                </Button>
             </View>
-         </View>
+         </ScrollView>
 
          </> }
         
          <View style={{ alignItems: "center", marginBottom: 5 }}>
-            <ProfileNavComponent navigation={navigation} />
+            <ProfileNavComponent navigation={navigation} user={user?.personal} />
          </View>
+         <SearchForm setSearchValue={(v)=>searchPosts(v)}/>
          {!posts && <View>
                 <ActivityIndicator/>
             </View>}
@@ -258,12 +268,12 @@ const styles = StyleSheet.create({
       fontFamily: "Poppins_300Light",
    },
    mediaContainer: {
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "center",
+      // display: "flex",
+      // flexDirection: "row",
+      // justifyContent: "center",
       gap: 10,
       marginTop: 0,
-      marginBottom: 8,
+      marginBottom: 15,
    },
    profileImage: {
       width: 100,

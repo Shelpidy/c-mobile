@@ -7,6 +7,7 @@ import {
    Image,
    Alert,
    ScrollView,
+   Pressable,
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../components/ImagesViewer";
@@ -21,6 +22,8 @@ import {
    FontAwesome,
    MaterialCommunityIcons,
    Feather,
+   Ionicons,
+   EvilIcons,
 } from "@expo/vector-icons";
 import axios from "axios";
 
@@ -92,7 +95,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
          let postId = route.params.post.id;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.104:5000/api/media/posts/cl/${postId}`
+               `http://192.168.0.106:5000/api/media/posts/cl/${postId}`
             );
             if (data.status == "success") {
                console.log(data.data);
@@ -124,7 +127,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/auth/users/${userId}`,
+               `http://192.168.0.106:5000/api/auth/users/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -170,7 +173,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.104:5000/api/media/posts/comments/`,
+            `http://192.168.0.106:5000/api/media/posts/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -193,7 +196,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.0.104:5000/api/media/posts/likes/`,
+            `http://192.168.0.106:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -296,21 +299,25 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
          </View>
          <Text style={styles.title}>{post?.title}</Text>
          {post?.text && <TextViewer text={post.text} />}
-         <View>
-            <View style={styles.likeCommentAmountCon}>
+         <View >
+
+        <View style={[styles.likeCommentAmountCon,{borderColor:theme.colors.secondary}]}>
                <View
                   style={{
                      flexDirection: "row",
                      alignItems: "center",
                      justifyContent: "flex-start",
                   }}>
-                  <IconButton
+                     <Pressable  disabled={loading} onPress={() => handleLike(post.id)}>
+                        <Ionicons size={30} color={theme.colors.secondary} name={liked ? "heart-sharp" : "heart-outline"} />
+                     </Pressable>
+                  {/* <IconButton
                      disabled={loading}
                      onPress={() => handleLike(post.id)}
                      mode="outlined"
                      size={20}
                      icon={liked ? "heart" : "heart-outline"}
-                  />
+                  /> */}
                   <Text style={styles.commentAmountText}>{likes.length}</Text>
                </View>
                <View
@@ -319,17 +326,22 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                      alignItems: "center",
                      justifyContent: "flex-start",
                   }}>
-                  <IconButton
+                  <Pressable>
+                     <Ionicons size={30} color={theme.colors.secondary}  name='chatbox-outline' />
+                  </Pressable>
+                  {/* <IconButton
                      mode="outlined"
                      size={20}
                      icon="comment-outline"
-                  />
+                  /> */}
                   <Text style={styles.commentAmountText}>
                      {comments.length}
                   </Text>
                </View>
                {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
-            </View>
+         </View>
+   
+    
             <View style={styles.commentBox}>
                <TextInput
                   value={postCommentState.text}
@@ -398,11 +410,16 @@ const styles = StyleSheet.create({
    likeCommentAmountCon: {
       flexDirection: "row",
       // justifyContent: "space-between",
-      gap: 15,
-      paddingHorizontal: 5,
+      gap: 25,
+      padding:10,
+      // borderWidth:1,
+      marginLeft:10,
+      borderRadius:20,
+      // justifyContent:'center',
+      
    },
    commentAmountText: {
-      fontFamily: "Poppins_400Regular",
+      fontFamily: "Poppins_200ExtraLight",
       fontSize: 16,
    },
    profileImage: {

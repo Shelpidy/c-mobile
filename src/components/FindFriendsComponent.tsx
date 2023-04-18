@@ -18,7 +18,7 @@ const FindFriendsComponent = () => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/media/unfollowing/${activeUserId}`,
+               `http://192.168.0.106:5000/api/media/unfollowing/${activeUserId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -56,10 +56,10 @@ const FindFriendsComponent = () => {
       );
    return (
       <View>
-         <Text
+         {/* <Text
             style={{ fontFamily: "Poppins_600SemiBold", marginHorizontal: 15 }}>
             <Feather size={20} name="users" /> Users
-         </Text>
+         </Text> */}
          <ScrollView horizontal style={styles.container}>
             {users?.map((user) => {
                return <FindFriendComponent key={String(user.id)} {...user} />;

@@ -36,7 +36,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
       };
       try {
          let response = await axios.post(
-            "http://192.168.0.104:5000/api/transactions/sendcommodity",
+            "http://192.168.0.106:5000/api/transactions/sendcommodity",
             postObj
          );
          if (response.status === 201) {

@@ -35,7 +35,7 @@ const postReducer = (state: Post = initialState, action: Action) => {
    }
 };
 
-const PostForm = () => {
+const ProductForm = () => {
    const [loading, setLoading] = useState<boolean>(false);
    const [postState, postDispatch] = useReducer(postReducer, initialState);
    const [imageOpen, setImageOpen] = useState(false);
@@ -50,7 +50,7 @@ const PostForm = () => {
       let postObj = { ...postState, userId: activeUserId };
       try {
          let response = await axios.post(
-            "http://192.168.0.104:5000/api/media/posts/",
+            "http://192.168.0.106:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {
@@ -177,7 +177,7 @@ const PostForm = () => {
    );
 };
 
-export default PostForm;
+export default ProductForm;
 
 const styles = StyleSheet.create({
    formContainer: {

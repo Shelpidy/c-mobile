@@ -7,6 +7,7 @@ import {
    ScrollView,
    Touchable,
    Pressable,
+   Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 // import { ScrollView } from "react-native-gesture-handler";
@@ -14,6 +15,8 @@ import React, { useEffect, useState } from "react";
 type ImageViewerProps = {
    images: any;
 };
+
+const {width,height} = Dimensions.get("window")
 
 const ImagesViewer: any = ({ images }: ImageViewerProps) => {
    const [postImages, setPostImages] = useState<any>(null);
@@ -70,10 +73,10 @@ const styles = StyleSheet.create({
       borderRadius: 2,
    },
    otherImage: {
-      width: 150,
-      height: 180,
+      width: width/2,
+      height: 200,
       marginBottom: 5,
-      margin: 4,
+      margin: 3,
       borderRadius: 2,
    },
 });

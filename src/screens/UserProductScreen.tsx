@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Alert, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ProductComponent from "../components/Marketing/ProductComponent";
+import SearchForm from "../components/SearchForm";
 
 const UserProductScreen = ({ navigation,route }:any) => {
    const [products, setProducts] = useState<ProductComponentProps[]>([]);
@@ -18,9 +19,10 @@ const UserProductScreen = ({ navigation,route }:any) => {
       let fetchData = async () => {
          let activeUserId = 1;
          setOwner(route.params.user)
+         console.log("User product screen",route.params.user)
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/marketing/products/user/${route.params.user.id}`
+               `http://192.168.0.106:5000/api/marketing/products/user/${route.params.user.id}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -63,11 +65,16 @@ const UserProductScreen = ({ navigation,route }:any) => {
       );
    }
 
+      const searchProducts = (_token:string)=>{
+        console.log("From product",_token)
+        let token = _token.toLowerCase()
+        let newProducts = allProducts?.filter(Product => Product?.description.toLowerCase().includes(token) || Product?.productName?.toLowerCase().includes(token) || Product?.price?.toLowerCase().includes(token))
+        setProducts(newProducts)
+   }
+
    return (
-      <ScrollView>
-        <View>
-            <Text>Owner and Search</Text>
-        </View>
+      <ScrollView style={{backgroundColor:"#f9f9f9"}}>
+        <SearchForm setSearchValue={searchProducts}/>
          {/* <Text>ProductsComponent {Products.length}</Text> */}
          {products.map((product) => {
             return (

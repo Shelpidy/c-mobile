@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "react-native-paper";
 import PostsComponent from "../components/MediaPosts/PostsComponent";
 import FindFriendsComponent from "../components/FindFriendsComponent";
+import PostProductFormNav from "../components/PostProductFormNav";
 // import { withTheme,Button,Theme } from "@rneui/themed";
 // import { Theme, Button } from "@rneui/base";
 
@@ -14,6 +15,7 @@ type HomeScreenProps = {
 const HomeScreen = ({ theme, navigation }: HomeScreenProps) => {
    return (
       <ScrollView style={styles.container}>
+         <PostProductFormNav page='post' navigation={navigation}/>
          <FindFriendsComponent />
          <PostsComponent navigation={navigation} />
          <Button onPress={() => navigation.navigate("ProfileScreen")}>

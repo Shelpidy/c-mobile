@@ -14,7 +14,7 @@ const FindFriendComponent = (user: User) => {
    const handleFollow = async (userId: number) => {
       try {
          let { data } = await axios.put(
-            `http://192.168.0.104:5000/api/media/follows/`,
+            `http://192.168.0.106:5000/api/media/follows/`,
             { followerId: 1, followingId: userId },
             { headers: { Accept: "application/json" } }
          );

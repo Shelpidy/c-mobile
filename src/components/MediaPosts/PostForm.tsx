@@ -44,13 +44,24 @@ const PostForm = () => {
    // const [assets, setAssets] = useState<Asset[]>([])
    const theme = useTheme();
 
+      const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+
+      useEffect(() => {
+      // dispatchPostComment({ type: "", payload: "" });
+      setCurrentUser({
+         id: 1,
+         email: "mexu.company@gmail.com",
+         accountNumber: "1COM10000000000",
+      });
+   }, []);
+
    const handlePost = async () => {
       setLoading(true);
-      let activeUserId = 1;
+      let activeUserId = currentUser.id;
       let postObj = { ...postState, userId: activeUserId };
       try {
          let response = await axios.post(
-            "http://192.168.0.104:5000/api/media/posts/",
+            "http://192.168.0.106:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {

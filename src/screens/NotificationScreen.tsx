@@ -26,7 +26,7 @@ const NotificationScreen = () => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/notifications/${activeUserId}`,
+               `http://192.168.0.106:5000/api/notifications/${activeUserId}`,
                { method: "GET" }
             );
             let data = await response.json();

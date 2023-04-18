@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { ActivityIndicator, Button, useTheme } from "react-native-paper";
 import PostComponent from "../components/MediaPosts/PostComponent";
+import ProfileNavComponent from "../components/ProfileNavComponent";
+
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,7 +33,7 @@ const UserProfileScreen = ({ navigation,route }:any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.0.106:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -60,7 +62,7 @@ const UserProfileScreen = ({ navigation,route }:any) => {
          let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.0.104:5000/api/media/posts/user/${userId}`
+               `http://192.168.0.106:5000/api/media/posts/user/${userId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -97,14 +99,14 @@ const UserProfileScreen = ({ navigation,route }:any) => {
 
    return (
       <ScrollView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
-         {user && <View>
+         {!user && <View>
                <ActivityIndicator/>
             </View>}
          {user && <>
           <View style={{ justifyContent: "center", alignItems: "center" }}>
             <Image
                source={{
-                  uri: "file:///storage/emulated/0/Pictures/facebook/1680605776562.jpg",
+                  uri: user?.personal?.profileImage,
                }}
                style={[
                   styles.profileImage,
@@ -119,8 +121,8 @@ const UserProfileScreen = ({ navigation,route }:any) => {
                {user?.personal?.fullName}
             </Text>
          </View>
-         <View style={styles.mediaContainer}>
-            <View style={{ alignItems: "center" }}>
+          <ScrollView horizontal style={styles.mediaContainer}>
+            <View style={{ alignItems: "center",margin:4}}>
                <Text
                   style={{
                      textAlign: "center",
@@ -128,7 +130,7 @@ const UserProfileScreen = ({ navigation,route }:any) => {
                   }}>
                   5.2k
                </Text>
-               <Button mode="contained-tonal">
+               <Button onPress={()=> navigation.navigate("FollowersScreen",{user})} mode="contained-tonal">
                   <Text
                      style={{
                         fontWeight: "bold",
@@ -139,9 +141,8 @@ const UserProfileScreen = ({ navigation,route }:any) => {
                   </Text>
                </Button>
             </View>
-            <View><Button>follow</Button></View>
 
-            <View style={{ alignItems: "center" }}>
+            <View style={{ alignItems: "center",margin:4}}>
                <Text
                   style={{
                      textAlign: "center",
@@ -160,27 +161,8 @@ const UserProfileScreen = ({ navigation,route }:any) => {
                   </Text>
                </Button>
             </View>
-            <View style={{ alignItems: "center" }}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_500Medium",
-                  }}>
-                  200
-               </Text>
-               <Button mode="contained-tonal">
-                  <Text
-                     style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        fontFamily: "Poppins_300Light",
-                     }}>
-                     Posts
-                  </Text>
-               </Button>
-               
-            </View>
-             <View style={{ alignItems: "center" }}>
+           
+             <View style={{ alignItems: "center",margin:4}}>
                <Text
                   style={{
                      textAlign: "center",
@@ -200,7 +182,7 @@ const UserProfileScreen = ({ navigation,route }:any) => {
                </Button>
                
             </View>
-             <View style={{ alignItems: "center" }}>
+             <View style={{ alignItems: "center",margin:4}}>
                <Text
                   style={{
                      textAlign: "center",
@@ -219,22 +201,33 @@ const UserProfileScreen = ({ navigation,route }:any) => {
                   </Text>
                </Button>
             </View>
-         </View>
+         </ScrollView>
          </> }
         
-         {/* <View style={{ alignItems: "center", marginBottom: 5 }}>
-            <ProfileNavComponent navigation={navigation} />
-         </View> */}
+         <View style={{ alignItems: "center", marginBottom: 5 }}>
+            <ProfileNavComponent navigation={navigation} user={user?.personal} />
+         </View>
          {!posts && <View>
                 <ActivityIndicator/>
             </View>}
          {posts && posts.map((post) => {
             return (
+               <View key={String(post.id)}>
+                   <View style={{ alignItems: "center",backgroundColor:"#ffffff",borderRadius:10,width:200,justifyContent:"center",flexDirection:'row'}}>
+                     <Text
+                        style={{
+                           fontFamily: "Poppins_500Medium",
+                        }}>
+                     Posts 200
+                     </Text>
+               </View>
                <PostComponent
-                  key={String(post.id)}
+                  
                   {...post}
                   navigation={navigation}
                />
+               </View>
+               
             );
          })}
       </ScrollView>
@@ -253,12 +246,12 @@ const styles = StyleSheet.create({
       fontFamily: "Poppins_300Light",
    },
    mediaContainer: {
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "center",
+      // display: "flex",
+      // flexDirection: "row",
+      // justifyContent: "center",
       gap: 10,
       marginTop: 0,
-      marginBottom: 8,
+      marginBottom: 15,
    },
    profileImage: {
       width: 100,

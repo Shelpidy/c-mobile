@@ -1,5 +1,5 @@
 import { Dimensions, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React,{useState,useEffect} from "react";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
 
@@ -7,22 +7,36 @@ import { Button } from "react-native-paper";
 const { width } = Dimensions.get("window");
 
 const ProfileNavComponent = ({ navigation,user }:any) => {
+   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+
+      useEffect(() => {
+      // dispatchPostComment({ type: "", payload: "" });
+      setCurrentUser({
+         id: 1,
+         email: "mexu.company@gmail.com",
+         accountNumber: "1COM10000000000",
+      });
+   }, []);
    return (
       <View style={styles.navs}>
-         <View style={styles.navLink}>
+         { currentUser.id === user?.id && 
+          <View style={styles.navLink}>
             <MaterialCommunityIcons name="cog" />
             <Text style={{ fontFamily: "Poppins_500Medium" }}>Settings</Text>
             <Button>
                <Entypo name="chevron-thin-right" />
             </Button>
          </View>
-         <View style={styles.navLink}>
+
+         }
+        
+         {/* <View style={styles.navLink}>
             <MaterialCommunityIcons name="cog" />
             <Text style={{ fontFamily: "Poppins_500Medium" }}>Posts</Text>
-            <Button>
+            <Button  onPress={() => navigation.navigate("UserPostScreen",{user})}>
                <Entypo name="chevron-thin-right" />
             </Button>
-         </View>
+         </View> */}
           <View style={styles.navLink}>
             <MaterialCommunityIcons name="cog" />
             <Text style={{ fontFamily: "Poppins_500Medium" }}>Products</Text>
@@ -30,27 +44,42 @@ const ProfileNavComponent = ({ navigation,user }:any) => {
                <Entypo name="chevron-thin-right" />
             </Button>
          </View>
-         <View style={styles.navLink}>
+         {
+            currentUser.id === user?.id && 
+             <View style={styles.navLink}>
             <MaterialCommunityIcons name="cog" />
             <Text style={{ fontFamily: "Poppins_500Medium" }}>Send Money</Text>
             <Button onPress={() => navigation.navigate("TransferMoneyScreen")}>
                <Entypo name="chevron-thin-right" />
             </Button>
          </View>
-         <View style={styles.navLink}>
+
+         }
+         {
+             currentUser.id === user?.id && 
+              <View style={styles.navLink}>
             <MaterialCommunityIcons name="cog" />
             <Text style={{ fontFamily: "Poppins_500Medium" }}>Transferees</Text>
             <Button>
                <Entypo name="chevron-thin-right" />
             </Button>
          </View>
-         <View style={styles.navLink}>
+
+         }
+         {
+             currentUser.id === user?.id && 
+              <View style={styles.navLink}>
             <MaterialCommunityIcons name="cog" />
             <Text style={{ fontFamily: "Poppins_500Medium" }}>Logout</Text>
             <Button>
                <Entypo name="chevron-thin-right" />
             </Button>
          </View>
+
+         }
+        
+        
+        
       </View>
    );
 };
@@ -64,14 +93,15 @@ const styles = StyleSheet.create({
       width: width - 40,
       borderRadius: 45,
       // marginBottom:120,
-      padding: 20,
+      paddingVertical: 15,
+      paddingHorizontal:10
       // alignItems:'center'
    },
    navLink: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      marginVertical: 1,
+      marginVertical: 0,
       // backgroundColor:"#f9f9f9",
       paddingVertical: 1,
       paddingHorizontal: 25,
