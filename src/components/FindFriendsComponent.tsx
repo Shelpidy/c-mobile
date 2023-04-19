@@ -6,7 +6,7 @@ import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { ActivityIndicator } from "react-native-paper";
 
-const FindFriendsComponent = () => {
+const FindFriendsComponent = ({ navigation }: any) => {
    const [users, setUsers] = useState<User[]>();
    const [loading, setLoading] = useState<boolean>(false);
 
@@ -18,7 +18,7 @@ const FindFriendsComponent = () => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/media/unfollowing/${activeUserId}`,
+               `http://192.168.0.108:5000/api/media/unfollowing/${activeUserId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -62,7 +62,13 @@ const FindFriendsComponent = () => {
          </Text> */}
          <ScrollView horizontal style={styles.container}>
             {users?.map((user) => {
-               return <FindFriendComponent key={String(user.id)} {...user} />;
+               return (
+                  <FindFriendComponent
+                     key={String(user.id)}
+                     user={user}
+                     navigation={navigation}
+                  />
+               );
             })}
          </ScrollView>
       </View>
@@ -73,7 +79,7 @@ export default FindFriendsComponent;
 
 const styles = StyleSheet.create({
    container: {
-      backgroundColor: "#f9f9f9",
+      backgroundColor: "#f5f5f5",
       padding: 5,
    },
 });

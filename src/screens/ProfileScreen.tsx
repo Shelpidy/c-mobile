@@ -8,34 +8,36 @@ import {
    StyleSheet,
    Text,
    View,
-   TextInput
+   TextInput,
 } from "react-native";
-import { ActivityIndicator, Button,useTheme } from "react-native-paper";
+import { ActivityIndicator, Button, useTheme } from "react-native-paper";
 import PostComponent from "../components/MediaPosts/PostComponent";
 import ProfileNavComponent from "../components/ProfileNavComponent";
 import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import SearchForm from "../components/SearchForm";
 
-
-
 const { width, height } = Dimensions.get("window");
 
-const ProfileScreen = ({ navigation,route }:any) => {
+const ProfileScreen = ({ navigation, route }: any) => {
    const theme = useTheme();
    const [posts, setPosts] = useState<PostComponentProps[] | null>(null);
    const [allPosts, setAllPosts] = useState<PostComponentProps[]>([]);
-   const [user,setUser] = useState<any>(null)
+   const [user, setUser] = useState<any>(null);
    const [pageNumber, setPageNumber] = useState<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
 
-   const searchPosts = (_token:string)=>{
-      console.log("From profile",_token)
-      let token = _token.toLowerCase()
-      let newPosts = allPosts?.filter(post => post?.text?.toLowerCase().includes(token) || post?.title?.toLowerCase().includes(token))
-      setPosts(newPosts)
-   }
+   const searchPosts = (_token: string) => {
+      console.log("From profile", _token);
+      let token = _token.toLowerCase();
+      let newPosts = allPosts?.filter(
+         (post) =>
+            post?.text?.toLowerCase().includes(token) ||
+            post?.title?.toLowerCase().includes(token)
+      );
+      setPosts(newPosts);
+   };
 
    useEffect(function () {
       console.log("Fetching user");
@@ -45,7 +47,7 @@ const ProfileScreen = ({ navigation,route }:any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.0.108:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -67,14 +69,13 @@ const ProfileScreen = ({ navigation,route }:any) => {
       fetchData();
    }, []);
 
-
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
          let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/media/posts/user/${userId}`
+               `http://192.168.0.108:5000/api/media/posts/user/${userId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -110,148 +111,190 @@ const ProfileScreen = ({ navigation,route }:any) => {
    }, [pageNumber]);
 
    return (
-      <ScrollView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
-         {!user && <View>
-               <ActivityIndicator/>
-            </View>}
-         {user && <>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Image
-               source={{
-                  uri: user?.personal?.profileImage,
-               }}
-               style={[
-                  styles.profileImage,
-                  { borderColor: theme.colors.primary},
-               ]}></Image>
-            <Text
-               style={{
-                  textAlign: "center",
-                  marginVertical: 10,
-                  fontFamily: "Poppins_600SemiBold",
-               }}>
-               {user?.personal?.fullName}
-            </Text>
-         </View>
-         <ScrollView horizontal style={styles.mediaContainer}>
-            <View style={{ alignItems: "center",margin:4}}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_500Medium",
-                  }}>
-                  {user?.followers?.count}
-               </Text>
-               <Button onPress={()=> navigation.navigate("FollowersScreen",{user:user?.personal})} mode="contained-tonal">
+      <ScrollView
+         style={{ flex: 1, backgroundColor: "#f5f5f5", paddingTop: 10 }}>
+         {!user && (
+            <View>
+               <ActivityIndicator />
+            </View>
+         )}
+         {user && (
+            <>
+               <View style={{ justifyContent: "center", alignItems: "center" }}>
+                  <Image
+                     source={{
+                        uri: user?.personal?.profileImage,
+                     }}
+                     style={[
+                        styles.profileImage,
+                        { borderColor: theme.colors.primary },
+                     ]}></Image>
                   <Text
                      style={{
-                        fontWeight: "bold",
                         textAlign: "center",
+                        marginVertical: 10,
                         fontFamily: "Poppins_500Medium",
                      }}>
-                     Followers
+                     {user?.personal?.fullName}
                   </Text>
-               </Button>
-            </View>
+               </View>
+               <ScrollView horizontal style={styles.mediaContainer}>
+                  <View style={{ alignItems: "center", margin: 4 }}>
+                     <Text
+                        style={{
+                           textAlign: "center",
+                           fontFamily: "Poppins_400Regular",
+                           color: theme.colors.secondary,
+                           fontSize: 16,
+                        }}>
+                        {user?.followers?.count}
+                     </Text>
+                     <Button
+                        style={{ backgroundColor: "#fff" }}
+                        onPress={() =>
+                           navigation.navigate("FollowersScreen", {
+                              user: user?.personal,
+                           })
+                        }
+                        mode="elevated">
+                        <Text
+                           style={{
+                              // fontWeight: "bold",
+                              textAlign: "center",
+                              fontFamily: "Poppins_400Regular",
+                              color: theme.colors.secondary,
+                              fontSize: 15,
+                           }}>
+                           Followers
+                        </Text>
+                     </Button>
+                  </View>
 
-            <View style={{ alignItems: "center",margin:4}}>
+                  <View style={{ alignItems: "center", margin: 4 }}>
+                     <Text
+                        style={{
+                           textAlign: "center",
+                           fontFamily: "Poppins_400Regular",
+                           // color:theme.colors.secondary,
+                           fontSize: 16,
+                        }}>
+                        {user?.followings?.count}
+                     </Text>
+                     <Button
+                        style={{ backgroundColor: "#fff" }}
+                        onPress={() =>
+                           navigation.navigate("FollowingsScreen", {
+                              user: user?.personal,
+                           })
+                        }
+                        mode="elevated">
+                        <Text
+                           style={{
+                              textAlign: "center",
+                              fontFamily: "Poppins_400Regular",
+                              color: theme.colors.secondary,
+                              //  color:theme.colors.secondary,
+                              fontSize: 15,
+                           }}>
+                           Following
+                        </Text>
+                     </Button>
+                  </View>
+                  {/* <View style={{ alignItems: "center",margin:4}}>
                <Text
                   style={{
                      textAlign: "center",
-                     fontFamily: "Poppins_500Medium",
-                  }}>
-                  {user?.followings?.count}
-               </Text>
-               <Button onPress={()=> navigation.navigate("FollowingsScreen",{user:user?.personal})} mode="contained-tonal">
-                  <Text
-                     style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        fontFamily: "Poppins_300Light",
-                     }}>
-                     Following
-                  </Text>
-               </Button>
-            </View>
-            {/* <View style={{ alignItems: "center",margin:4}}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_500Medium",
+                     fontFamily: "Poppins_400Regular",
                   }}>
                   200
                </Text>
-               <Button mode="contained-tonal">
+               <Button mode="elevated">
                   <Text
                      style={{
                         fontWeight: "bold",
                         textAlign: "center",
-                        fontFamily: "Poppins_300Light",
+                        fontFamily: "Poppins_400Regular",
                      }}>
                      Posts
                   </Text>
                </Button>
                
             </View> */}
-             <View style={{ alignItems: "center",margin:4}}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_500Medium",
-                  }}>
-                  {user?.sales?.count}
-               </Text>
-               <Button mode="contained-tonal">
-                  <Text
-                     style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        fontFamily: "Poppins_300Light",
-                     }}>
-                     Sales
-                  </Text>
-               </Button>
-               
-            </View>
-             <View style={{ alignItems: "center",margin:4}}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_500Medium",
-                  }}>
-                 {user?.affiliates?.count}
-               </Text>
-               <Button mode="contained-tonal">
-                  <Text
-                     style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        fontFamily: "Poppins_300Light",
-                     }}>
-                     Affiliate Product
-                  </Text>
-               </Button>
-            </View>
-         </ScrollView>
+                  <View style={{ alignItems: "center", margin: 4 }}>
+                     <Text
+                        style={{
+                           textAlign: "center",
+                           fontFamily: "Poppins_400Regular",
+                           //  color:theme.colors.secondary,
+                           fontSize: 15,
+                        }}>
+                        {user?.sales?.count}
+                     </Text>
+                     <Button
+                        style={{ backgroundColor: "#fff" }}
+                        mode="elevated">
+                        <Text
+                           style={{
+                              // fontWeight: "bold",
+                              textAlign: "center",
+                              fontFamily: "Poppins_400Regular",
+                              color: theme.colors.secondary,
+                              fontSize: 15,
+                           }}>
+                           Sales
+                        </Text>
+                     </Button>
+                  </View>
+                  <View style={{ alignItems: "center", margin: 4 }}>
+                     <Text
+                        style={{
+                           textAlign: "center",
+                           fontFamily: "Poppins_400Regular",
+                           // color:theme.colors.secondary,
+                           fontSize: 15,
+                        }}>
+                        {user?.affiliates?.count}
+                     </Text>
+                     <Button
+                        style={{ backgroundColor: "#fff" }}
+                        mode="elevated">
+                        <Text
+                           style={{
+                              // fontWeight: "bold",
+                              textAlign: "center",
+                              fontFamily: "Poppins_400Regular",
+                              color: theme.colors.secondary,
+                           }}>
+                           Affiliate Product
+                        </Text>
+                     </Button>
+                  </View>
+               </ScrollView>
+            </>
+         )}
 
-         </> }
-        
          <View style={{ alignItems: "center", marginBottom: 5 }}>
-            <ProfileNavComponent navigation={navigation} user={user?.personal} />
+            <ProfileNavComponent
+               navigation={navigation}
+               user={user?.personal}
+            />
          </View>
-         <SearchForm setSearchValue={(v)=>searchPosts(v)}/>
-         {!posts && <View>
-                <ActivityIndicator/>
-            </View>}
-         {posts && posts.map((post) => {
-            return (
-               <PostComponent
-                  key={String(post.id)}
-                  {...post}
-                  navigation={navigation}
-               />
-            );
-         })}
+         <SearchForm setSearchValue={(v) => searchPosts(v)} />
+         {!posts && (
+            <View>
+               <ActivityIndicator />
+            </View>
+         )}
+         {posts &&
+            posts.map((post) => {
+               return (
+                  <PostComponent
+                     key={String(post.id)}
+                     {...post}
+                     navigation={navigation}
+                  />
+               );
+            })}
       </ScrollView>
    );
 };
@@ -262,10 +305,10 @@ const styles = StyleSheet.create({
    container: {
       paddingTop: 20,
       flex: 1,
-      backgroundColor: "#F9F9F9",
+      backgroundColor: "#f5f5f5",
       alignItems: "center",
       // justifyContent: "center",
-      fontFamily: "Poppins_300Light",
+      fontFamily: "Poppins_400Regular",
    },
    mediaContainer: {
       // display: "flex",
@@ -273,7 +316,7 @@ const styles = StyleSheet.create({
       // justifyContent: "center",
       gap: 10,
       marginTop: 0,
-      marginBottom: 15,
+      marginBottom: 10,
    },
    profileImage: {
       width: 100,

@@ -22,7 +22,7 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/media/posts/${activeUserId}`
+               `http://192.168.0.108:5000/api/media/posts/${activeUserId}`
             );
             let data = await response.json();
             if (data.status == "success") {

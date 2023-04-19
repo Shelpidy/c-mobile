@@ -26,7 +26,7 @@ const NotificationScreen = () => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/notifications/${activeUserId}`,
+               `http://192.168.0.108:5000/api/notifications/${activeUserId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -85,7 +85,7 @@ export default NotificationScreen;
 
 const styles = StyleSheet.create({
    container: {
-      backgroundColor: "#f9f9f9",
+      backgroundColor: "#f5f5f5",
       padding: 10,
    },
    notContainer: {

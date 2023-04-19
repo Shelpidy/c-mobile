@@ -15,8 +15,8 @@ type HomeScreenProps = {
 const HomeScreen = ({ theme, navigation }: HomeScreenProps) => {
    return (
       <ScrollView style={styles.container}>
-         <PostProductFormNav page='post' navigation={navigation}/>
-         <FindFriendsComponent />
+         <PostProductFormNav page="post" navigation={navigation} />
+         <FindFriendsComponent navigation={navigation} />
          <PostsComponent navigation={navigation} />
          <Button onPress={() => navigation.navigate("ProfileScreen")}>
             Profile
@@ -39,6 +39,6 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
    container: {
-      backgroundColor: "#f9f9f9",
+      backgroundColor: "#f5f5f5",
    },
 });

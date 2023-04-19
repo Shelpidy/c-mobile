@@ -16,7 +16,7 @@ type ImageViewerProps = {
    images: any;
 };
 
-const {width,height} = Dimensions.get("window")
+const { width, height } = Dimensions.get("window");
 
 const ImagesViewer: any = ({ images }: ImageViewerProps) => {
    const [postImages, setPostImages] = useState<any>(null);
@@ -44,7 +44,7 @@ const ImagesViewer: any = ({ images }: ImageViewerProps) => {
                         {/* <Text>Image Listing kkk kkfkfkkk</Text> */}
                         <Image
                            key={image}
-                           resizeMode='cover'
+                           resizeMode="cover"
                            style={styles.otherImage}
                            source={{ uri: image }}
                         />
@@ -55,7 +55,7 @@ const ImagesViewer: any = ({ images }: ImageViewerProps) => {
          )}
 
          <Image
-            resizeMode='cover'
+            resizeMode="cover"
             style={styles.image}
             source={{ uri: JSON.parse(postImages)[imgIndex] }}
          />
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
       borderRadius: 2,
    },
    otherImage: {
-      width: width/2,
+      width: width / 2,
       height: 200,
       marginBottom: 5,
       margin: 3,

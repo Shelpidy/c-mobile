@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ProductComponent from "../components/Marketing/ProductComponent";
 import SearchForm from "../components/SearchForm";
+import PostProductFormNav from "../components/PostProductFormNav";
 
-const UserProductScreen = ({ navigation,route }:any) => {
+const UserProductScreen = ({ navigation, route }: any) => {
    const [products, setProducts] = useState<ProductComponentProps[]>([]);
    const [allProducts, setAllProducts] = useState<ProductComponentProps[]>([]);
    const [pageNumber, setPageNumber] = useState<number>(1);
@@ -12,17 +13,17 @@ const UserProductScreen = ({ navigation,route }:any) => {
       useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
-   const [owner,setOwner] = useState<User>()
+   const [owner, setOwner] = useState<User>();
 
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
          let activeUserId = 1;
-         setOwner(route.params.user)
-         console.log("User product screen",route.params.user)
+         setOwner(route.params.user);
+         console.log("User product screen", route.params.user);
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/marketing/products/user/${route.params.user.id}`
+               `http://192.168.0.108:5000/api/marketing/products/user/${route.params.user.id}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -65,16 +66,22 @@ const UserProductScreen = ({ navigation,route }:any) => {
       );
    }
 
-      const searchProducts = (_token:string)=>{
-        console.log("From product",_token)
-        let token = _token.toLowerCase()
-        let newProducts = allProducts?.filter(Product => Product?.description.toLowerCase().includes(token) || Product?.productName?.toLowerCase().includes(token) || Product?.price?.toLowerCase().includes(token))
-        setProducts(newProducts)
-   }
+   const searchProducts = (_token: string) => {
+      console.log("From product", _token);
+      let token = _token.toLowerCase();
+      let newProducts = allProducts?.filter(
+         (Product) =>
+            Product?.description.toLowerCase().includes(token) ||
+            Product?.productName?.toLowerCase().includes(token) ||
+            Product?.price?.toLowerCase().includes(token)
+      );
+      setProducts(newProducts);
+   };
 
    return (
-      <ScrollView style={{backgroundColor:"#f9f9f9"}}>
-        <SearchForm setSearchValue={searchProducts}/>
+      <ScrollView style={{ backgroundColor: "#f5f5f5", paddingTop: 5 }}>
+         <SearchForm setSearchValue={searchProducts} />
+         <PostProductFormNav navigation={navigation} page="product" />
          {/* <Text>ProductsComponent {Products.length}</Text> */}
          {products.map((product) => {
             return (

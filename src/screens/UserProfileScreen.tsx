@@ -12,14 +12,13 @@ import { ActivityIndicator, Button, useTheme } from "react-native-paper";
 import PostComponent from "../components/MediaPosts/PostComponent";
 import ProfileNavComponent from "../components/ProfileNavComponent";
 
-
 const { width, height } = Dimensions.get("window");
 
-const UserProfileScreen = ({ navigation,route }:any) => {
+const UserProfileScreen = ({ navigation, route }: any) => {
    const theme = useTheme();
    const [posts, setPosts] = useState<PostComponentProps[] | null>(null);
    const [allPosts, setAllPosts] = useState<PostComponentProps[]>([]);
-   const [user,setUser] = useState<any>(null)
+   const [user, setUser] = useState<any>(null);
    const [pageNumber, setPageNumber] = useState<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
@@ -27,13 +26,14 @@ const UserProfileScreen = ({ navigation,route }:any) => {
 
    useEffect(function () {
       console.log("Fetching user");
+      console.log(route.params.userId);
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.0.108:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -55,23 +55,26 @@ const UserProfileScreen = ({ navigation,route }:any) => {
       fetchData();
    }, []);
 
-
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
          let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/media/posts/user/${userId}`
+               `http://192.168.0.108:5000/api/media/posts/user/${userId}`
             );
             let data = await response.json();
             if (data.status == "success") {
-               // console.log(data.data)
+               console.log(data.data);
                // setPosts(data.data);
+               let numOfPageLinks = 1;
                let fetchedPost: PostComponentProps[] = data.data;
-               let numOfPageLinks = Math.ceil(
-                  fetchedPost.length / numberOfPostsPerPage
-               );
+               if (fetchedPost.length > numberOfPostsPerPage) {
+                  numOfPageLinks = Math.ceil(
+                     fetchedPost.length / numberOfPostsPerPage
+                  );
+               }
+
                // console.log(fetchedPost);
                setAllPosts(fetchedPost);
                setNumberOfPageLinks(numOfPageLinks);
@@ -98,119 +101,131 @@ const UserProfileScreen = ({ navigation,route }:any) => {
    }, [pageNumber]);
 
    return (
-      <ScrollView style={{ flex: 1, backgroundColor: "#f9f9f9" }}>
-         {!user && <View>
-               <ActivityIndicator/>
-            </View>}
-         {user && <>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Image
-               source={{
-                  uri: user?.personal?.profileImage,
-               }}
-               style={[
-                  styles.profileImage,
-                  { borderColor: theme.colors.primary},
-               ]}></Image>
-            <Text
-               style={{
-                  textAlign: "center",
-                  marginVertical: 10,
-                  fontFamily: "Poppins_600SemiBold",
-               }}>
-               {user?.personal?.fullName}
-            </Text>
-         </View>
-          <ScrollView horizontal style={styles.mediaContainer}>
-            <View style={{ alignItems: "center",margin:4}}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_500Medium",
-                  }}>
-                  5.2k
-               </Text>
-               <Button onPress={()=> navigation.navigate("FollowersScreen",{user})} mode="contained-tonal">
+      <ScrollView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
+         {!user && (
+            <View>
+               <ActivityIndicator />
+            </View>
+         )}
+         {user && (
+            <>
+               <View style={{ justifyContent: "center", alignItems: "center" }}>
+                  <Image
+                     source={{
+                        uri: user?.personal?.profileImage,
+                     }}
+                     style={[
+                        styles.profileImage,
+                        { borderColor: theme.colors.primary },
+                     ]}></Image>
                   <Text
                      style={{
-                        fontWeight: "bold",
                         textAlign: "center",
-                        fontFamily: "Poppins_500Medium",
+                        marginVertical: 10,
+                        fontFamily: "Poppins_600SemiBold",
                      }}>
-                     Followers
+                     {user?.personal?.fullName}
                   </Text>
-               </Button>
-            </View>
+               </View>
+               <ScrollView horizontal style={styles.mediaContainer}>
+                  <View style={{ alignItems: "center", margin: 4 }}>
+                     <Text
+                        style={{
+                           textAlign: "center",
+                           fontFamily: "Poppins_500Medium",
+                        }}>
+                        5.2k
+                     </Text>
+                     <Button
+                        onPress={() =>
+                           navigation.navigate("FollowersScreen", { user })
+                        }
+                        mode="contained-tonal">
+                        <Text
+                           style={{
+                              fontWeight: "bold",
+                              textAlign: "center",
+                              fontFamily: "Poppins_500Medium",
+                           }}>
+                           Followers
+                        </Text>
+                     </Button>
+                  </View>
 
-            <View style={{ alignItems: "center",margin:4}}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_500Medium",
-                  }}>
-                  220
-               </Text>
-               <Button mode="contained-tonal">
-                  <Text
-                     style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        fontFamily: "Poppins_300Light",
-                     }}>
-                     Following
-                  </Text>
-               </Button>
-            </View>
-           
-             <View style={{ alignItems: "center",margin:4}}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_500Medium",
-                  }}>
-                  200
-               </Text>
-               <Button mode="contained-tonal">
-                  <Text
-                     style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        fontFamily: "Poppins_300Light",
-                     }}>
-                     Sales
-                  </Text>
-               </Button>
-               
-            </View>
-             <View style={{ alignItems: "center",margin:4}}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_500Medium",
-                  }}>
-                  200
-               </Text>
-               <Button mode="contained-tonal">
-                  <Text
-                     style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        fontFamily: "Poppins_300Light",
-                     }}>
-                     Affiliate Product
-                  </Text>
-               </Button>
-            </View>
-         </ScrollView>
-         </> }
-        
+                  <View style={{ alignItems: "center", margin: 4 }}>
+                     <Text
+                        style={{
+                           textAlign: "center",
+                           fontFamily: "Poppins_500Medium",
+                        }}>
+                        220
+                     </Text>
+                     <Button mode="contained-tonal">
+                        <Text
+                           style={{
+                              fontWeight: "bold",
+                              textAlign: "center",
+                              fontFamily: "Poppins_300Light",
+                           }}>
+                           Following
+                        </Text>
+                     </Button>
+                  </View>
+
+                  <View style={{ alignItems: "center", margin: 4 }}>
+                     <Text
+                        style={{
+                           textAlign: "center",
+                           fontFamily: "Poppins_500Medium",
+                        }}>
+                        200
+                     </Text>
+                     <Button mode="contained-tonal">
+                        <Text
+                           style={{
+                              fontWeight: "bold",
+                              textAlign: "center",
+                              fontFamily: "Poppins_300Light",
+                           }}>
+                           Sales
+                        </Text>
+                     </Button>
+                  </View>
+                  <View style={{ alignItems: "center", margin: 4 }}>
+                     <Text
+                        style={{
+                           textAlign: "center",
+                           fontFamily: "Poppins_500Medium",
+                        }}>
+                        200
+                     </Text>
+                     <Button mode="contained-tonal">
+                        <Text
+                           style={{
+                              fontWeight: "bold",
+                              textAlign: "center",
+                              fontFamily: "Poppins_300Light",
+                           }}>
+                           Affiliate Product
+                        </Text>
+                     </Button>
+                  </View>
+               </ScrollView>
+            </>
+         )}
+
          <View style={{ alignItems: "center", marginBottom: 5 }}>
-            <ProfileNavComponent navigation={navigation} user={user?.personal} />
+            <ProfileNavComponent
+               navigation={navigation}
+               user={user?.personal}
+            />
          </View>
-         {!posts && <View>
-                <ActivityIndicator/>
-            </View>}
-         {posts && posts.map((post) => {
+         {!posts && (
+            <View>
+               <ActivityIndicator />
+            </View>
+         )}
+         {/* {posts && posts.map((post) => {
             return (
                <View key={String(post.id)}>
                    <View style={{ alignItems: "center",backgroundColor:"#ffffff",borderRadius:10,width:200,justifyContent:"center",flexDirection:'row'}}>
@@ -229,7 +244,7 @@ const UserProfileScreen = ({ navigation,route }:any) => {
                </View>
                
             );
-         })}
+         })} */}
       </ScrollView>
    );
 };
@@ -240,7 +255,7 @@ const styles = StyleSheet.create({
    container: {
       paddingTop: 20,
       flex: 1,
-      backgroundColor: "#F9F9F9",
+      backgroundColor: "#f5f5f5",
       alignItems: "center",
       // justifyContent: "center",
       fontFamily: "Poppins_300Light",

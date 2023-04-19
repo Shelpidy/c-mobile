@@ -7,6 +7,7 @@ import {
    Image,
    Alert,
    ScrollView,
+   Pressable,
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../components/ImagesViewer";
@@ -14,13 +15,14 @@ import VideoPlayer from "../components/VideoPlayer";
 import TextViewer from "../components/TextViewer";
 // import Comments from "../components/marketingproducts/Comments";
 // import { productComments, productLikes, users } from "../data";
-import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
+import { TextInput, useTheme, Button, IconButton, Divider } from "react-native-paper";
 import {
    AntDesign,
    Entypo,
    FontAwesome,
    MaterialCommunityIcons,
    Feather,
+   Ionicons,
 } from "@expo/vector-icons";
 import axios from "axios";
 import ProductComments from "../components/Marketing/ProductComments";
@@ -80,7 +82,7 @@ const ProductScreen = ({ navigation, route }: any) => {
 
    useEffect(() => {
       setproduct(route.params.product);
-      console.log("product",route.params.product);
+      console.log("product", route.params.product);
    }, []);
 
    useEffect(function () {
@@ -89,10 +91,10 @@ const ProductScreen = ({ navigation, route }: any) => {
          let productId = route.params.product.id;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.106:5000/api/marketing/products/cl/${productId}`
+               `http://192.168.0.108:5000/api/marketing/products/cl/${productId}`
             );
             if (data.status == "success") {
-            //    console.log(data.data);
+               //    console.log(data.data);
                let ls: any[] = data.data.likes;
                setComments(data.data.comments);
                setLikes(data.data.likes);
@@ -121,7 +123,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${userId}`,
+               `http://192.168.0.108:5000/api/auth/users/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -156,8 +158,6 @@ const ProductScreen = ({ navigation, route }: any) => {
    //    Setproducter(users.find((user) => user.id === product.userId));
    // }, [users]);
 
-   
-
    const handleComment = async () => {
       setLoading(true);
       let activeUserId = 1;
@@ -169,7 +169,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.106:5000/api/marketing/products/comments/`,
+            `http://192.168.0.108:5000/api/marketing/products/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -192,7 +192,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.0.106:5000/api/marketing/products/likes/`,
+            `http://192.168.0.108:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
@@ -298,76 +298,143 @@ const ProductScreen = ({ navigation, route }: any) => {
          )}
          <View
             style={{
-               flexDirection: "row",
+               flexDirection: "column",
                marginVertical: 5,
-               justifyContent:"space-evenly",
-               alignItems: "center",
+               justifyContent: "space-evenly",
+               //    alignItems: "center",
             }}>
             <Text style={styles.productName}>{product?.productName}</Text>
+            <View style={{ flexDirection: "row" }}>
+               {product.initialPrice && (
+                  <Text
+                     style={[
+                        styles.productInitialPrice,
+                        {
+                           color: theme.colors.secondary,
+                           textDecorationLine: "line-through",
+                        },
+                     ]}>
+                     C{product?.initialPrice}
+                  </Text>
+               )}
 
-            {product.initialPrice && (
                <Text
                   style={[
-                     styles.productInitialPrice,
-                     {
-                        color: theme.colors.secondary,
-                        textDecorationLine: "line-through",
-                     },
+                     styles.productPrice,
+                     { color: theme.colors.primary, fontSize: 25 },
                   ]}>
-                  C{product?.initialPrice}
+                  C{product?.price}
                </Text>
-            )}
-            <Text
-               style={[styles.productPrice, { color: theme.colors.primary }]}>
-               C{product?.price}
-            </Text>
-            <Button  mode='outlined'>Affiliate</Button>
+            </View>
          </View>
          {product?.description && <TextViewer text={product.description} />}
          <View>
-            <View style={styles.likeCommentAmountCon}>
+            <View>
                <View
-                  style={{
-                     flexDirection: "row",
-                     alignItems: "center",
-                     justifyContent: "flex-start",
-                  }}>
-                  <IconButton
+                  style={[
+                     styles.likeCommentAmountCon,
+                     { borderColor: theme.colors.secondary },
+                  ]}>
+                  <View
+                     style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                     }}>
+                     <Pressable
+                        disabled={loading}
+                        onPress={() => handleLike(product.id)}>
+                        <Ionicons
+                           size={30}
+                           color={theme.colors.secondary}
+                           name={liked ? "heart-sharp" : "heart-outline"}
+                        />
+                     </Pressable>
+                     {/* <IconButton
                      disabled={loading}
-                     onPress={() => handleLike(product!.id)}
+                     onPress={() => handleLike(post.id)}
                      mode="outlined"
-                     size={18}
+                     size={20}
                      icon={liked ? "heart" : "heart-outline"}
+                  /> */}
+                     <Text style={styles.commentAmountText}>
+                        {likes.length}
+                     </Text>
+                  </View>
+                  <View
+                     style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                     }}>
+                     <Pressable>
+                        <Ionicons
+                           size={30}
+                           color={theme.colors.secondary}
+                           name="chatbox-outline"
+                        />
+                     </Pressable>
+
+                     <Text style={styles.commentAmountText}>
+                        {comments.length}
+                     </Text>
+                  </View>
+                   <View style={{ flexDirection: "row" }}>
+                  <Button mode="contained">Request</Button>
+                  <Button
+                     textColor={theme.colors.primary}
+                     style={{ marginHorizontal: 3 }}
+                     mode="contained-tonal">
+                     Affiliate
+                  </Button>
+               </View>
+               </View>
+            
+               <View style={{ padding: 5 }}>
+                  <ProductComments
+                     posterId={product.userId}
+                     navigation={navigation}
+                     productComments={comments}
                   />
-                  <Text style={styles.commentAmountText}>{likes.length}</Text>
                </View>
-               <View
-                  style={{
-                     flexDirection: "row",
-                     alignItems: "center",
-                     justifyContent: "flex-start",
-                  }}>
-                  <IconButton
-                     mode="outlined"
-                     size={18}
-                     icon="comment-outline"
-                  />
-                  <Text style={styles.commentAmountText}>
-                     {comments.length}
-                  </Text>
-               </View>
-               <View>
-                  <Button style={{backgroundColor:"#f9f9ff"}} mode='contained-tonal'>Request</Button>
-               </View>
+
+              
                {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
             </View>
-             <View style={styles.productContents}>
-                <View>
-                    <View><Text>SIZES</Text></View>
-                    {product.sizes !== undefined && product.sizes && 
-                    <Text style={{borderWidth:2}}>{JSON.parse(product.sizes+'').map((size:any)=><Text>{size}</Text>)}</Text>}
-                </View>
-                <View><Text>Number Available</Text></View>
+            <View style={styles.productContents}>
+                <Divider/>
+               <View style={{flex:1,flexDirection:"row",padding:5}}>
+                 
+                   { product && product?.sizes && 
+                    <View style={{flexDirection:"row",alignItems:"center"}}>
+                        <View style={{marginRight:20}}>
+                              <Text style={{fontFamily:"Poppins_500Medium"}}>SIZES</Text>
+                        </View>
+                      
+                        {
+                            JSON.parse(String(product.sizes)).map((size:any)=>{
+                                return <View key={size} style={{borderWidth:1,paddingHorizontal:10,paddingVertical:5,borderRadius:2,borderColor:theme.colors.secondary,marginHorizontal:1,justifyContent:"center",alignItems:"center"}}><Text>{size}</Text></View>
+                            })
+                        }
+                       
+                  </View>}
+                 
+               </View>
+               <Divider/>
+                <View style={{flex:1,flexDirection:"row",padding:5}}>
+                 
+                     
+                   { product && product?.numberAvailable && 
+                    <View style={{flexDirection:"row",alignItems:"center"}}>
+                        <View style={{marginRight:20}}>
+                              <Text style={{fontFamily:"Poppins_500Medium"}}>NUMBER AVAILABLE</Text>
+                        </View>
+                       <View style={{borderWidth:1,paddingHorizontal:10,paddingVertical:5,borderRadius:2,borderColor:theme.colors.secondary,marginHorizontal:1,justifyContent:"center",alignItems:"center"}}><Text>{product.numberAvailable}</Text></View>
+                       
+                  </View>}
+                 
+               </View>
+               <Divider/>
             </View>
             <View style={styles.commentBox}>
                <TextInput
@@ -391,7 +458,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                />
                <Entypo size={26} name="emoji-neutral" />
             </View>
-           
+
             <View style={{ padding: 5, marginBottom: 10 }}>
                <ProductComments
                   posterId={product?.userId}
@@ -438,12 +505,15 @@ const styles = StyleSheet.create({
    likeCommentAmountCon: {
       flexDirection: "row",
       // justifyContent: "space-between",
-      gap: 15,
-      paddingHorizontal: 15,
-      marginVertical: 5,
+      gap: 25,
+      padding: 10,
+      // borderWidth:1,
+      marginLeft: 10,
+      borderRadius: 20,
+      // justifyContent:'center',
    },
    commentAmountText: {
-      fontFamily: "Poppins_400Regular",
+      fontFamily: "Poppins_200ExtraLight",
       fontSize: 16,
    },
    profileImage: {
@@ -458,22 +528,24 @@ const styles = StyleSheet.create({
       marginTop: 6,
    },
    productPrice: {
-      fontFamily: "Poppins_600SemiBold",
+      fontFamily: "Poppins_400Regular",
       fontSize: 16,
       marginHorizontal: 10,
+      textAlignVertical: "center",
       marginTop: 6,
    },
    productInitialPrice: {
       fontFamily: "Poppins_300Light",
       fontSize: 16,
       marginHorizontal: 10,
+      textAlignVertical: "center",
       marginTop: 6,
    },
-   productContents:{
-     borderRadius:2,
-     backgroundColor:"#f9f9ff",
-     margin:5,
-     padding:10,
-     height:60
-   }
+   productContents: {
+      borderRadius: 2,
+    //   backgroundColor: "#f9f9ff",
+      margin: 5,
+      padding: 10,
+    //   height: 60,
+   },
 });

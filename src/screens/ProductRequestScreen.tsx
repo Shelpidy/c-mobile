@@ -1,14 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
 
 const ProductRequestScreen = () => {
-  return (
-    <View>
-      <Text>ProductRequestScreen</Text>
-    </View>
-  )
-}
+   return (
+      <View>
+         <Text>ProductRequestScreen</Text>
+      </View>
+   );
+};
 
-export default ProductRequestScreen
+export default ProductRequestScreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

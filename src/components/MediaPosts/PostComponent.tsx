@@ -20,7 +20,7 @@ import {
    FontAwesome,
    MaterialCommunityIcons,
    Feather,
-   Ionicons
+   Ionicons,
 } from "@expo/vector-icons";
 import axios from "axios";
 import UpdatePostForm from "./UpdatePostForm";
@@ -87,7 +87,7 @@ const PostComponent = (props: NPostComponentProps) => {
          let activeUserId = 1;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.106:5000/api/media/posts/cl/${props.id}`
+               `http://192.168.0.108:5000/api/media/posts/cl/${props.id}`
             );
             if (data.status == "success") {
                console.log(data.data);
@@ -119,7 +119,7 @@ const PostComponent = (props: NPostComponentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${props.userId}`,
+               `http://192.168.0.108:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -154,20 +154,20 @@ const PostComponent = (props: NPostComponentProps) => {
    //    SetPoster(users.find((user) => user.id === props.userId));
    // }, [users]);
 
-   const gotoUserProfile = ()=>{
-    if(currentUser.id === poster.id) {
-         props.navigation.navigate("ProfileScreen",{userId:poster.id})
-    }else{
-        props.navigation.navigate("UserProfileScreen",{userId:poster.id})
-     }
-   }
+   const gotoUserProfile = () => {
+      if (currentUser.id === poster.id) {
+         props.navigation.navigate("ProfileScreen", { userId: poster.id });
+      } else {
+         props.navigation.navigate("UserProfileScreen", { userId: poster.id });
+      }
+   };
 
    const handleLike = async (postId: number) => {
       console.log(postId);
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.0.106:5000/api/media/posts/likes/`,
+            `http://192.168.0.108:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -231,13 +231,13 @@ const PostComponent = (props: NPostComponentProps) => {
                   alignItems: "center",
                   padding: 8,
                }}>
-                  <Pressable onPress={gotoUserProfile}>
-                       <Image
-                        style={styles.profileImage}
-                        source={{ uri: poster.profileImage }}
-                     />
-                  </Pressable>
-             
+               <Pressable onPress={gotoUserProfile}>
+                  <Image
+                     style={styles.profileImage}
+                     source={{ uri: poster.profileImage }}
+                  />
+               </Pressable>
+
                <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
                   {poster.firstName} {poster.middleName} {poster.lastName}
                </Text>
@@ -267,16 +267,26 @@ const PostComponent = (props: NPostComponentProps) => {
          <Text style={styles.title}>{props?.title}</Text>
          {props?.text && <TextViewer text={props.text} />}
          <View>
-             <View style={[styles.likeCommentAmountCon,{borderColor:theme.colors.secondary}]}>
+            <View
+               style={[
+                  styles.likeCommentAmountCon,
+                  { borderColor: theme.colors.secondary },
+               ]}>
                <View
                   style={{
                      flexDirection: "row",
                      alignItems: "center",
                      justifyContent: "flex-start",
                   }}>
-                     <Pressable  disabled={loading} onPress={() => handleLike(props.id)}>
-                        <Ionicons size={30} color={theme.colors.secondary} name={liked ? "heart-sharp" : "heart-outline"} />
-                     </Pressable>
+                  <Pressable
+                     disabled={loading}
+                     onPress={() => handleLike(props.id)}>
+                     <Ionicons
+                        size={30}
+                        color={theme.colors.secondary}
+                        name={liked ? "heart-sharp" : "heart-outline"}
+                     />
+                  </Pressable>
                   {/* <IconButton
                      disabled={loading}
                      onPress={() => handleLike(post.id)}
@@ -293,7 +303,11 @@ const PostComponent = (props: NPostComponentProps) => {
                      justifyContent: "flex-start",
                   }}>
                   <Pressable>
-                     <Ionicons size={30} color={theme.colors.secondary}  name='chatbox-outline' />
+                     <Ionicons
+                        size={30}
+                        color={theme.colors.secondary}
+                        name="chatbox-outline"
+                     />
                   </Pressable>
                   {/* <IconButton
                      mode="outlined"
@@ -305,7 +319,7 @@ const PostComponent = (props: NPostComponentProps) => {
                   </Text>
                </View>
                {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
-         </View>
+            </View>
             {/* <View style={styles.commentBox}>
                <TextInput
                   style={[
@@ -359,16 +373,15 @@ const styles = StyleSheet.create({
       flex: 1,
       marginHorizontal: 5,
    },
-     likeCommentAmountCon: {
+   likeCommentAmountCon: {
       flexDirection: "row",
       // justifyContent: "space-between",
       gap: 25,
-      padding:10,
+      padding: 10,
       // borderWidth:1,
-      marginLeft:10,
-      borderRadius:20,
+      marginLeft: 10,
+      borderRadius: 20,
       // justifyContent:'center',
-     
    },
    commentAmountText: {
       fontFamily: "Poppins_200ExtraLight",

@@ -6,7 +6,7 @@ import axios from "axios";
 import { ActivityIndicator } from "react-native-paper";
 import UserComponent from "../components/UserComponent";
 
-const FollowersScreen = ({navigation,route}:any) => {
+const FollowersScreen = ({ navigation, route }: any) => {
    const [users, setUsers] = useState<User[]>();
    const [loading, setLoading] = useState<boolean>(false);
 
@@ -18,7 +18,7 @@ const FollowersScreen = ({navigation,route}:any) => {
          let userId = route.params.user.id;
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/media/following/${userId}`,
+               `http://192.168.0.108:5000/api/media/follower/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -56,14 +56,20 @@ const FollowersScreen = ({navigation,route}:any) => {
       );
    return (
       <View>
-         <Text>Followings</Text>
+         <Text>Followers</Text>
          {/* <Text
             style={{ fontFamily: "Poppins_600SemiBold", marginHorizontal: 15 }}>
             <Feather size={20} name="users" /> Users
          </Text> */}
          <ScrollView horizontal style={styles.container}>
             {users?.map((user) => {
-               return <UserComponent key={String(user.id)} navigation={navigation} _user={user} />;
+               return (
+                  <UserComponent
+                     key={String(user.id)}
+                     navigation={navigation}
+                     _user={user}
+                  />
+               );
             })}
          </ScrollView>
       </View>
@@ -74,7 +80,7 @@ export default FollowersScreen;
 
 const styles = StyleSheet.create({
    container: {
-      backgroundColor: "#f9f9f9",
+      backgroundColor: "#f5f5f5",
       padding: 5,
    },
 });

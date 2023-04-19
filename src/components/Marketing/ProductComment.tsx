@@ -19,7 +19,7 @@ const Comment = (props: ProductCommentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${props.userId}`,
+               `http://192.168.0.108:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -94,7 +94,7 @@ const Comment = (props: ProductCommentProps) => {
                   />
                   <View
                      style={{
-                        backgroundColor: "#f9f9f9",
+                        backgroundColor: "#f5f5f5",
                         flex: 1,
                         borderRadius: 5,
                         paddingHorizontal: 4,

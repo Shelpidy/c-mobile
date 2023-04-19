@@ -6,6 +6,7 @@ import {
    Dimensions,
    Image,
    Alert,
+   Pressable,
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../ImagesViewer";
@@ -19,6 +20,7 @@ import {
    Entypo,
    FontAwesome,
    MaterialCommunityIcons,
+   Ionicons,
    Feather,
 } from "@expo/vector-icons";
 import axios from "axios";
@@ -82,7 +84,7 @@ const ProductComponent = (props: ProductComponentProps) => {
          let activeUserId = 1;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.106:5000/api/marketing/products/cl/${props.id}`
+               `http://192.168.0.108:5000/api/marketing/products/cl/${props.id}`
             );
             if (data.status == "success") {
                console.log("Comments and Likes -----", data.data);
@@ -114,7 +116,7 @@ const ProductComponent = (props: ProductComponentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${props.userId}`,
+               `http://192.168.0.108:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -154,7 +156,7 @@ const ProductComponent = (props: ProductComponentProps) => {
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.0.106:5000/api/marketing/products/likes/`,
+            `http://192.168.0.108:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
@@ -248,7 +250,7 @@ const ProductComponent = (props: ProductComponentProps) => {
             {props.images && <ImagesViewer images={props.images} />}
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>
-           <View
+         <View
             style={{
                flexDirection: "row",
                marginVertical: 5,
@@ -277,45 +279,34 @@ const ProductComponent = (props: ProductComponentProps) => {
 
          {props?.description && <TextViewer text={props.description} />}
          <View>
-            <View style={styles.likeCommentAmountCon}>
-               <View style={styles.likeCommentAmountCon}>
-                  <View
-                     style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        // justifyContent: "flex-start",
-                     }}>
-                     <IconButton
-                        disabled={loading}
-                        onPress={() => handleLike(props.id)}
-                        mode="outlined"
-                        size={20}
-                        icon={liked ? "heart" : "heart-outline"}
+            <View
+               style={[
+                  styles.likeCommentAmountCon,
+                  { borderColor: theme.colors.secondary },
+               ]}>
+               <View
+                  style={{
+                     flexDirection: "row",
+                     alignItems: "center",
+                     justifyContent: "flex-start",
+                  }}>
+                  <Pressable
+                     disabled={loading}
+                     onPress={() => handleLike(props.id)}>
+                     <Ionicons
+                        size={30}
+                        color={theme.colors.secondary}
+                        name={liked ? "heart-sharp" : "heart-outline"}
                      />
-                     <Text style={styles.commentAmountText}>
-                        {likes && likes?.length}
-                     </Text>
-                  </View>
-                  <View
-                     style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "flex-start",
-                     }}>
-                     <IconButton
-                        onPress={() =>
-                           props.navigation.navigate("ProductScreen", {
-                              product: { ...props },
-                           })
-                        }
-                        mode="outlined"
-                        size={20}
-                        icon="comment-outline"
-                     />
-                     <Text style={styles.commentAmountText}>
-                        {productComments?.length}
-                     </Text>
-                  </View>
+                  </Pressable>
+                  {/* <IconButton
+                     disabled={loading}
+                     onPress={() => handleLike(post.id)}
+                     mode="outlined"
+                     size={20}
+                     icon={liked ? "heart" : "heart-outline"}
+                  /> */}
+                  <Text style={styles.commentAmountText}>{likes.length}</Text>
                </View>
                <View
                   style={{
@@ -323,11 +314,35 @@ const ProductComponent = (props: ProductComponentProps) => {
                      alignItems: "center",
                      justifyContent: "flex-start",
                   }}>
-                  <Button mode="contained" style={{ marginHorizontal: 8 }}>
+                  <Pressable>
+                     <Ionicons
+                        size={30}
+                        color={theme.colors.secondary}
+                        name="chatbox-outline"
+                     />
+                  </Pressable>
+                  {/* <IconButton
+                     mode="outlined"
+                     size={20}
+                     icon="comment-outline"
+                  /> */}
+                  <Text style={styles.commentAmountText}>
+                     {productComments.length}
+                  </Text>
+               </View>
+               <View style={{ flex: 1 }}>
+                  <Button
+                     textColor={theme.colors.primary}
+                     onPress={() =>
+                        props.navigation.navigate("ProductScreen", {
+                           product: props,
+                        })
+                     }
+                     mode="contained-tonal">
                      Preview
                   </Button>
                </View>
-               {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comment-o'/> {productComments.length}</Text> */}
+               {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
             </View>
             {/* <View style={styles.commentBox}>
                <TextInput
@@ -378,7 +393,7 @@ const styles = StyleSheet.create({
       marginHorizontal: 10,
       marginTop: 6,
    },
-  productName: {
+   productName: {
       fontFamily: "Poppins_400Regular",
       fontSize: 16,
       marginHorizontal: 10,
@@ -402,12 +417,16 @@ const styles = StyleSheet.create({
    },
    likeCommentAmountCon: {
       flexDirection: "row",
-      justifyContent: "space-between",
-      gap: 15,
-      paddingHorizontal: 5,
+      // justifyContent: "space-between",
+      gap: 25,
+      padding: 10,
+      // borderWidth:1,
+      marginLeft: 10,
+      borderRadius: 20,
+      // justifyContent:'center',
    },
    commentAmountText: {
-      fontFamily: "Poppins_400Regular",
+      fontFamily: "Poppins_200ExtraLight",
       fontSize: 16,
    },
    profileImage: {

@@ -71,7 +71,7 @@ const HomeStack = (props: HomeStackProps) => {
          <Stack.Screen
             name="UserProductScreen"
             component={UserProductScreen}></Stack.Screen>
-          <Stack.Screen
+         <Stack.Screen
             name="ProductRequestScreen"
             component={ProductRequestScreen}></Stack.Screen>
          <Stack.Screen

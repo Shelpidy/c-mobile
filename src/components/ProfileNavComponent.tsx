@@ -1,15 +1,21 @@
-import { Dimensions, StyleSheet, Text, View } from "react-native";
-import React,{useState,useEffect} from "react";
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Button } from "react-native-paper";
-
+import { Alert, Dimensions, StyleSheet, Text, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+   AntDesign,
+   Entypo,
+   Feather,
+   MaterialCommunityIcons,
+   MaterialIcons,
+} from "@expo/vector-icons";
+import { Button, useTheme } from "react-native-paper";
 
 const { width } = Dimensions.get("window");
 
-const ProfileNavComponent = ({ navigation,user }:any) => {
+const ProfileNavComponent = ({ navigation, user }: any) => {
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const theme = useTheme();
 
-      useEffect(() => {
+   useEffect(() => {
       // dispatchPostComment({ type: "", payload: "" });
       setCurrentUser({
          id: 1,
@@ -19,17 +25,26 @@ const ProfileNavComponent = ({ navigation,user }:any) => {
    }, []);
    return (
       <View style={styles.navs}>
-         { currentUser.id === user?.id && 
-          <View style={styles.navLink}>
-            <MaterialCommunityIcons name="cog" />
-            <Text style={{ fontFamily: "Poppins_500Medium" }}>Settings</Text>
-            <Button>
-               <Entypo name="chevron-thin-right" />
-            </Button>
-         </View>
+         {currentUser.id === user?.id && (
+            <View style={styles.navLink}>
+               <AntDesign
+                  name="setting"
+                  size={20}
+                  color={theme.colors.secondary}
+               />
+               <Text
+                  style={{
+                     fontFamily: "Poppins_500Medium",
+                     color: theme.colors.secondary,
+                  }}>
+                  Settings
+               </Text>
+               <Button>
+                  <Entypo name="chevron-thin-right" />
+               </Button>
+            </View>
+         )}
 
-         }
-        
          {/* <View style={styles.navLink}>
             <MaterialCommunityIcons name="cog" />
             <Text style={{ fontFamily: "Poppins_500Medium" }}>Posts</Text>
@@ -37,49 +52,102 @@ const ProfileNavComponent = ({ navigation,user }:any) => {
                <Entypo name="chevron-thin-right" />
             </Button>
          </View> */}
-          <View style={styles.navLink}>
-            <MaterialCommunityIcons name="cog" />
-            <Text style={{ fontFamily: "Poppins_500Medium" }}>Products</Text>
-               <Button onPress={() => navigation.navigate("UserProductScreen",{user})}>
+         <View style={styles.navLink}>
+            <Feather
+               name="shopping-cart"
+               size={20}
+               color={theme.colors.secondary}
+            />
+            <Text
+               style={{
+                  fontFamily: "Poppins_500Medium",
+                  color: theme.colors.secondary,
+               }}>
+               Products
+            </Text>
+            <Button
+               onPress={() =>
+                  navigation.navigate("UserProductScreen", { user })
+               }>
                <Entypo name="chevron-thin-right" />
             </Button>
          </View>
-         {
-            currentUser.id === user?.id && 
-             <View style={styles.navLink}>
-            <MaterialCommunityIcons name="cog" />
-            <Text style={{ fontFamily: "Poppins_500Medium" }}>Send Money</Text>
-            <Button onPress={() => navigation.navigate("TransferMoneyScreen")}>
-               <Entypo name="chevron-thin-right" />
-            </Button>
-         </View>
-
-         }
-         {
-             currentUser.id === user?.id && 
-              <View style={styles.navLink}>
-            <MaterialCommunityIcons name="cog" />
-            <Text style={{ fontFamily: "Poppins_500Medium" }}>Transferees</Text>
-            <Button>
-               <Entypo name="chevron-thin-right" />
-            </Button>
-         </View>
-
-         }
-         {
-             currentUser.id === user?.id && 
-              <View style={styles.navLink}>
-            <MaterialCommunityIcons name="cog" />
-            <Text style={{ fontFamily: "Poppins_500Medium" }}>Logout</Text>
-            <Button>
-               <Entypo name="chevron-thin-right" />
-            </Button>
-         </View>
-
-         }
-        
-        
-        
+         {currentUser.id === user?.id && (
+            <View style={styles.navLink}>
+               <MaterialCommunityIcons
+                  name="transfer"
+                  size={20}
+                  color={theme.colors.secondary}
+               />
+               <Text
+                  style={{
+                     fontFamily: "Poppins_500Medium",
+                     color: theme.colors.secondary,
+                  }}>
+                  Send Money
+               </Text>
+               <Button
+                  onPress={() => navigation.navigate("TransferMoneyScreen")}>
+                  <Entypo name="chevron-thin-right" />
+               </Button>
+            </View>
+         )}
+         {currentUser.id === user?.id && (
+            <View style={styles.navLink}>
+               <MaterialIcons
+                  name="account-balance"
+                  size={20}
+                  color={theme.colors.secondary}
+               />
+               <Text
+                  style={{
+                     fontFamily: "Poppins_500Medium",
+                     color: theme.colors.secondary,
+                  }}>
+                  Check Balance
+               </Text>
+               <Button
+                  onPress={() =>
+                     Alert.alert("", "Your Commodity blanace is C 20000.00")
+                  }>
+                  <Entypo name="chevron-thin-right" />
+               </Button>
+            </View>
+         )}
+         {currentUser.id === user?.id && (
+            <View style={styles.navLink}>
+               <Feather name="users" size={20} color={theme.colors.secondary} />
+               <Text
+                  style={{
+                     fontFamily: "Poppins_500Medium",
+                     color: theme.colors.secondary,
+                  }}>
+                  Transferees
+               </Text>
+               <Button>
+                  <Entypo name="chevron-thin-right" />
+               </Button>
+            </View>
+         )}
+         {currentUser.id === user?.id && (
+            <View style={styles.navLink}>
+               <AntDesign
+                  name="logout"
+                  size={20}
+                  color={theme.colors.secondary}
+               />
+               <Text
+                  style={{
+                     fontFamily: "Poppins_500Medium",
+                     color: theme.colors.secondary,
+                  }}>
+                  Logout
+               </Text>
+               <Button>
+                  <Entypo name="chevron-thin-right" />
+               </Button>
+            </View>
+         )}
       </View>
    );
 };
@@ -94,7 +162,7 @@ const styles = StyleSheet.create({
       borderRadius: 45,
       // marginBottom:120,
       paddingVertical: 15,
-      paddingHorizontal:10
+      paddingHorizontal: 10,
       // alignItems:'center'
    },
    navLink: {
@@ -102,7 +170,7 @@ const styles = StyleSheet.create({
       alignItems: "center",
       justifyContent: "space-between",
       marginVertical: 0,
-      // backgroundColor:"#f9f9f9",
+      // backgroundColor:"#f5f5f5",
       paddingVertical: 1,
       paddingHorizontal: 25,
       borderRadius: 20,

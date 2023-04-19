@@ -44,9 +44,9 @@ const PostForm = () => {
    // const [assets, setAssets] = useState<Asset[]>([])
    const theme = useTheme();
 
-      const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
 
-      useEffect(() => {
+   useEffect(() => {
       // dispatchPostComment({ type: "", payload: "" });
       setCurrentUser({
          id: 1,
@@ -61,7 +61,7 @@ const PostForm = () => {
       let postObj = { ...postState, userId: activeUserId };
       try {
          let response = await axios.post(
-            "http://192.168.0.106:5000/api/media/posts/",
+            "http://192.168.0.108:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {
@@ -120,7 +120,7 @@ const PostForm = () => {
             borderWidth: 2,
             borderRadius: 5,
             margin: 8,
-            borderColor: "#f9f9f9",
+            borderColor: "#f5f5f5",
          }}>
          <Modal visible={imageOpen}>
             <ImagePicker

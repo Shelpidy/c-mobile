@@ -31,21 +31,27 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
 
       let postObj = {
          transfereeAccountNumber,
-         transferorAccontNumber: currentUser.accountNumber,
+         transferorAccountNumber: currentUser.accountNumber,
          amount,
       };
       try {
-         let response = await axios.post(
-            "http://192.168.0.106:5000/api/transactions/sendcommodity",
-            postObj
+         let resp = await fetch(
+            "http://192.168.0.108:5000/api/transactions/sendcommodity",
+            {
+               method: "POST",
+               body: JSON.stringify(postObj),
+               headers: { "Content-Type": "application/json" },
+            }
          );
-         if (response.status === 201) {
-            console.log(response.data);
+         let responseData = await resp.json();
+         console.log(responseData);
+         if (resp.status === 202) {
+            console.log(responseData);
             setLoading(false);
-            Alert.alert("Successful", response.data.data.message);
+            Alert.alert("Successful", responseData.message);
          } else {
             setLoading(false);
-            Alert.alert("Failed", response.data.data.message);
+            Alert.alert("Failed", responseData.message);
          }
       } catch (err) {
          setLoading(false);
@@ -67,9 +73,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
                onChangeText={(value) => setTransfereeAccountNumber(value)}
                // inputMode="email"
                right={
-                  <TextInput.Icon
-                     color={theme.colors.primary}
-                     icon="card"></TextInput.Icon>
+                  <TextInput.Affix text="XXCOM.."></TextInput.Affix>
                }></TextInput>
             <TextInput
                mode="outlined"
@@ -79,9 +83,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
                label="Amount"
                //    inputMode='none'
                right={
-                  <TextInput.Icon
-                     color={theme.colors.primary}
-                     icon="pay"></TextInput.Icon>
+                  <TextInput.Affix text="C 0.00"></TextInput.Affix>
                }></TextInput>
             <TextInput
                mode="outlined"
