@@ -61,7 +61,7 @@ const PostForm = () => {
       let postObj = { ...postState, userId: activeUserId };
       try {
          let response = await axios.post(
-            "http://192.168.0.108:5000/api/media/posts/",
+            "http://192.168.120.183:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {

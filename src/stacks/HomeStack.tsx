@@ -19,6 +19,7 @@ import ProductScreen from "../screens/ProductScreen";
 import UserProductScreen from "../screens/UserProductScreen";
 import ProductRequestScreen from "../screens/ProductRequestScreen";
 import UserRequestScreen from "../screens/UserRequestScreen";
+import ChatScreen from "../screens/ChatScreen";
 const Stack = createNativeStackNavigator();
 type HomeStackProps = {
    navigation: any;
@@ -77,6 +78,7 @@ const HomeStack = (props: HomeStackProps) => {
          <Stack.Screen
             name="UserRequestScreen"
             component={UserRequestScreen}></Stack.Screen>
+         <Stack.Screen name="ChatScreen" component={ChatScreen}></Stack.Screen>
       </Stack.Navigator>
    );
 };

@@ -15,7 +15,13 @@ import VideoPlayer from "../components/VideoPlayer";
 import TextViewer from "../components/TextViewer";
 // import Comments from "../components/marketingproducts/Comments";
 // import { productComments, productLikes, users } from "../data";
-import { TextInput, useTheme, Button, IconButton, Divider } from "react-native-paper";
+import {
+   TextInput,
+   useTheme,
+   Button,
+   IconButton,
+   Divider,
+} from "react-native-paper";
 import {
    AntDesign,
    Entypo,
@@ -91,7 +97,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          let productId = route.params.product.id;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.108:5000/api/marketing/products/cl/${productId}`
+               `http://192.168.120.183:5000/api/marketing/products/cl/${productId}`
             );
             if (data.status == "success") {
                //    console.log(data.data);
@@ -123,7 +129,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.108:5000/api/auth/users/${userId}`,
+               `http://192.168.120.183:5000/api/auth/users/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -169,7 +175,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.108:5000/api/marketing/products/comments/`,
+            `http://192.168.120.183:5000/api/marketing/products/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -192,7 +198,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.0.108:5000/api/marketing/products/likes/`,
+            `http://192.168.120.183:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
@@ -379,17 +385,17 @@ const ProductScreen = ({ navigation, route }: any) => {
                         {comments.length}
                      </Text>
                   </View>
-                   <View style={{ flexDirection: "row" }}>
-                  <Button mode="contained">Request</Button>
-                  <Button
-                     textColor={theme.colors.primary}
-                     style={{ marginHorizontal: 3 }}
-                     mode="contained-tonal">
-                     Affiliate
-                  </Button>
+                  <View style={{ flexDirection: "row" }}>
+                     <Button mode="contained">Request</Button>
+                     <Button
+                        textColor={theme.colors.primary}
+                        style={{ marginHorizontal: 3 }}
+                        mode="contained-tonal">
+                        Affiliate
+                     </Button>
+                  </View>
                </View>
-               </View>
-            
+
                <View style={{ padding: 5 }}>
                   <ProductComments
                      posterId={product.userId}
@@ -398,43 +404,68 @@ const ProductScreen = ({ navigation, route }: any) => {
                   />
                </View>
 
-              
                {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
             </View>
             <View style={styles.productContents}>
-                <Divider/>
-               <View style={{flex:1,flexDirection:"row",padding:5}}>
-                 
-                   { product && product?.sizes && 
-                    <View style={{flexDirection:"row",alignItems:"center"}}>
-                        <View style={{marginRight:20}}>
-                              <Text style={{fontFamily:"Poppins_500Medium"}}>SIZES</Text>
+               <Divider />
+               <View style={{ flex: 1, flexDirection: "row", padding: 5 }}>
+                  {product && product?.sizes && (
+                     <View
+                        style={{ flexDirection: "row", alignItems: "center" }}>
+                        <View style={{ marginRight: 20 }}>
+                           <Text style={{ fontFamily: "Poppins_500Medium" }}>
+                              SIZES
+                           </Text>
                         </View>
-                      
-                        {
-                            JSON.parse(String(product.sizes)).map((size:any)=>{
-                                return <View key={size} style={{borderWidth:1,paddingHorizontal:10,paddingVertical:5,borderRadius:2,borderColor:theme.colors.secondary,marginHorizontal:1,justifyContent:"center",alignItems:"center"}}><Text>{size}</Text></View>
-                            })
-                        }
-                       
-                  </View>}
-                 
+
+                        {JSON.parse(String(product.sizes)).map((size: any) => {
+                           return (
+                              <View
+                                 key={size}
+                                 style={{
+                                    borderWidth: 1,
+                                    paddingHorizontal: 10,
+                                    paddingVertical: 5,
+                                    borderRadius: 2,
+                                    borderColor: theme.colors.secondary,
+                                    marginHorizontal: 1,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                 }}>
+                                 <Text>{size}</Text>
+                              </View>
+                           );
+                        })}
+                     </View>
+                  )}
                </View>
-               <Divider/>
-                <View style={{flex:1,flexDirection:"row",padding:5}}>
-                 
-                     
-                   { product && product?.numberAvailable && 
-                    <View style={{flexDirection:"row",alignItems:"center"}}>
-                        <View style={{marginRight:20}}>
-                              <Text style={{fontFamily:"Poppins_500Medium"}}>NUMBER AVAILABLE</Text>
+               <Divider />
+               <View style={{ flex: 1, flexDirection: "row", padding: 5 }}>
+                  {product && product?.numberAvailable && (
+                     <View
+                        style={{ flexDirection: "row", alignItems: "center" }}>
+                        <View style={{ marginRight: 20 }}>
+                           <Text style={{ fontFamily: "Poppins_500Medium" }}>
+                              NUMBER AVAILABLE
+                           </Text>
                         </View>
-                       <View style={{borderWidth:1,paddingHorizontal:10,paddingVertical:5,borderRadius:2,borderColor:theme.colors.secondary,marginHorizontal:1,justifyContent:"center",alignItems:"center"}}><Text>{product.numberAvailable}</Text></View>
-                       
-                  </View>}
-                 
+                        <View
+                           style={{
+                              borderWidth: 1,
+                              paddingHorizontal: 10,
+                              paddingVertical: 5,
+                              borderRadius: 2,
+                              borderColor: theme.colors.secondary,
+                              marginHorizontal: 1,
+                              justifyContent: "center",
+                              alignItems: "center",
+                           }}>
+                           <Text>{product.numberAvailable}</Text>
+                        </View>
+                     </View>
+                  )}
                </View>
-               <Divider/>
+               <Divider />
             </View>
             <View style={styles.commentBox}>
                <TextInput
@@ -543,9 +574,9 @@ const styles = StyleSheet.create({
    },
    productContents: {
       borderRadius: 2,
-    //   backgroundColor: "#f9f9ff",
+      //   backgroundColor: "#f9f9ff",
       margin: 5,
       padding: 10,
-    //   height: 60,
+      //   height: 60,
    },
 });

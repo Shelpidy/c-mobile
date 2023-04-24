@@ -33,7 +33,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.108:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.120.183:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -61,7 +61,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
          let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.0.108:5000/api/media/posts/user/${userId}`
+               `http://192.168.120.183:5000/api/media/posts/user/${userId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -211,6 +211,9 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      </Button>
                   </View>
                </ScrollView>
+               <Button onPress={() => navigation.navigate("ChatScreen")}>
+                  message
+               </Button>
             </>
          )}
 

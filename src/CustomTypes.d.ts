@@ -125,3 +125,23 @@ declare type Product = {
    createdAt: Date;
    updatedAt: Date;
 };
+
+declare type ChatUser = {
+   _id: number;
+   name: string;
+   avatar: string;
+};
+
+declare type IMessage = {
+   _id: string | number;
+   text: string;
+   createdAt: Date | number;
+   user: ChatUser;
+   image?: string;
+   video?: string;
+   audio?: string;
+   system?: boolean;
+   sent?: boolean;
+   received?: boolean;
+   pending?: boolean;
+};

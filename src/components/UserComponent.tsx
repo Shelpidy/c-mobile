@@ -61,7 +61,7 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
    //          //  let activeUserId = 1
    //          try {
    //             let response = await fetch(
-   //                `http://192.168.0.108:5000/api/auth/users/${user.id}`,
+   //                `http://192.168.120.183:5000/api/auth/users/${user.id}`,
    //                { method: "GET" }
    //             );
    //             let data = await response.json();
@@ -86,7 +86,7 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
    const handleFollow = async () => {
       try {
          let { data } = await axios.put(
-            `http://192.168.0.108:5000/api/media/follows/`,
+            `http://192.168.120.183:5000/api/media/follows/`,
             { followerId: currentUser.id, followingId: user?.id },
             { headers: { Accept: "application/json" } }
          );

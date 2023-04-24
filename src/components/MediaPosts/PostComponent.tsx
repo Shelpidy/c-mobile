@@ -87,7 +87,7 @@ const PostComponent = (props: NPostComponentProps) => {
          let activeUserId = 1;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.108:5000/api/media/posts/cl/${props.id}`
+               `http://192.168.120.183:5000/api/media/posts/cl/${props.id}`
             );
             if (data.status == "success") {
                console.log(data.data);
@@ -119,7 +119,7 @@ const PostComponent = (props: NPostComponentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.108:5000/api/auth/users/${props.userId}`,
+               `http://192.168.120.183:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -167,7 +167,7 @@ const PostComponent = (props: NPostComponentProps) => {
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.0.108:5000/api/media/posts/likes/`,
+            `http://192.168.120.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
