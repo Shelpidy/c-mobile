@@ -331,7 +331,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                      textColor={theme.colors.primary}
                      onPress={() =>
                         props.navigation.navigate("ProductScreen", {
-                           product: props,
+                           productId:props.id,userId:props.userId
                         })
                      }
                      mode="contained-tonal">
@@ -340,18 +340,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                </View>
                {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
             </View>
-            {/* <View style={styles.commentBox}>
-               <TextInput
-                  style={[
-                     styles.commentInputField,
-                     { color: theme.colors.primary },
-                  ]}
-                  right={<TextInput.Icon icon="send" />}
-                  mode="outlined"
-                  multiline
-               />
-               <Entypo size={26} name="emoji-neutral" />
-            </View> */}
+
             <View style={{ padding: 5 }}>
                <ProductComments
                   posterId={props.userId}

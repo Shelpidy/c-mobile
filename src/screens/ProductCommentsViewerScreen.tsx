@@ -1,9 +1,11 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
-import React, { useState, useEffect } from "react";
-import Comment from "../components/MediaPosts/Comment";
+import React, { useState, useEffect } from "react"
 import { Button } from "react-native-paper";
 import { FontAwesome5 } from "@expo/vector-icons";
 import PostComment from "../components/MediaPosts/PostComment";
+import ProductComment from "../components/Marketing/ProductComment";
+
+
 
 type CommentsViewerScreenProps = {
    navigation: any;
@@ -51,7 +53,7 @@ const ProductCommentsViewerScreen = ({
 
          {comments?.map((comment) => {
             return (
-               <PostComment
+               <ProductComment
                   key={String(comment.id)}
                   posterId={posterId}
                   {...comment}

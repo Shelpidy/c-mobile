@@ -79,8 +79,9 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
 
    if (!poster) {
       return (
-         <View>
-            <Skeleton height={50} animation="wave" width={width - 10} />
+         <View style={{justifyContent:"center",flexDirection:"row",marginVertical:5}}>
+             <Skeleton height={50} animation="wave" circle width={50} />
+             <Skeleton height={50} style={{borderRadius:20,marginLeft:4}} animation="wave" width={300} />
          </View>
       );
    }

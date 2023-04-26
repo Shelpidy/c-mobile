@@ -44,7 +44,7 @@ const ProductComments = ({
             <Button
                onPress={() =>
                   navigation.navigate("ProductCommentsViewerScreen", {
-                     ProductComments,
+                     comments:productComments,
                      posterId,
                   })
                }>

@@ -18,7 +18,7 @@ const HomeScreen = ({ theme, navigation }: HomeScreenProps) => {
          <PostProductFormNav page="post" navigation={navigation} />
          <FindFriendsComponent navigation={navigation} />
          <PostsComponent navigation={navigation} />
-         <Button onPress={() => navigation.navigate("ProfileScreen")}>
+         {/* <Button onPress={() => navigation.navigate("ProfileScreen")}>
             Profile
          </Button>
          <Button onPress={() => navigation.navigate("PostScreen")}>
@@ -30,7 +30,10 @@ const HomeScreen = ({ theme, navigation }: HomeScreenProps) => {
          <Button onPress={() => navigation.navigate("MarketingScreen")}>
             Market
          </Button>
-         <Text>HomeScreen</Text>
+          <Button onPress={() => navigation.navigate("ProductsRequestScreen")}>
+            Cart Products
+         </Button>
+         <Text>HomeScreen</Text> */}
       </ScrollView>
    );
 };

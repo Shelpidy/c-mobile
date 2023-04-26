@@ -65,7 +65,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
             );
             let data = await response.json();
             if (data.status == "success") {
-               console.log(data.data);
+               // console.log(data.data);
                // setPosts(data.data);
                let numOfPageLinks = 1;
                let fetchedPost: PostComponentProps[] = data.data;
@@ -211,7 +211,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      </Button>
                   </View>
                </ScrollView>
-               <Button onPress={() => navigation.navigate("ChatScreen")}>
+               <Button onPress={() => navigation.navigate("ChatScreen",{user:user?.personal})}>
                   message
                </Button>
             </>

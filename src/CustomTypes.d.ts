@@ -75,6 +75,7 @@ declare type ProductComponentProps = {
    description: string;
    images: string[];
    price: string;
+   affiliateId:number | number[] | null
    initialPrice: string | null;
    affiliatePrice: string | null;
    sizes: string[] | null;
@@ -84,7 +85,7 @@ declare type ProductComponentProps = {
    userId: number;
    createdAt: Date;
    updatedAt: Date;
-   navigation: any;
+   navigation?: any;
    route?: any;
 };
 
@@ -116,7 +117,9 @@ declare type Product = {
    description: string;
    images: string[];
    price: string;
+   affiliateId:number | number[] | null
    initialPrice: string;
+   affiliatePrice: string | null;
    sizes: string[];
    numberAvailable: string;
    rating: number;
@@ -145,3 +148,10 @@ declare type IMessage = {
    received?: boolean;
    pending?: boolean;
 };
+
+declare type MakePurchaseParams = {
+     productId:number,
+     affiliateId?:number,
+     userId:number,
+     buyerId:number
+}

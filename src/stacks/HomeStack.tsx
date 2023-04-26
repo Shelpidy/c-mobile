@@ -17,14 +17,27 @@ import ProductCommentsViewerScreen from "../screens/ProductCommentsViewerScreen"
 import MarketingScreen from "../screens/MarketingScreen";
 import ProductScreen from "../screens/ProductScreen";
 import UserProductScreen from "../screens/UserProductScreen";
-import ProductRequestScreen from "../screens/ProductRequestScreen";
+import ProductsRequestScreen from "../screens/ProductsRequestScreen";
 import UserRequestScreen from "../screens/UserRequestScreen";
 import ChatScreen from "../screens/ChatScreen";
+import SearchScreen from "../screens/SearchScreen";
+// import { createDrawerNavigator } from '@react-navigation/drawer';
+
 const Stack = createNativeStackNavigator();
 type HomeStackProps = {
    navigation: any;
 };
+
+// const drawer = createDrawerNavigator()
+
+// const HomeStack = ()=>{
+//   return( <drawer.Navigator>
+//       <drawer.Screen name="HomeDrawer" component={DrawerContainer}></drawer.Screen>
+//    </drawer.Navigator>)
+// }
+
 const HomeStack = (props: HomeStackProps) => {
+   const [open, setOpen] = React.useState(false);
    return (
       <Stack.Navigator
          screenOptions={{ header: () => <CustomHeader {...props} /> }}>
@@ -73,12 +86,13 @@ const HomeStack = (props: HomeStackProps) => {
             name="UserProductScreen"
             component={UserProductScreen}></Stack.Screen>
          <Stack.Screen
-            name="ProductRequestScreen"
-            component={ProductRequestScreen}></Stack.Screen>
+            name="ProductsRequestScreen"
+            component={ProductsRequestScreen}></Stack.Screen>
          <Stack.Screen
             name="UserRequestScreen"
             component={UserRequestScreen}></Stack.Screen>
          <Stack.Screen name="ChatScreen" component={ChatScreen}></Stack.Screen>
+         <Stack.Screen name="SearchScreen" component={SearchScreen}></Stack.Screen>
       </Stack.Navigator>
    );
 };

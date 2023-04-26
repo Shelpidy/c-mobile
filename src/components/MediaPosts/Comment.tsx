@@ -98,7 +98,7 @@ const Comment = (props: CommentProps) => {
                         {commentor.firstName} {commentor.middleName}{" "}
                         {commentor.lastName}
                      </Text>
-                     <Text style={{ fontFamily: "Poppins_300Light" }}>
+                     <Text style={{ fontFamily: "Poppins_300Light",paddingHorizontal:5 }}>
                         {props.text}
                      </Text>
                      {/* <Text>Comment Likes</Text>  */}
@@ -113,11 +113,8 @@ const Comment = (props: CommentProps) => {
                         {(currentUser.id == props?.userId ||
                            currentUser.id == props?.posterId) && (
                            <View style={{ flexDirection: "row" }}>
-                              <Button onPress={() => setOpenModal(true)}>
-                                 <Feather name="edit" /> Edit
-                              </Button>
-                              <Button onPress={() => setOpenModal(true)}>
-                                 <Feather name="trash" /> Delete
+                               <Button onPress={() => setOpenModal(true)}>
+                                  <SimpleLineIcons name="options-vertical" />
                               </Button>
                            </View>
                         )}

@@ -21,10 +21,12 @@ import {
    MaterialCommunityIcons,
    Feather,
    Ionicons,
+   SimpleLineIcons,
 } from "@expo/vector-icons";
 import axios from "axios";
 import UpdatePostForm from "./UpdatePostForm";
 import { Pressable } from "react-native";
+import TextShortener from "../TextShortener";
 
 type NPostComponentProps = PostComponentProps & { navigation: any };
 type PostComment = Omit<CommentProps, "posterId">;
@@ -90,7 +92,7 @@ const PostComponent = (props: NPostComponentProps) => {
                `http://192.168.120.183:5000/api/media/posts/cl/${props.id}`
             );
             if (data.status == "success") {
-               console.log(data.data);
+               // console.log(data.data);
                let ls: any[] = data.data.likes;
                let cs = data.data.comments;
                setComments(cs);
@@ -124,7 +126,7 @@ const PostComponent = (props: NPostComponentProps) => {
             );
             let data = await response.json();
             if (data.status == "success") {
-               console.log("Users-----", data.data);
+               // console.log("Users-----", data.data);
                SetPoster(data.data.personal);
                // Alert.alert("Success",data.message)
                setLoading(false);
@@ -139,20 +141,8 @@ const PostComponent = (props: NPostComponentProps) => {
          }
       };
       fetchData();
-   }, []);
+   }, [])
 
-   // useEffect(() => {
-   //    setLikes(postLikes.filter((like) => like.postId === props.id));
-   //    setComments(
-   //       postComments.filter((comment) => comment.postId === props.id)
-   //    );
-
-   //    // GET COMMENTS AND LIKES
-   // }, [users, postComments, postLikes]);
-
-   // useEffect(() => {
-   //    SetPoster(users.find((user) => user.id === props.userId));
-   // }, [users]);
 
    const gotoUserProfile = () => {
       if (currentUser.id === poster.id) {
@@ -252,8 +242,8 @@ const PostComponent = (props: NPostComponentProps) => {
                   }}>
                   {currentUser.id == props?.userId && (
                      <View>
-                        <Button onPress={() => setOpenModal(true)}>
-                           <Feather name="edit" /> Edit Post
+                        <Button style={{backgroundColor:"#f9f9f9"}} onPress={() => setOpenModal(true)}>
+                           <SimpleLineIcons name="options-vertical" />
                         </Button>
                      </View>
                   )}
@@ -264,8 +254,9 @@ const PostComponent = (props: NPostComponentProps) => {
             {props.images && <ImagesViewer images={props.images} />}
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>
-         <Text style={styles.title}>{props?.title}</Text>
-         {props?.text && <TextViewer text={props.text} />}
+         {props.title && <Text style={styles.title}>{props?.title}</Text> }
+         
+         {props?.text && <TextShortener style={{marginHorizontal:8,fontFamily:"Poppins_300Light"}} text={props.text} onPressViewMore={()=>props.navigation.navigate("FullPostViewScreen",{...props})} showViewMore={true} textLength={100}></TextShortener>}
          <View>
             <View
                style={[
@@ -287,13 +278,7 @@ const PostComponent = (props: NPostComponentProps) => {
                         name={liked ? "heart-sharp" : "heart-outline"}
                      />
                   </Pressable>
-                  {/* <IconButton
-                     disabled={loading}
-                     onPress={() => handleLike(post.id)}
-                     mode="outlined"
-                     size={20}
-                     icon={liked ? "heart" : "heart-outline"}
-                  /> */}
+                 
                   <Text style={styles.commentAmountText}>{likes.length}</Text>
                </View>
                <View
@@ -309,29 +294,14 @@ const PostComponent = (props: NPostComponentProps) => {
                         name="chatbox-outline"
                      />
                   </Pressable>
-                  {/* <IconButton
-                     mode="outlined"
-                     size={20}
-                     icon="comment-outline"
-                  /> */}
+                 
                   <Text style={styles.commentAmountText}>
                      {comments.length}
                   </Text>
                </View>
-               {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
+            
             </View>
-            {/* <View style={styles.commentBox}>
-               <TextInput
-                  style={[
-                     styles.commentInputField,
-                     { color: theme.colors.primary },
-                  ]}
-                  right={<TextInput.Icon icon="send" />}
-                  mode="outlined"
-                  multiline
-               />
-               <Entypo size={26} name="emoji-neutral" />
-            </View> */}
+           
             <View style={{ padding: 5 }}>
                <Comments
                   posterId={props.userId}
@@ -364,8 +334,7 @@ const styles = StyleSheet.create({
       paddingHorizontal: 15,
    },
    title: {
-      fontFamily: "Poppins_700Bold",
-      fontSize: 16,
+      fontFamily: "Poppins_500Medium",
       marginHorizontal: 10,
       marginTop: 6,
    },

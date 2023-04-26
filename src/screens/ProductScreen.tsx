@@ -86,10 +86,30 @@ const ProductScreen = ({ navigation, route }: any) => {
       });
    }, []);
 
-   useEffect(() => {
-      setproduct(route.params.product);
-      console.log("product", route.params.product);
+
+    useEffect(function () {
+      let fetchData = async () => {
+         let productId = route.params.productId;
+         try {
+            let { data } = await axios.get(
+               `http://192.168.120.183:5000/api/marketing/products/${productId}`
+            );
+            if (data.status == "success") {
+               //    console.log(data.data);
+               setproduct(data.data)
+            } else {
+               Alert.alert("Failed", data.message);
+            }
+            setLoading(false);
+         } catch (err) {
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      };
+      fetchData();
    }, []);
+
+
 
    useEffect(function () {
       let fetchData = async () => {
@@ -123,7 +143,7 @@ const ProductScreen = ({ navigation, route }: any) => {
    useEffect(function () {
       console.log("Fetching user");
       setLoading(true);
-      let userId = route.params.product.userId;
+      let userId = route.params.userId;
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
@@ -396,13 +416,13 @@ const ProductScreen = ({ navigation, route }: any) => {
                   </View>
                </View>
 
-               <View style={{ padding: 5 }}>
+               {/* <View style={{ padding: 5 }}>
                   <ProductComments
                      posterId={product.userId}
                      navigation={navigation}
                      productComments={comments}
                   />
-               </View>
+               </View> */}
 
                {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
             </View>

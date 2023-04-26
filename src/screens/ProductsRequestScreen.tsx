@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View, Alert, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
-import ProductComponent from "../components/Marketing/ProductComponent";
 import SearchForm from "../components/SearchForm";
 import PostProductFormNav from "../components/PostProductFormNav";
+import ProductRequestComponent from "../components/Marketing/ProductRequestComponent";
+import { ActivityIndicator } from "react-native-paper";
 
 // import { Products as _fetchedPost } from "../../data";
 
@@ -10,7 +11,7 @@ type ProductsComponentProps = {
    navigation?: any;
 };
 
-const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
+const ProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
    const [products, setProducts] = useState<ProductComponentProps[]>([]);
    const [allProducts, setAllProducts] = useState<ProductComponentProps[]>([]);
    const [pageNumber, setPageNumber] = useState<number>(1);
@@ -20,17 +21,19 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
 
+   
+
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               "http://192.168.120.183:5000/api/marketing/products"
+               `http://192.168.120.183:5000/api/marketing/products/request/${activeUserId}`
             );
             let data = await response.json();
             if (data.status == "success") {
-               console.log(data.data);
+               // console.log(data.data);
                // setProducts(data.data);
                let fetchedPost: ProductComponentProps[] = data.data;
                let numOfPageLinks = Math.ceil(
@@ -64,7 +67,7 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       return (
          <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <Text>Loading Products...</Text>
+            <ActivityIndicator  size={35} />
          </View>
       );
    }
@@ -82,13 +85,11 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
    };
 
    return (
-      <ScrollView style={{backgroundColor:"#f9f9f9"}}>
-         {/* <Text>ProductsComponent {Products.length}</Text> */}
-         <PostProductFormNav page="product" navigation={navigation} />
+      <ScrollView style={{backgroundColor:"#f7f7f7"}}>
          <SearchForm setSearchValue={searchProducts} />
          {products.map((product) => {
             return (
-               <ProductComponent
+               <ProductRequestComponent
                   key={String(product.id)}
                   {...product}
                   navigation={navigation}
@@ -99,6 +100,6 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
    );
 };
 
-export default MarketingScreen;
+export default ProductsRequestScreen;
 
 const styles = StyleSheet.create({});

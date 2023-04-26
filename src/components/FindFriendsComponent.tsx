@@ -23,7 +23,7 @@ const FindFriendsComponent = ({ navigation }: any) => {
             );
             let data = await response.json();
             if (data.status == "success") {
-               console.log("Users-----", data.data);
+               // console.log("Users-----", data.data);
                setUsers(data.data?.sort(() => 0.5 - Math.random()));
                // Alert.alert("Success",data.message)
                setLoading(false);

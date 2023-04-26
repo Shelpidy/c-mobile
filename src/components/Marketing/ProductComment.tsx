@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { users } from "../../data";
 import { Feather, SimpleLineIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
-import axios from "axios";
+
 
 const Comment = (props: ProductCommentProps) => {
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
@@ -104,7 +104,7 @@ const Comment = (props: ProductCommentProps) => {
                         {commentor.firstName} {commentor.middleName}{" "}
                         {commentor.lastName}
                      </Text>
-                     <Text style={{ fontFamily: "Poppins_300Light" }}>
+                     <Text style={{ fontFamily: "Poppins_300Light",paddingHorizontal:5 }}>
                         {props.text}
                      </Text>
                      {/* <Text>Comment Likes</Text>  */}
@@ -120,10 +120,7 @@ const Comment = (props: ProductCommentProps) => {
                            currentUser.id == props?.posterId) && (
                            <View style={{ flexDirection: "row" }}>
                               <Button onPress={() => setOpenModal(true)}>
-                                 <Feather name="edit" /> Edit
-                              </Button>
-                              <Button onPress={() => setOpenModal(true)}>
-                                 <Feather name="trash" /> Delete
+                                  <SimpleLineIcons name="options-vertical" />
                               </Button>
                            </View>
                         )}
