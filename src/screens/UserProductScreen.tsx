@@ -23,7 +23,7 @@ const UserProductScreen = ({ navigation, route }: any) => {
          console.log("User product screen", route.params.user);
          try {
             let response = await fetch(
-               `http://192.168.120.183:5000/api/marketing/products/user/${route.params.user.id}`
+               `http://192.168.2.183:5000/api/marketing/products/user/${route.params.user.id}`
             );
             let data = await response.json();
             if (data.status == "success") {

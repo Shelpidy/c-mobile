@@ -67,7 +67,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       productCommentReducer,
       initialState
    );
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const [currentUser, setCurrentUser] = useState<any>({});
    const [product, setproduct] = useState<ProductComponentProps | null>(null);
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [comments, setComments] = useState<ProductComment[]>([]);
@@ -75,6 +75,8 @@ const ProductScreen = ({ navigation, route }: any) => {
    const [producter, Setproducter] = useState<any>();
    const [liked, setLiked] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
+   const [loading1, setLoading1] = useState<boolean>(false);
+   const [loading2, setLoading2] = useState<boolean>(false);
    const theme = useTheme();
 
    useEffect(() => {
@@ -92,7 +94,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          let productId = route.params.productId;
          try {
             let { data } = await axios.get(
-               `http://192.168.120.183:5000/api/marketing/products/${productId}`
+               `http://192.168.2.183:5000/api/marketing/products/${productId}`
             );
             if (data.status == "success") {
                //    console.log(data.data);
@@ -114,13 +116,13 @@ const ProductScreen = ({ navigation, route }: any) => {
    useEffect(function () {
       let fetchData = async () => {
          let activeUserId = 1;
-         let productId = route.params.product.id;
+         let productId = route.params.productId;
          try {
             let { data } = await axios.get(
-               `http://192.168.120.183:5000/api/marketing/products/cl/${productId}`
+               `http://192.168.2.183:5000/api/marketing/products/cl/${productId}`
             );
             if (data.status == "success") {
-               //    console.log(data.data);
+                  console.log(data.data);
                let ls: any[] = data.data.likes;
                setComments(data.data.comments);
                setLikes(data.data.likes);
@@ -144,12 +146,13 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log("Fetching user");
       setLoading(true);
       let userId = route.params.userId;
+      console.log("USERID",userId)
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.120.183:5000/api/auth/users/${userId}`,
+               `http://192.168.2.183:5000/api/auth/users/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -184,6 +187,67 @@ const ProductScreen = ({ navigation, route }: any) => {
    //    Setproducter(users.find((user) => user.id === product.userId));
    // }, [users]);
 
+   const handleProductRequest = async()=>{
+      if(product?.affiliateId !== null){
+         Alert.alert("","Affiliated product can not be added to shopping cart.")
+         return
+      }
+      setLoading(true)
+      let requestObj =  {
+         userId:route.params.userId,
+         productId:route.params.productId
+      }
+      try{
+         let { data } = await axios.post(
+            `http://192.168.2.183:5000/api/marketing/products/request/`,
+             requestObj
+         );
+         if(data.status == 'success'){
+              Alert.alert("Success",'You have successfully added a product to Shopping-Cart')
+              setLoading(false)
+         }else{
+            Alert.alert("Failed",data.message)
+            setLoading(false)
+         }
+
+      }catch(err){
+         Alert.alert("Failed", String(err));
+         setLoading(false);
+
+
+      }
+   }
+
+
+   
+   const handleProductAffiliate = async()=>{
+      setLoading1(true)
+      let requestObj =  {
+         userId:route.params.userId,
+         productId:route.params.productId,
+         affiliateId:currentUser.id
+      }
+      try{
+         let { data } = await axios.post(
+            `http://192.168.2.183:5000/api/marketing/affiliates/`,
+             requestObj
+         );
+         if(data.status == 'success'){
+              Alert.alert("Success",'You have successfully affiliated a product')
+              setLoading1(false)
+         }else{
+            Alert.alert("Failed",data.message)
+            setLoading1(false)
+         }
+
+      }catch(err){
+         Alert.alert("Failed", String(err));
+         setLoading1(false);
+
+
+      }
+   }
+
    const handleComment = async () => {
       setLoading(true);
       let activeUserId = 1;
@@ -195,13 +259,13 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.120.183:5000/api/marketing/products/comments/`,
+            `http://192.168.2.183:5000/api/marketing/products/comments/`,
             commentObj
          );
          if (data.status == "success") {
             console.log(data.data);
             setComments([...comments, data.data]);
-            dispatchproductComment({ type: "TEXT", payload: "" });
+            // dispatchproductComment({ type: "TEXT", payload: "" });
             // Alert.alert("Success",data.message)
          } else {
             Alert.alert("Failed", data.message);
@@ -213,12 +277,43 @@ const ProductScreen = ({ navigation, route }: any) => {
       }
    };
 
+   
+   const handleBuy = async () => {
+      setLoading2(true);
+      let activeUserId = 1;
+      let buyObj:MakePurchaseParams = {
+         affiliateId:JSON.parse(String(product?.affiliateId))[0],
+         productId: product?.id,
+         userId: product?.userId,
+         buyerId:currentUser.id
+      };
+      console.log(buyObj);
+      try {
+         let { data } = await axios.post(
+            `http://192.168.2.183:5000/api/marketing/buy`,
+            buyObj
+         );
+         if (data.status == "success") {
+            console.log(data.data);
+            // setComments([...comments, data.data]);
+            // dispatchproductComment({ type: "TEXT", payload: "" });
+            Alert.alert("Success",data.message)
+         } else {
+            Alert.alert("Failed", data.message);
+         }
+         setLoading2(false);
+      } catch (err) {
+         Alert.alert("Failed", String(err));
+         setLoading2(false);
+      }
+   };
+
    const handleLike = async (productId: number) => {
       console.log(productId);
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.120.183:5000/api/marketing/products/likes/`,
+            `http://192.168.2.183:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
@@ -232,7 +327,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                   ...likes,
                   {
                      id: likes.length,
-                     productId: likes[0].productId,
+                     productId: likes[0]?.productId,
                      userId: currentUser.id,
                      createdAt: new Date(),
                      updatedAt: new Date(),
@@ -406,13 +501,22 @@ const ProductScreen = ({ navigation, route }: any) => {
                      </Text>
                   </View>
                   <View style={{ flexDirection: "row" }}>
-                     <Button mode="contained">Request</Button>
+                     <Button loading={loading} disabled={loading} onPress={handleProductRequest} mode="contained">Add to cart</Button>
+                     <Button loading={loading2} disabled={loading2} onPress={handleBuy} mode="contained">Buy</Button>
+                    
+                    {
+                     product.userId !== currentUser.id && !(product.affiliateId?.includes(currentUser?.id)) && 
                      <Button
+                       loading={loading1}
+                       disabled={loading1}
+                       onPress={handleProductAffiliate}
                         textColor={theme.colors.primary}
                         style={{ marginHorizontal: 3 }}
                         mode="contained-tonal">
                         Affiliate
                      </Button>
+                   }
+                   
                   </View>
                </View>
 

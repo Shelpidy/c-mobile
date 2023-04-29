@@ -75,7 +75,7 @@ declare type ProductComponentProps = {
    description: string;
    images: string[];
    price: string;
-   affiliateId:number | number[] | null
+   affiliateId?:number[] | null
    initialPrice: string | null;
    affiliatePrice: string | null;
    sizes: string[] | null;
@@ -150,8 +150,20 @@ declare type IMessage = {
 };
 
 declare type MakePurchaseParams = {
-     productId:number,
-     affiliateId?:number,
-     userId:number,
-     buyerId:number
+     productId:any,
+     affiliateId:any,
+     userId:any,
+     buyerId:any
 }
+
+declare type CustomNotification = {
+        id:number
+        userId:number
+        title:string
+        message:string
+        readStatus:boolean
+        notificationFrom:number
+        createdAt:Date
+        notificationType:string
+        updatedAt:Date | null
+    }

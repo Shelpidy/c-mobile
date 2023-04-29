@@ -38,7 +38,7 @@ const CustomHeader = ({ navigation }: CustomHeaderProps) => {
           let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.120.183:5000/api/auth/users/${activeUserId}`,
+               `http://192.168.2.183:5000/api/auth/users/${activeUserId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -144,7 +144,7 @@ const CustomHeader = ({ navigation }: CustomHeaderProps) => {
            <Appbar.Action icon={()=><Feather color={activeTab === 3?theme.colors.primary:theme.colors.secondary} size={20} name='shopping-cart'/>} onPress={() =>gotoNextScreen("ProductsRequestScreen")} />
            <Appbar.Action icon={()=><Feather color={activeTab === 4?theme.colors.primary:theme.colors.secondary} size={20} name='search'/>} onPress={() => gotoNextScreen("SearchScreen")} />
            {/* <Appbar.Action icon={()=><Feather size={20} name='users'/>} onPress={() =>setOpen(!open)} /> */}
-         <Appbar.Action  onPress={()=>gotoNextScreen("ProfileScreen")} icon={()=>
+         <Appbar.Action  onPress={()=>gotoNextScreen("ProfileScreen",{userId:currentUser.id})} icon={()=>
               <Image
                     resizeMode="cover"
                      style={styles.profileImage}

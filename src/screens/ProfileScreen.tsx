@@ -47,7 +47,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.120.183:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.2.183:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -75,7 +75,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
          let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.120.183:5000/api/media/posts/user/${userId}`
+               `http://192.168.2.183:5000/api/media/posts/user/${userId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -112,7 +112,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
 
    return (
       <ScrollView
-         style={{ flex: 1, backgroundColor: "#f5f5f5", paddingTop: 10 }}>
+         style={{ flex: 1, backgroundColor: "#fafafa", paddingTop: 10 }}>
          {!user && (
             <View>
                <ActivityIndicator />

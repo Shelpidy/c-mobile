@@ -28,7 +28,7 @@ const ChatScreen = ({ navigation, route }: any) => {
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
    const [secondUser,setSecondUser] = useState<User>()
 
-   const socket = io("http://192.168.120.183:5002/chat/31");
+   const socket = io("http://192.168.2.183:5002/chat/31");
 
    const toggleEmojiPicker = () => {
       setShowEmojiPicker(!showEmojiPicker);
@@ -63,7 +63,7 @@ const ChatScreen = ({ navigation, route }: any) => {
     console.log("Fetching data")
     let fetchData = async()=>{
       try{
-         let resp = await fetch("http://192.168.120.183:5002/chats/31",{ method: "GET" })
+         let resp = await fetch("http://192.168.2.183:5002/chats/31",{ method: "GET" })
         //  let data = await resp.json()
          console.log("Chat data",resp)
         //  setMessages(data)

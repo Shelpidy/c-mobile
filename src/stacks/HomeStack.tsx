@@ -21,6 +21,7 @@ import ProductsRequestScreen from "../screens/ProductsRequestScreen";
 import UserRequestScreen from "../screens/UserRequestScreen";
 import ChatScreen from "../screens/ChatScreen";
 import SearchScreen from "../screens/SearchScreen";
+import ProductNotificationScreen from "../screens/ProductNotificationScreen";
 // import { createDrawerNavigator } from '@react-navigation/drawer';
 
 const Stack = createNativeStackNavigator();
@@ -93,6 +94,7 @@ const HomeStack = (props: HomeStackProps) => {
             component={UserRequestScreen}></Stack.Screen>
          <Stack.Screen name="ChatScreen" component={ChatScreen}></Stack.Screen>
          <Stack.Screen name="SearchScreen" component={SearchScreen}></Stack.Screen>
+         <Stack.Screen name="ProductNotificationScreen" component={ProductNotificationScreen}></Stack.Screen>
       </Stack.Navigator>
    );
 };

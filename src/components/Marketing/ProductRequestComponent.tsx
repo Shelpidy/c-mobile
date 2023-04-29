@@ -72,6 +72,8 @@ const ProductRequestComponent = (props: ProductComponentProps) => {
    const [poster, SetPoster] = useState<any>();
    const [liked, setLiked] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
+   const [loading1, setLoading1] = useState<boolean>(false);
+   const [loading2, setLoading2] = useState<boolean>(false);
    const theme = useTheme();
 
    useEffect(() => {
@@ -90,7 +92,7 @@ const ProductRequestComponent = (props: ProductComponentProps) => {
       let fetchData = async () => {
          try {
             let response = await fetch(
-               `http://192.168.120.183:5000/api/auth/users/${props.userId}`,
+               `http://192.168.2.183:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -112,38 +114,58 @@ const ProductRequestComponent = (props: ProductComponentProps) => {
       fetchData();
    }, []);
 
-
-   const handleBuy = async (productId: number) => {
-      console.log(productId);
+    const handleDelete = async () => {
+      setLoading1(true);
+      let productId = props.id
+      let userId = currentUser.id
       try {
-         let activeUserId = 1;
-         let { data } = await axios.put(
-            `http://192.168.120.183:5000/api/marketing/products/likes/`,
-            { userId: activeUserId, productId: productId }
+         let { data } = await axios.delete(
+            `http://192.168.2.183:5000/api/marketing/products/request/${productId}/${userId}`,
+           
          );
          if (data.status == "success") {
             console.log(data.data);
-            if (liked) {
-               if (likes) {
-                  setLikes(likes.slice(0, likes.length - 1));
-                  setLiked(!liked);
-               }
-            } else {
-               if (likes) {
-                  setLikes([...likes, data.data]);
-                  setLiked(!liked);
-               }
-            }
-
-            Alert.alert("Success", data.message);
+            // setComments([...comments, data.data]);
+            // dispatchproductComment({ type: "TEXT", payload: "" });
+            Alert.alert("Success",data.message)
          } else {
             Alert.alert("Failed", data.message);
          }
-         setLoading(false);
+         setLoading1(false);
       } catch (err) {
-         console.log(err);
          Alert.alert("Failed", String(err));
-         setLoading(false);
+         setLoading1(false);
+      }
+   };
+   
+
+    const handleBuy = async () => {
+      setLoading2(true);
+      let activeUserId = 1;
+      let buyObj:MakePurchaseParams = {
+         affiliateId:JSON.parse(String(props?.affiliateId))[0],
+         productId: props?.id,
+         userId: props?.userId,
+         buyerId:currentUser.id
+      };
+      console.log(buyObj);
+      try {
+         let { data } = await axios.post(
+            `http://192.168.2.183:5000/api/marketing/buy`,
+            buyObj
+         );
+         if (data.status == "success") {
+            console.log(data.data);
+            // setComments([...comments, data.data]);
+            // dispatchproductComment({ type: "TEXT", payload: "" });
+            Alert.alert("Success",data.message)
+         } else {
+            Alert.alert("Failed", data.message);
+         }
+         setLoading2(false);
+      } catch (err) {
+         Alert.alert("Failed", String(err));
+         setLoading2(false);
       }
    };
 
@@ -196,13 +218,15 @@ const ProductRequestComponent = (props: ProductComponentProps) => {
                 style={styles.stockImage}
                 source={{ uri: JSON.parse(String(props.images))[0]}}
                />
-            <Text style={styles.productName}><TextShortener style={{textAlignVertical:"center",fontFamily:"Poppins_300Light"}} text={props.productName} textLength={15} /></Text>
+            <Text style={styles.productName}><TextShortener style={{textAlignVertical:"center",fontFamily:"Poppins_300Light"}} text={props.productName} textLength={10} /></Text>
 
             <Text
                style={[styles.productPrice, { color: theme.colors.primary }]}>
                C{props?.price}
             </Text>
-            <Button  mode='contained'>Buy</Button>
+            <Button onPress={handleBuy} mode='contained'>Buy</Button>
+            <Button onPress={handleDelete} mode='text'><Feather name="x"/></Button>
+
          </View>
       </View>
    );

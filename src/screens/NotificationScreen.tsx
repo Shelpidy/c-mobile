@@ -5,18 +5,24 @@ import {
    View,
    ScrollView,
    Alert,
+   TouchableHighlight,
+   Pressable,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Skeleton } from "@rneui/themed";
-import { Button } from "react-native-paper";
+import { Skeleton, ThemeConsumer } from "@rneui/themed";
+import { Button, useTheme,ActivityIndicator } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
+import NotificationComponent from "../components/TransactionNotificationComponent";
+import ProductNotificationComponent from "../components/ProductNotificationComponent";
+import TransactionNotificationComponent from "../components/TransactionNotificationComponent";
 
 const { width, height } = Dimensions.get("screen");
 
-const NotificationScreen = () => {
-   const [notifications, setNotifications] = useState<any[] | null>(null);
+const NotificationScreen = ({navigation}:any) => {
+   const [notifications, setNotifications] = useState<CustomNotification[] | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const theme = useTheme()
 
    useEffect(function () {
       console.log("Fetching user");
@@ -26,12 +32,12 @@ const NotificationScreen = () => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               `http://192.168.120.183:5000/api/notifications/${activeUserId}`,
+               `http://192.168.2.183:5000/api/notifications/${activeUserId}`,
                { method: "GET" }
             );
             let data = await response.json();
             if (data.status == "success") {
-               console.log("User Notifications-----", data.data);
+               // console.log("User Notifications-----", data.data);
                setNotifications(data.data.sort(() => -1));
                // Alert.alert("Success",data.message)
                setLoading(false);
@@ -48,34 +54,29 @@ const NotificationScreen = () => {
       fetchData();
    }, []);
 
+
    if (!notifications) {
       return (
-         <ScrollView style={styles.container}>
-            <Skeleton animation="wave" style={styles.skeletonHeader} />
-            <Skeleton animation="wave" style={styles.skeletonBody} />
-            <Skeleton animation="wave" style={styles.skeletonBody} />
-            <Skeleton animation="wave" style={styles.skeletonBody} />
-            <Skeleton animation="wave" style={styles.skeletonBody} />
-         </ScrollView>
+          <View style={styles.notContainer}>
+            <ActivityIndicator></ActivityIndicator>
+          </View>
       );
    }
    return (
       <ScrollView style={styles.container}>
          {notifications.map((notification) => {
-            return (
-               <View style={styles.notContainer} key={String(notification.id)}>
-                  <View style={styles.notHeader}>
-                     <Text style={styles.notTitle}>{notification.title}</Text>
-                     <Button mode="text">
-                        <AntDesign name="delete" size={19} />
-                     </Button>
-                  </View>
-                  <Text style={styles.notMessage}>{notification.message}</Text>
-                  <Text style={styles.notMessage}>
-                     {notification.createdAt}
-                  </Text>
-               </View>
-            );
+            if(notification.title === 'Buy Transaction'){
+               return(<ProductNotificationComponent key={String(notification.id)} notification={notification} navigation={navigation}  />)
+            }
+            else if(notification.title === 'Money Transaction'){
+               return <TransactionNotificationComponent  key={String(notification.id)} notification={notification} navigation={navigation}  />
+               
+            }
+            else{
+               return <View><Text>No other notification</Text></View>
+            }
+        
+         
          })}
       </ScrollView>
    );
@@ -85,33 +86,13 @@ export default NotificationScreen;
 
 const styles = StyleSheet.create({
    container: {
-      backgroundColor: "#f5f5f5",
-      padding: 10,
+      backgroundColor: "#f5f5f5"
+      
    },
    notContainer: {
       backgroundColor: "#ffffff",
-      padding: 10,
-      marginVertical: 5,
-   },
-   skeletonBody: {
-      width: "100%",
-      height: height / 3,
-      margin: 5,
-   },
-   skeletonHeader: {
-      width: "100%",
-      height: 50,
-      margin: 5,
-   },
-   notTitle: {
-      fontFamily: "Poppins_500Medium",
-   },
-   notMessage: {
-      fontFamily: "Poppins_300Light",
-   },
-   notHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-   },
+      flex:1,
+      justifyContent:"center",
+      alignItems:"center"
+   }
 });

@@ -19,7 +19,7 @@ const Comment = (props: ProductCommentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.120.183:5000/api/auth/users/${props.userId}`,
+               `http://192.168.2.183:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();

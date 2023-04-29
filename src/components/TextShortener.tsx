@@ -39,7 +39,7 @@ const TextShortener = ({
    }, [textLength, text, style]);
 
    if (loading) return <Text>......</Text>;
-   return showViewMore? <View style={containerStyle}><Text style={_style}>{shortenText} <Text onPress={onPressViewMore} style={{color:theme.colors.primary}}>...view more</Text></Text>{children}</View>:<View style={containerStyle}><Text style={_style}>{shortenText}<Text>...</Text></Text>{children}</View>
+   return showViewMore? <View style={containerStyle}><Text style={_style}>{shortenText} <Text onPress={onPressViewMore} style={{color:theme.colors.primary}}>view more</Text></Text>{children}</View>:<View style={containerStyle}><Text style={_style}>{shortenText}<Text></Text></Text>{children}</View>
 };
 
 export default TextShortener;
