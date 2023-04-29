@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import SearchForm from "../components/SearchForm";
 import PostProductFormNav from "../components/PostProductFormNav";
 import ProductRequestComponent from "../components/Marketing/ProductRequestComponent";
+import axios from "axios"
 
 // import { Products as _fetchedPost } from "../../data";
 
@@ -18,6 +19,7 @@ const UserProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
       useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
+   const [loading2, setLoading2] = useState<boolean>(false);
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
 
    useEffect(function () {
@@ -68,6 +70,9 @@ const UserProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
          </View>
       );
    }
+
+  
+
 
    const searchProducts = (_token: string) => {
       console.log("From product", _token);
