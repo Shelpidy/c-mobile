@@ -26,11 +26,11 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               "http://192.168.2.183:5000/api/marketing/products"
+               "http://192.168.0.106:5000/api/marketing/products"
             );
             let data = await response.json();
             if (data.status == "success") {
-               console.log(data.data);
+               // console.log('Products',data.data);
                // setProducts(data.data);
                let fetchedPost: ProductComponentProps[] = data.data;
                let numOfPageLinks = Math.ceil(

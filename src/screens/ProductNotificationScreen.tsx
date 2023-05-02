@@ -1,17 +1,52 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, View,Alert} from 'react-native'
+import React, { useState,useEffect } from 'react'
+import UserComponent from '../components/UserComponent'
+import ProductComponent from '../components/Marketing/ProductComponent'
 
-const ProductNotificationScreen = ({notification}:any) => {
+const ProductNotificationScreen = ({navigation,route}:any) => {
 
-  const [affiliate,setAffiliate] = useState<User | null>(null)
   const [owner,setOwner] = useState<User | null>(null)
-  const [product,setProduct] = useState<Product | null>(null)
-  
+  const [product,setProduct] = useState<ProductComponentProps | null>(null)
+  const [loading,setLoading] = useState<boolean>(false)
+
+    useEffect(function () {
+      console.log("Fetching user");
+      setLoading(true);
+      let fetchData = async () => {
+         // console.log("Fetching user")
+         //  let activeUserId = 1
+         try {
+            let response = await fetch(
+               `http://192.168.0.106:5000/api/notifications/product/${route.params.productId}`,
+               { method: "GET" }
+            );
+            let data = await response.json();
+            if (data.status == "success") {
+               console.log("Data-----", data.data);
+               setOwner(data.data.owner);
+               setProduct(data.data.product)
+               // Alert.alert("Success",data.message)
+               setLoading(false);
+            } else {
+               Alert.alert("Failed", data.message);
+            }
+            setLoading(false);
+         } catch (err) {
+            console.log(err);
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      };
+      fetchData();
+   }, []);
+
   return (
     <View>
       <Text>ProductNotificationScreen</Text>
+      {owner && <UserComponent _user={owner} navigation={navigation} />} 
+      {product && <ProductComponent {...product} navigation={navigation}/>} 
     </View>
-  )
+  ) 
 }
 
 export default ProductNotificationScreen

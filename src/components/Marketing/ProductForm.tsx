@@ -50,7 +50,7 @@ const ProductForm = () => {
       let postObj = { ...postState, userId: activeUserId };
       try {
          let response = await axios.post(
-            "http://192.168.2.183:5000/api/media/posts/",
+            "http://192.168.0.106:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {

@@ -18,7 +18,7 @@ import MarketingScreen from "../screens/MarketingScreen";
 import ProductScreen from "../screens/ProductScreen";
 import UserProductScreen from "../screens/UserProductScreen";
 import ProductsRequestScreen from "../screens/ProductsRequestScreen";
-import UserRequestScreen from "../screens/UserRequestScreen";
+import UserRequestScreen from "../screens/_";
 import ChatScreen from "../screens/ChatScreen";
 import SearchScreen from "../screens/SearchScreen";
 import ProductNotificationScreen from "../screens/ProductNotificationScreen";

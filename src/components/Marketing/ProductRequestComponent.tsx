@@ -62,7 +62,13 @@ const buyProductReducer = (
    }
 };
 
-const ProductRequestComponent = (props: ProductComponentProps) => {
+type ProductRequestComponent = {
+    props: ProductComponentProps
+    navigation:any
+    refreshRequest:()=> void
+}
+
+const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent) => {
    const [productParams, dispatchProductParams] = useReducer(
       buyProductReducer,
       initialState
@@ -92,7 +98,7 @@ const ProductRequestComponent = (props: ProductComponentProps) => {
       let fetchData = async () => {
          try {
             let response = await fetch(
-               `http://192.168.2.183:5000/api/auth/users/${props.userId}`,
+               `http://192.168.0.106:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -120,14 +126,14 @@ const ProductRequestComponent = (props: ProductComponentProps) => {
       let userId = currentUser.id
       try {
          let { data } = await axios.delete(
-            `http://192.168.2.183:5000/api/marketing/products/request/${productId}/${userId}`,
-           
+            `http://192.168.0.106:5000/api/marketing/products/request/${productId}/${userId}`,
          );
          if (data.status == "success") {
             console.log(data.data);
             // setComments([...comments, data.data]);
             // dispatchproductComment({ type: "TEXT", payload: "" });
             Alert.alert("Success",data.message)
+            refreshRequest()
          } else {
             Alert.alert("Failed", data.message);
          }
@@ -143,7 +149,7 @@ const ProductRequestComponent = (props: ProductComponentProps) => {
       setLoading2(true);
       let activeUserId = 1;
       let buyObj:MakePurchaseParams = {
-         affiliateId:JSON.parse(String(props?.affiliateId))[0],
+         affiliateId:null,
          productId: props?.id,
          userId: props?.userId,
          buyerId:currentUser.id
@@ -151,7 +157,7 @@ const ProductRequestComponent = (props: ProductComponentProps) => {
       console.log(buyObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.2.183:5000/api/marketing/buy`,
+            `http://192.168.0.106:5000/api/marketing/buy`,
             buyObj
          );
          if (data.status == "success") {

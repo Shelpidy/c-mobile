@@ -84,7 +84,7 @@ const ProductComponent = (props: ProductComponentProps) => {
          let activeUserId = 1;
          try {
             let { data } = await axios.get(
-               `http://192.168.2.183:5000/api/marketing/products/cl/${props.id}`
+               `http://192.168.0.106:5000/api/marketing/products/cl/${props.id}`
             );
             if (data.status == "success") {
                console.log("Comments and Likes -----", data.data);
@@ -116,12 +116,12 @@ const ProductComponent = (props: ProductComponentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.2.183:5000/api/auth/users/${props.userId}`,
+               `http://192.168.0.106:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
             if (data.status == "success") {
-               console.log("Users-----", data.data);
+               // console.log("Users-----", data.data);
                SetPoster(data.data.personal);
                // Alert.alert("Success",data.message)
                setLoading(false);
@@ -138,29 +138,17 @@ const ProductComponent = (props: ProductComponentProps) => {
       fetchData();
    }, []);
 
-   // useEffect(() => {
-   //    setLikes(postLikes.filter((like) => like.postId === props.id));
-   //    setProductComments(
-   //       postProductComments.filter((comment) => comment.postId === props.id)
-   //    );
-
-   //    // GET ProductComments AND LIKES
-   // }, [users, postProductComments, postLikes]);
-
-   // useEffect(() => {
-   //    SetPoster(users.find((user) => user.id === props.userId));
-   // }, [users]);
-
+   
    const handleLike = async (productId: number) => {
       console.log(productId);
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.2.183:5000/api/marketing/products/likes/`,
+            `http://192.168.0.106:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
-            console.log(data.data);
+            // console.log(data.data);
             if (liked) {
                if (likes) {
                   setLikes(likes.slice(0, likes.length - 1));
@@ -327,13 +315,13 @@ const ProductComponent = (props: ProductComponentProps) => {
                </View>
                <View style={{ flex: 1 }}>
                   <Button
-                     textColor={theme.colors.primary}
+                     // textColor={theme.colors.primary}
                      onPress={() =>
                         props.navigation.navigate("ProductScreen", {
-                           productId:props.id,userId:props.userId
+                           productId:props.id,userId:props.userId,affiliateId:props?.affiliateId && props.affiliateId[0]
                         })
                      }
-                     mode="contained-tonal">
+                     mode="contained">
                      Preview
                   </Button>
                </View>

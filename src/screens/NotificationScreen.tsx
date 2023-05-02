@@ -32,13 +32,13 @@ const NotificationScreen = ({navigation}:any) => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               `http://192.168.2.183:5000/api/notifications/${activeUserId}`,
+               `http://192.168.0.106:5000/api/notifications/${activeUserId}`,
                { method: "GET" }
             );
             let data = await response.json();
             if (data.status == "success") {
                // console.log("User Notifications-----", data.data);
-               setNotifications(data.data.sort(() => -1));
+               setNotifications(data.data);
                // Alert.alert("Success",data.message)
                setLoading(false);
             } else {

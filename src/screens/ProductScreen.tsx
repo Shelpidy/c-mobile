@@ -77,9 +77,12 @@ const ProductScreen = ({ navigation, route }: any) => {
    const [loading, setLoading] = useState<boolean>(false);
    const [loading1, setLoading1] = useState<boolean>(false);
    const [loading2, setLoading2] = useState<boolean>(false);
+   const [affiliateId,setAffiliateId] = useState<any>(null)
    const theme = useTheme();
 
    useEffect(() => {
+      setAffiliateId(route.params.affiliateId)
+      console.log("AffiliateId",route.params.affiliateId)
       dispatchproductComment({ type: "", payload: "" });
       setCurrentUser({
          id: 1,
@@ -94,10 +97,10 @@ const ProductScreen = ({ navigation, route }: any) => {
          let productId = route.params.productId;
          try {
             let { data } = await axios.get(
-               `http://192.168.2.183:5000/api/marketing/products/${productId}`
+               `http://192.168.0.106:5000/api/marketing/products/${productId}`
             );
             if (data.status == "success") {
-               //    console.log(data.data);
+               console.log("Product",data.data);
                setproduct(data.data)
             } else {
                Alert.alert("Failed", data.message);
@@ -119,7 +122,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          let productId = route.params.productId;
          try {
             let { data } = await axios.get(
-               `http://192.168.2.183:5000/api/marketing/products/cl/${productId}`
+               `http://192.168.0.106:5000/api/marketing/products/cl/${productId}`
             );
             if (data.status == "success") {
                   console.log(data.data);
@@ -152,7 +155,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.2.183:5000/api/auth/users/${userId}`,
+               `http://192.168.0.106:5000/api/auth/users/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -188,7 +191,7 @@ const ProductScreen = ({ navigation, route }: any) => {
    // }, [users]);
 
    const handleProductRequest = async()=>{
-      if(product?.affiliateId !== null){
+      if(affiliateId){
          Alert.alert("","Affiliated product can not be added to shopping cart.")
          return
       }
@@ -199,7 +202,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       }
       try{
          let { data } = await axios.post(
-            `http://192.168.2.183:5000/api/marketing/products/request/`,
+            `http://192.168.0.106:5000/api/marketing/products/request/`,
              requestObj
          );
          if(data.status == 'success'){
@@ -225,11 +228,11 @@ const ProductScreen = ({ navigation, route }: any) => {
       let requestObj =  {
          userId:route.params.userId,
          productId:route.params.productId,
-         affiliateId:currentUser.id
+         affiliateId:affiliateId
       }
       try{
          let { data } = await axios.post(
-            `http://192.168.2.183:5000/api/marketing/affiliates/`,
+            `http://192.168.0.106:5000/api/marketing/affiliates/`,
              requestObj
          );
          if(data.status == 'success'){
@@ -259,7 +262,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.2.183:5000/api/marketing/products/comments/`,
+            `http://192.168.0.106:5000/api/marketing/products/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -290,7 +293,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(buyObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.2.183:5000/api/marketing/buy`,
+            `http://192.168.0.106:5000/api/marketing/buy`,
             buyObj
          );
          if (data.status == "success") {
@@ -313,7 +316,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.2.183:5000/api/marketing/products/likes/`,
+            `http://192.168.0.106:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
@@ -500,7 +503,9 @@ const ProductScreen = ({ navigation, route }: any) => {
                         {comments.length}
                      </Text>
                   </View>
-                  <View style={{ flexDirection: "row" }}>
+                 
+               </View>
+                <View style={{ flexDirection: "row",justifyContent:"space-evenly"}}>
                      <Button loading={loading} disabled={loading} onPress={handleProductRequest} mode="contained">Add to cart</Button>
                      <Button loading={loading2} disabled={loading2} onPress={handleBuy} mode="contained">Buy</Button>
                     
@@ -518,7 +523,6 @@ const ProductScreen = ({ navigation, route }: any) => {
                    }
                    
                   </View>
-               </View>
 
                {/* <View style={{ padding: 5 }}>
                   <ProductComments

@@ -21,6 +21,7 @@ const UserProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const [loading2, setLoading2] = useState<boolean>(false);
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const [refresh,setRefresh] = useState<number>(0);
 
    useEffect(function () {
       setLoading(true);
@@ -28,7 +29,7 @@ const UserProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               `http://192.168.2.183:5000/api/marketing/products/request/${activeUserId}`
+               `http://192.168.0.106:5000/api/marketing/products/request/${activeUserId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -55,7 +56,8 @@ const UserProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
          }
       };
       fetchData();
-   }, []);
+   }, [refresh]);
+
    useEffect(() => {
       const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
       const lastIndex = currentIndex + numberOfProductsPerPage;
@@ -95,7 +97,8 @@ const UserProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
             return (
                <ProductRequestComponent
                   key={String(product.id)}
-                  {...product}
+                  props = {product}
+                  refreshRequest={()=> setRefresh(refresh + 1)}
                   navigation={navigation}
                />
             );

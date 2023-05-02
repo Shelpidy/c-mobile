@@ -3,6 +3,7 @@ import React, { useState,useEffect } from 'react'
 import { Skeleton } from '@rneui/base'
 import { useTheme } from 'react-native-paper'
 import { Image } from 'react-native'
+import axios from 'axios'
 
 type TransactionNotificationComponentProps = {
     notification:CustomNotification
@@ -25,7 +26,7 @@ const TransactionNotificationComponent = ({notification,navigation}:TransactionN
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.2.183:5000/api/auth/users/${notification.notificationFrom}`,
+               `http://192.168.0.106:5000/api/auth/users/${notification.notificationFrom}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -47,14 +48,22 @@ const TransactionNotificationComponent = ({notification,navigation}:TransactionN
       fetchData();
    }, [])
 
-    const handleNotification =()=>{
-      if(notification.title === 'Money Transaction'){
-         navigation.navigate("UserProfileScreen",{userId:notification.notificationFrom})
-      }
-      else if(notification.title === 'Buy Transaction'){
-          navigation.navigate("ProductNotificationScreen",{userId:notification.notificationFrom})
-      }
+      const handleNotification = async()=>{
+            let notId = notification.id
+            try{
+               let {data} = await axios.get(`http://192.168.0.106:5000/api/notifications/read/${notId}`)
+               if(data.status == 'success'){
+                     navigation.navigate("UserProfileScreen",{userId:notification.notificationFrom})
+                  Alert.alert("Failed",data.message)
+               }
+            }catch(err){
+               Alert.alert("Failed","Connection failed.")
+            }
+         
+     
    }
+
+
   if(!notFrom){
       return(<View style={{flexDirection:'row',margin:2}}>
         <Skeleton animation="wave" width={50} height={50} circle />

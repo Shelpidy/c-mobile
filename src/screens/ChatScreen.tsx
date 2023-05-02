@@ -12,7 +12,7 @@ import { Button, Divider, IconButton, useTheme } from "react-native-paper";
 import { View, Text, KeyboardAvoidingView, Platform,Alert, Image } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
-import { io } from "socket.io-client";
+import { io,Socket } from "socket.io-client";
 import { StyleSheet } from "react-native";
 import TextShortener from "../components/TextShortener";
 
@@ -27,12 +27,19 @@ const ChatScreen = ({ navigation, route }: any) => {
    const [loading,setLoading] = useState<boolean>(true)
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
    const [secondUser,setSecondUser] = useState<User>()
+  const [socket, setSocket] = useState<Socket | null>(null);
 
-   const socket = io("http://192.168.2.183:5002/chat/31");
+
 
    const toggleEmojiPicker = () => {
       setShowEmojiPicker(!showEmojiPicker);
    };
+
+   const generateRoomId = (secUserId:any,activeUserId:any)=>{
+       let maxId =  Math.max(secUserId,activeUserId)
+       let minId = Math.min(secUserId,activeUserId)
+       return Number(`${maxId}${minId}`)
+    }
 
 
   useEffect(() => {
@@ -47,26 +54,58 @@ const ChatScreen = ({ navigation, route }: any) => {
       });
    }, []);
 
-   useEffect(()=>{
+useEffect(()=>{
+  let secUser = route.params.user.id
+  let activeUser = 1
+  let roomId = generateRoomId(secUser,activeUser)
+  let newSocket = io(`http://192.168.0.106:8080/?roomId=${roomId}`);
+  setSocket(newSocket);
+
+  // cleanup function to close the socket connection when the component unmounts
+  return () =>{
+     newSocket.close();
+  }
+}, []);
+
+
+useEffect(()=>{
+    let secUser = route.params.user.id
+    let activeUser = 1
+    let roomId = generateRoomId(secUser,activeUser)
+    console.log(roomId)
     console.log("Socket connecting")
-    socket.on('connected',()=>{
-      console.log("Connect to chat successfully")
-    })
-    socket.on("message",(e:any)=>{
-          console.log(e.data)
+
+    if(socket){
+         socket.on('message',(msg:any)=>{
+         console.log("Message from the server",msg)
+       
     })
 
-   },[])
+    socket.on(String(roomId),(message:any)=>{
+            console.log("From Server",message)
+            setMessages((previousMessages) =>
+            GiftedChat.append(previousMessages, message)
+      );
+            
+    })
+
+    }},[socket])
+
+
 
 
    useEffect(()=>{
-    console.log("Fetching data")
+    console.log("Fetching chats")
+    let secUser = route.params.user.id
+    let activeUser = 1
+    let roomId = generateRoomId(secUser,activeUser)
+
     let fetchData = async()=>{
       try{
-         let resp = await fetch("http://192.168.2.183:5002/chats/31",{ method: "GET" })
-        //  let data = await resp.json()
-         console.log("Chat data",resp)
-        //  setMessages(data)
+         let resp = await fetch(`http://192.168.0.106:8080/chats/${roomId}`,{ method: "GET" })
+         let chatMessages = await resp.json()
+         console.log("Chats Messages",chatMessages)
+         setMessages(chatMessages.reverse())
 
       }catch(err){
          console.log(err);
@@ -79,18 +118,26 @@ const ChatScreen = ({ navigation, route }: any) => {
      
    }, []);
 
-   const onSend = useCallback((messages: IMessage[] = []) => {
-      setMessages((previousMessages) =>
-         GiftedChat.append(previousMessages, messages)
-      );
-   }, []);
+
+   const onSend = useCallback((message: IMessage) => {
+      let secUser = route.params.user.id
+      let activeUser = 1
+      let roomId = generateRoomId(secUser,activeUser)
+      let sendData = {
+         senderId:route.params.user.id,
+         receipientId:message.user._id,
+         text:message.text,
+         roomId:roomId
+      }
+      console.log(sendData,roomId)
+      
+      socket?.emit(String(roomId),sendData)
+   }, [socket]);
 
    const handleEmojiSelect =(emoji:any)=>{
     setTextValue(textValue+emoji)
    }
 
-
-   
    const handleChatInput =(val:string)=>{
     setTextValue(val)
    }
@@ -118,15 +165,15 @@ const ChatScreen = ({ navigation, route }: any) => {
          <KeyboardAvoidingView style={{ flex: 1, marginBottom: 20 }}>
             <GiftedChat
               
-               renderActions={(props) => {
-                  return (
-                     <Actions {...props}>
-                        <Button>F</Button>
-                       <View>  <Button onPress={toggleEmojiPicker} mode='contained'>E</Button></View>
+               // renderActions={(props) => {
+               //    return (
+               //       <Actions {...props}>
+               //          <Button>F</Button>
+               //         <View>  <Button onPress={toggleEmojiPicker} mode='contained'>E</Button></View>
                       
-                     </Actions>
-                  );
-               }}
+               //       </Actions>
+               //    );
+               // }}
             
                renderChatFooter={() => {
                   if (showEmojiPicker)
@@ -149,7 +196,7 @@ const ChatScreen = ({ navigation, route }: any) => {
                         textInputStyle={{
                            backgroundColor: theme.colors.inverseOnSurface, // set your desired background color here
                            borderRadius: 20,
-                           paddingLeft: 10,
+                           paddingLeft: 20,
                            paddingRight: 10,
                            alignItems: "center",
                            justifyContent: "center",
@@ -157,7 +204,7 @@ const ChatScreen = ({ navigation, route }: any) => {
                            paddingBottom: 5,
                            marginRight: 5,
                         }}
-                        placeholder="Type for me a message..."
+                        placeholder="Type a message..."
                         
                      />
                   );
@@ -197,9 +244,9 @@ const ChatScreen = ({ navigation, route }: any) => {
                messages={messages}
                onInputTextChanged={handleChatInput}
                text={textValue}
-               onSend={(messages) => onSend(messages)}
+               onSend={(messages) => onSend(messages[0])}
                user={{
-                  _id: 1,
+                  _id: 3,
                }}
             />
          </KeyboardAvoidingView>

@@ -20,6 +20,7 @@ const ProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const [refresh,setRefresh] = useState<number>(0);
 
    
 
@@ -29,11 +30,11 @@ const ProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
          let activeUserId = 1;
          try {
             let response = await fetch(
-               `http://192.168.2.183:5000/api/marketing/products/request/${activeUserId}`
+               `http://192.168.0.106:5000/api/marketing/products/request/${activeUserId}`
             );
             let data = await response.json();
             if (data.status == "success") {
-               // console.log(data.data);
+               console.log("REQUEST PRODUCTS",data.data);
                // setProducts(data.data);
                let fetchedPost: ProductComponentProps[] = data.data;
                let numOfPageLinks = Math.ceil(
@@ -56,7 +57,9 @@ const ProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
          }
       };
       fetchData();
-   }, []);
+   }, [refresh]);
+
+
    useEffect(() => {
       const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
       const lastIndex = currentIndex + numberOfProductsPerPage;
@@ -85,13 +88,14 @@ const ProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
    };
 
    return (
-      <ScrollView style={{backgroundColor:"#f7f7f7"}}>
+      <ScrollView style={{backgroundColor:"#f5f5f5",paddingTop:5}}>
          <SearchForm setSearchValue={searchProducts} />
          {products.map((product) => {
             return (
                <ProductRequestComponent
                   key={String(product.id)}
-                  {...product}
+                  props = {product}
+                  refreshRequest={()=> setRefresh(refresh + 1)}
                   navigation={navigation}
                />
             );

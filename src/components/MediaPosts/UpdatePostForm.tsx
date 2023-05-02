@@ -63,7 +63,7 @@ const UpdatePostForm = (post: NPostComponentProps) => {
       let postObj = { ...postState };
       try {
          let response = await axios.put(
-            "http://192.168.2.183:5000/api/media/posts/",
+            "http://192.168.0.106:5000/api/media/posts/",
             postObj
          );
          if (response.status === 202) {

@@ -3,6 +3,7 @@ import React, { useState,useEffect } from 'react'
 import { Skeleton } from '@rneui/base'
 import { useTheme } from 'react-native-paper'
 import { Image } from 'react-native'
+import axios from 'axios'
 
 type ProductNotificationComponentProps = {
     notification:CustomNotification
@@ -18,14 +19,14 @@ const ProductNotificationComponent = ({notification,navigation}:ProductNotificat
     const theme = useTheme()
 
       useEffect(function () {
-      console.log("Fetching user");
+      console.log("Fetching notification products");
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.2.183:5000/api/marketing/products/${notification.notificationFrom}`,
+               `http://192.168.0.106:5000/api/marketing/products/${notification.notificationFrom}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -47,13 +48,21 @@ const ProductNotificationComponent = ({notification,navigation}:ProductNotificat
       fetchData();
    }, [])
 
-    const handleNotification =()=>{
-      if(notification.title === 'Money Transaction'){
-         navigation.navigate("UserProfileScreen",{userId:notification.notificationFrom})
+    const handleNotification = async()=>{
+      let notId  = notification.id
+      try{
+          let {data} = await axios.put(`http://192.168.0.106:5000/api/notifications/read/${notId}`)
+          if(data.status == 'success'){
+             navigation.navigate("ProductNotificationScreen",{productId:notification.notificationFrom})
+          }else{
+            Alert.alert("Failed",data.message)
+          }
+      }catch(err){
+           console.log(err)
+           Alert.alert("Failed",String(err))
       }
-      else if(notification.title === 'Buy Transaction'){
-          navigation.navigate("ProductNotificationScreen",{userId:notification.notificationFrom})
-      }
+    
+     
    }
   if(!notFrom){
       return(<View style={{flexDirection:'row',margin:2}}>
@@ -62,7 +71,7 @@ const ProductNotificationComponent = ({notification,navigation}:ProductNotificat
         </View>)
   }
   return (
-    <Pressable onPress={handleNotification} style={[styles.notContainer,{backgroundColor:notification.readStatus?theme.colors.primaryContainer:"white"}]} key={String(notification.id)}>
+    <Pressable onPress={handleNotification} style={[styles.notContainer,{backgroundColor:notification.readStatus?"white":theme.colors.primaryContainer}]} key={String(notification.id)}>
         <View> 
           {notFrom.images && <Image resizeMode = 'cover' source={{uri:JSON.parse(String(notFrom.images))[0]}} style={{width:50,height:50,marginRight:3,borderRadius:25}}/> }
         </View>
@@ -73,10 +82,14 @@ const ProductNotificationComponent = ({notification,navigation}:ProductNotificat
             <AntDesign name="delete" size={19} />
             </Button> */}
         </View>
-        <Text style={styles.notMessage}>{notification?.message}</Text>
+        <View>
+           <Text style={styles.notMessage}>{notification?.message}</Text>
         <Text style={styles.notMessage}>
             {notification?.createdAt}
         </Text>
+
+        </View>
+      
 
         </View>
        
@@ -94,7 +107,7 @@ const styles = StyleSheet.create({
    },
    notContainer: {
       backgroundColor: "#ffffff",
-      flexDirection:"row",
+      // flexDirection:"row",
       padding: 10,
       marginVertical: 1,
       borderRadius:4
