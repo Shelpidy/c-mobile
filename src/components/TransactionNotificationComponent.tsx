@@ -4,6 +4,8 @@ import { Skeleton } from '@rneui/base'
 import { useTheme } from 'react-native-paper'
 import { Image } from 'react-native'
 import axios from 'axios'
+import moment from "moment"
+import TextShortener from './TextShortener'
 
 type TransactionNotificationComponentProps = {
     notification:CustomNotification
@@ -26,7 +28,7 @@ const TransactionNotificationComponent = ({notification,navigation}:TransactionN
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${notification.notificationFrom}`,
+               `http://192.168.0.100:5000/api/auth/users/${notification.notificationFrom}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -51,7 +53,7 @@ const TransactionNotificationComponent = ({notification,navigation}:TransactionN
       const handleNotification = async()=>{
             let notId = notification.id
             try{
-               let {data} = await axios.get(`http://192.168.0.106:5000/api/notifications/read/${notId}`)
+               let {data} = await axios.get(`http://192.168.0.100:5000/api/notifications/read/${notId}`)
                if(data.status == 'success'){
                      navigation.navigate("UserProfileScreen",{userId:notification.notificationFrom})
                   Alert.alert("Failed",data.message)
@@ -59,8 +61,7 @@ const TransactionNotificationComponent = ({notification,navigation}:TransactionN
             }catch(err){
                Alert.alert("Failed","Connection failed.")
             }
-         
-     
+
    }
 
 
@@ -78,17 +79,16 @@ const TransactionNotificationComponent = ({notification,navigation}:TransactionN
         <View>
              <View style={styles.notHeader}>
             <Text style={styles.notTitle}>{notification.title}</Text>
-            {/* <Button mode="text">
-            <AntDesign name="delete" size={19} />
-            </Button> */}
+           
         </View>
-        <Text style={styles.notMessage}>{notification?.message}</Text>
-        <Text style={styles.notMessage}>
-            {notification?.createdAt}
+        <View style={{width:300,paddingRight:5}}>
+           <TextShortener style={styles.notMessage} textLength={90} text={notification?.message}/>
+        </View>
+        {/* <Text style={styles.notMessage}>{notification?.message}</Text> */}
+        <Text style={[styles.notDate,{color:theme.colors.secondary,flex:1}]}>
+            {moment(notification?.createdAt, "YYYYMMDD").fromNow()}
         </Text>
-
         </View>
-       
     </Pressable>
   )
 }
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
 
    notContainer: {
       backgroundColor: "#ffffff",
-      flexDirection:"row",
+      flexDirection:'row',
       padding: 5,
       marginVertical: 1,
       marginHorizontal:2,
@@ -112,7 +112,14 @@ const styles = StyleSheet.create({
    },
    notMessage: {
       fontFamily: "Poppins_300Light",
-      paddingHorizontal:2
+      paddingHorizontal:2,
+      flexWrap:'wrap'
+   },
+   notDate: {
+      fontFamily: "Poppins_300Light_Italic",
+      paddingHorizontal:2,
+      textAlign:'right',
+      fontSize:13,
    },
    notHeader: {
       flexDirection: "row",

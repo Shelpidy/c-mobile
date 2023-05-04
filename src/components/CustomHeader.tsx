@@ -38,7 +38,7 @@ const CustomHeader = ({ navigation }: CustomHeaderProps) => {
           let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${activeUserId}`,
+               `http://192.168.0.100:5000/api/auth/users/${activeUserId}`,
                { method: "GET" }
             );
             let data = await response.json();

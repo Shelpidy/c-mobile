@@ -28,10 +28,10 @@ const TextShortener = ({
       let txts = text.slice(0, textLength);
       if (text.length <= textLength) {
          setShortenText(text);
-      } else {
-         setShortenText(txts);
+      } 
+      else {
+         setShortenText(txts + "....");
       }
-
       if (style) {
          _setStyle(style);
       }

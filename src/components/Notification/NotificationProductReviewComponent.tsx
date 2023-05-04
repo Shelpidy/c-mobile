@@ -12,9 +12,9 @@ import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../ImagesViewer";
 import VideoPlayer from "../VideoPlayer";
 import TextViewer from "../TextViewer";
-import ProductComments from "./ProductComments";
+// import ProductComments from "./ProductComments";
 // import { postProductComments, postLikes, users } from "../../data";
-import { TextInput, useTheme, Button, IconButton, Divider } from "react-native-paper";
+import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
 import {
    AntDesign,
    Entypo,
@@ -24,16 +24,16 @@ import {
    Feather,
 } from "@expo/vector-icons";
 import axios from "axios";
-import TextShortener from "../TextShortener";
-import { Skeleton } from "@rneui/base";
+import { useNavigation } from "@react-navigation/native";
+// import UpdateProductForm from "./UpdateProduct";
 
+// type ProductComment = Omit<CommentProps, "posterId">;
+const initialState: ProductComment = {};
 
-const initialState: Partial<MakePurchaseParams> = {};
 const { width } = Dimensions.get("window");
 
-
-const buyProductReducer = (
-   state: Partial<MakePurchaseParams> = initialState,
+const postCommentReducer = (
+   state: ProductComment = initialState,
    action: Action
 ) => {
    switch (action.type) {
@@ -47,43 +47,32 @@ const buyProductReducer = (
             ...state,
             userId: action.payload,
          };
-      case "AFFILIATEID":
+      case "TEXT":
          return {
             ...state,
-            affiliateId: action.payload,
-         };
-    case "BUYERID":
-         return {
-            ...state,
-            buyerId: action.payload,
+            text: action.payload,
          };
       default:
          return state;
    }
+   
 };
 
-type ProductRequestComponent = {
+type NotificationProductReviewComponentProps = {
     props: ProductComponentProps
-    navigation:any
-    refreshRequest:()=> void
+    buyerId:number
 }
 
-const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent) => {
-   const [productParams, dispatchProductParams] = useReducer(
-      buyProductReducer,
-      initialState
-   );
+const NotificationProductReviewComponent = ({props,buyerId}:NotificationProductReviewComponentProps) => {
+
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
-   const [likes, setLikes] = useState<ProductLike[] | null>(null);
    const [poster, SetPoster] = useState<any>();
-   const [liked, setLiked] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
-   const [loading1, setLoading1] = useState<boolean>(false);
-   const [loading2, setLoading2] = useState<boolean>(false);
    const theme = useTheme();
+   const navigation = useNavigation<any>()
 
    useEffect(() => {
-      // dispatchbuyProduct({ type: "", payload: "" });
+      // dispatchPostComment({ type: "", payload: "" });
       setCurrentUser({
          id: 1,
          email: "mexu.company@gmail.com",
@@ -91,11 +80,12 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
       });
    }, []);
 
-
    useEffect(function () {
       console.log("Fetching user");
       setLoading(true);
       let fetchData = async () => {
+         // console.log("Fetching user")
+         //  let activeUserId = 1
          try {
             let response = await fetch(
                `http://192.168.0.100:5000/api/auth/users/${props.userId}`,
@@ -103,7 +93,7 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
             );
             let data = await response.json();
             if (data.status == "success") {
-               console.log("Users-----", data.data);
+               // console.log("Users-----", data.data);
                SetPoster(data.data.personal);
                // Alert.alert("Success",data.message)
                setLoading(false);
@@ -120,75 +110,14 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
       fetchData();
    }, []);
 
-    const handleDelete = async () => {
-      setLoading1(true);
-      let productId = props.id
-      let userId = currentUser.id
-      try {
-         let { data } = await axios.delete(
-            `http://192.168.0.100:5000/api/marketing/products/request/${productId}/${userId}`,
-         );
-         if (data.status == "success") {
-            console.log(data.data);
-            // setComments([...comments, data.data]);
-            // dispatchproductComment({ type: "TEXT", payload: "" });
-            Alert.alert("Success",data.message)
-            refreshRequest()
-         } else {
-            Alert.alert("Failed", data.message);
-         }
-         setLoading1(false);
-      } catch (err) {
-         Alert.alert("Failed", String(err));
-         setLoading1(false);
-      }
-   };
    
+ 
 
-    const handleBuy = async () => {
-      setLoading2(true);
-      let activeUserId = 1;
-      let buyObj:MakePurchaseParams = {
-         affiliateId:null,
-         productId: props?.id,
-         userId: props?.userId,
-         buyerId:currentUser.id
-      };
-      console.log(buyObj);
-      try {
-         let { data } = await axios.post(
-            `http://192.168.0.100:5000/api/marketing/buy`,
-            buyObj
-         );
-         if (data.status == "success") {
-            console.log(data.data);
-            // setComments([...comments, data.data]);
-            // dispatchproductComment({ type: "TEXT", payload: "" });
-            Alert.alert("Success",data.message)
-         } else {
-            Alert.alert("Failed", data.message);
-         }
-         setLoading2(false);
-      } catch (err) {
-         Alert.alert("Failed", String(err));
-         setLoading2(false);
-      }
-   };
-
-   if (!props.images) {
+   if (!poster) {
       return (
-        <View style={{padding:4}}>
-             <View style={{flexDirection:"row",marginVertical:4}}>
-            <Skeleton animation='wave'  width={45} height={45} circle  />
-            <Skeleton style={{borderRadius:5,paddingHorizontal:2}} animation='wave' width={305} height={45}/>
+         <View>
+            <Text>Loading products</Text>
          </View>
-          <View style={{flexDirection:"row",marginVertical:5}}>
-            <Skeleton animation='wave'  width={60} height={60} circle  />
-            <Skeleton style={{borderRadius:5,paddingHorizontal:2}} animation='wave' width={290} height={60}/>
-         </View>
-
-        </View>
-        
       );
    }
 
@@ -200,7 +129,6 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
                   flexDirection: "row",
                   alignItems: "center",
                   padding: 8,
-                  backgroundColor:"#f9f9f9"
                }}>
                <Image
                   style={styles.profileImage}
@@ -209,44 +137,87 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
                <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
                   {poster.firstName} {poster.middleName} {poster.lastName}
                </Text>
+
             </View>
          )}
-        {/* <Divider/> */}
+         <View>
+            {props.images && <ImagesViewer images={props.images} />}
+            {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
+         </View>
          <View
             style={{
                flexDirection: "row",
                marginVertical: 5,
                alignItems: "center",
-               justifyContent:"space-around",
-               
             }}>
-                <Image
-                style={styles.stockImage}
-                source={{ uri: JSON.parse(String(props.images))[0]}}
-               />
-            <Text style={styles.productName}><TextShortener style={{textAlignVertical:"center",fontFamily:"Poppins_300Light"}} text={props.productName} textLength={10} /></Text>
+            <Text style={styles.productName}>{props?.productName}</Text>
 
+            {props.initialPrice && (
+               <Text
+                  style={[
+                     styles.productInitialPrice,
+                     {
+                        color: theme.colors.secondary,
+                        textDecorationLine: "line-through",
+                     },
+                  ]}>
+                  C{props?.initialPrice}
+               </Text>
+            )}
             <Text
                style={[styles.productPrice, { color: theme.colors.primary }]}>
                C{props?.price}
             </Text>
-            <Button onPress={handleBuy} mode='contained'>Buy</Button>
-            <Button onPress={handleDelete} mode='text'><Feather name="x"/></Button>
+            {/* <Button  mode='contained'>Affiliate</Button> */}
+         </View>
 
+         {props?.description && <TextViewer text={props.description} />}
+         <View>
+            <View
+               style={[
+                  styles.likeCommentAmountCon,
+                  { borderColor: theme.colors.secondary },
+               ]}>
+               <View style={{ flex: 1,flexDirection:"row"}}>
+                  <Button
+                     // textColor={theme.colors.primary}
+                     style={{flex:1,borderColor:theme.colors.primary}}
+                     onPress={() =>
+                        navigation.navigate("ProductScreen", {
+                           productId:props.id,userId:props.userId,affiliateId:props?.affiliateId && props.affiliateId[0]
+                        })
+                     }
+                     mode='outlined'>
+                     Preview
+                  </Button>
+                  <Button
+                  style={{marginHorizontal:5,flex:1}}
+                     // textColor={theme.colors.primary}
+                     onPress={() =>
+                        navigation.navigate("ChatScreen", {
+                            userId:buyerId
+                        })
+                     }
+                     mode='contained'>
+                        <AntDesign name="message1" style={{marginRight:2}} /> Message
+                  </Button>
+               </View>
+               {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
+            </View>
          </View>
       </View>
    );
 };
 
-export default ProductRequestComponent;
+export default NotificationProductReviewComponent;
 
 const styles = StyleSheet.create({
    postContainer: {
       backgroundColor: "#ffffff",
       // marginHorizontal:6,
-      marginVertical: 4,
+      marginVertical: 3,
       borderRadius: 4,
-    //   paddingVertical: 10,
+      paddingVertical: 10,
       borderWidth: 1,
       borderColor: "#f3f3f3",
    },
@@ -303,10 +274,5 @@ const styles = StyleSheet.create({
       width: 35,
       height: 35,
       borderRadius: 20,
-   },
-    stockImage: {
-      width: 50,
-      height: 50,
-      borderRadius:25
    },
 });

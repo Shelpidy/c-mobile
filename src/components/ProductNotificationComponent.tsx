@@ -4,6 +4,9 @@ import { Skeleton } from '@rneui/base'
 import { useTheme } from 'react-native-paper'
 import { Image } from 'react-native'
 import axios from 'axios'
+import moment from "moment"
+import TextShortener from './TextShortener'
+
 
 type ProductNotificationComponentProps = {
     notification:CustomNotification
@@ -26,7 +29,7 @@ const ProductNotificationComponent = ({notification,navigation}:ProductNotificat
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/marketing/products/${notification.notificationFrom}`,
+               `http://192.168.0.100:5000/api/marketing/products/${notification.notificationFrom}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -51,7 +54,7 @@ const ProductNotificationComponent = ({notification,navigation}:ProductNotificat
     const handleNotification = async()=>{
       let notId  = notification.id
       try{
-          let {data} = await axios.put(`http://192.168.0.106:5000/api/notifications/read/${notId}`)
+          let {data} = await axios.put(`http://192.168.0.100:5000/api/notifications/read/${notId}`)
           if(data.status == 'success'){
              navigation.navigate("ProductNotificationScreen",{productId:notification.notificationFrom})
           }else{
@@ -77,22 +80,14 @@ const ProductNotificationComponent = ({notification,navigation}:ProductNotificat
         </View>
         <View>
              <View style={styles.notHeader}>
-            <Text style={styles.notTitle}>{notification.title}</Text>
-            {/* <Button mode="text">
-            <AntDesign name="delete" size={19} />
-            </Button> */}
         </View>
         <View>
-           <Text style={styles.notMessage}>{notification?.message}</Text>
-        <Text style={styles.notMessage}>
-            {notification?.createdAt}
-        </Text>
-
+          <View style={{width:300,paddingRight:5}}>
+            <TextShortener style={styles.notMessage} textLength={90} text={notification?.message}/>
+         </View>
+            <Text style={[styles.notDate,{color:theme.colors.secondary}]}> {moment(notification?.createdAt, "YYYYMMDD").fromNow()}</Text>
         </View>
-      
-
         </View>
-       
     </Pressable>
   )
 }
@@ -105,11 +100,12 @@ const styles = StyleSheet.create({
       backgroundColor: "#f5f5f5",
       padding: 10,
    },
-   notContainer: {
+    notContainer: {
       backgroundColor: "#ffffff",
-      // flexDirection:"row",
-      padding: 10,
+      flexDirection:'row',
+      padding: 5,
       marginVertical: 1,
+      marginHorizontal:2,
       borderRadius:4
    },
 
@@ -118,6 +114,14 @@ const styles = StyleSheet.create({
    },
    notMessage: {
       fontFamily: "Poppins_300Light",
+      paddingHorizontal:2,
+      flexWrap:'wrap'
+   },
+   notDate: {
+      fontFamily: "Poppins_300Light_Italic",
+      paddingHorizontal:2,
+      textAlign:'right',
+      fontSize:13,
    },
    notHeader: {
       flexDirection: "row",

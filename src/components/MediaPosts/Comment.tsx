@@ -1,15 +1,18 @@
-import { Modal, StyleSheet, Text, View, Image, Alert } from "react-native";
+import { Modal, StyleSheet, Text, View, Image, Alert,Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { users } from "../../data";
 import { Feather, SimpleLineIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
 import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
 const Comment = (props: CommentProps) => {
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [commentor, setCommentor] = useState<any>(null);
    const [loading, setLoading] = useState<any>(false);
+
+   const navigation = useNavigation<any>()
 
    useEffect(function () {
       console.log("Fetching user");
@@ -19,7 +22,7 @@ const Comment = (props: CommentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${props.userId}`,
+               `http://192.168.0.100:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -48,15 +51,14 @@ const Comment = (props: CommentProps) => {
 
    const handleEditComment = () => {};
 
-   // useEffect(() => {
-   //    setCommentor(users.find((user) => user.id === props.userId));
-   //    // console.log(commentor)
-   //    setCurrentUser({
-   //       id: props?.id,
-   //       email: "mexu.company@gmail.com",
-   //       accountNumber: "1COM30000000000",
-   //    });
-   // }, [users]);
+    const gotoUserProfile = () => {
+      if (currentUser.id === commentor.id) {
+         navigation.navigate("ProfileScreen", { userId: commentor.id });
+      } else {
+         navigation.navigate("UserProfileScreen", { userId: commentor.id });
+      }
+   };
+
 
    return (
       <View style={styles.container}>
@@ -82,10 +84,14 @@ const Comment = (props: CommentProps) => {
          {commentor && (
             <View>
                <View style={styles.commentorMedia}>
-                  <Image
+                  <Pressable onPress={gotoUserProfile} >
+                      <Image
                      style={styles.profileImage}
                      source={{ uri: commentor.profileImage }}
                   />
+
+                  </Pressable>
+                 
                   <View
                      style={{
                         backgroundColor: "#f5f5f5",

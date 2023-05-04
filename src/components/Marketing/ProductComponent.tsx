@@ -84,7 +84,7 @@ const ProductComponent = (props: ProductComponentProps) => {
          let activeUserId = 1;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.106:5000/api/marketing/products/cl/${props.id}`
+               `http://192.168.0.100:5000/api/marketing/products/cl/${props.id}`
             );
             if (data.status == "success") {
                console.log("Comments and Likes -----", data.data);
@@ -116,7 +116,7 @@ const ProductComponent = (props: ProductComponentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${props.userId}`,
+               `http://192.168.0.100:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -144,7 +144,7 @@ const ProductComponent = (props: ProductComponentProps) => {
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.0.106:5000/api/marketing/products/likes/`,
+            `http://192.168.0.100:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
@@ -170,6 +170,14 @@ const ProductComponent = (props: ProductComponentProps) => {
          console.log(err);
          Alert.alert("Failed", String(err));
          setLoading(false);
+      }
+   };
+
+     const gotoUserProfile = () => {
+      if (currentUser.id === poster.id) {
+         props.navigation.navigate("ProfileScreen", { userId: poster.id });
+      } else {
+         props.navigation.navigate("UserProfileScreen", { userId: poster.id });
       }
    };
 
@@ -208,10 +216,14 @@ const ProductComponent = (props: ProductComponentProps) => {
                   alignItems: "center",
                   padding: 8,
                }}>
-               <Image
+               <Pressable onPress={gotoUserProfile}>
+                   <Image
                   style={styles.profileImage}
                   source={{ uri: poster.profileImage }}
                />
+
+               </Pressable>
+              
                <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
                   {poster.firstName} {poster.middleName} {poster.lastName}
                </Text>

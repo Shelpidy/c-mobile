@@ -11,6 +11,8 @@ import {
 import { ActivityIndicator, Button, useTheme } from "react-native-paper";
 import PostComponent from "../components/MediaPosts/PostComponent";
 import ProfileNavComponent from "../components/ProfileNavComponent";
+import axios from 'axios'
+import { AntDesign } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,7 +25,11 @@ const UserProfileScreen = ({ navigation, route }: any) => {
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
+   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const [followed, setFollowed] = useState<boolean>(false);
 
+
+     
    useEffect(function () {
       console.log("Fetching user");
       console.log(route.params.userId);
@@ -32,24 +38,33 @@ const UserProfileScreen = ({ navigation, route }: any) => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
+              let _currentUser: CurrentUser = {
+                     id: 1,
+                     email: "mexu.company@gmail.com",
+                     accountNumber: "1COM10000000000",
+                     followingIds: [1, 2, 3],
+                  };
+            setCurrentUser(_currentUser);
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.0.100:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
             if (data.status == "success") {
                console.log("Users-----", data.data);
                setUser(data.data);
-               // Alert.alert("Success",data.message)
-               setLoading(false);
-            } else {
-               Alert.alert("Failed", data.message);
-            }
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
+              
+                  if (_currentUser.followingIds?.includes(data.data?.personal)) {
+                     setFollowed(true);
+                  }
+                     } else {
+                        Alert.alert("Failed", data.message);
+                     }
+                     setLoading(false);
+                  } catch (err) {
+                     console.log(err);
+                     Alert.alert("Failed", String(err));
+                     setLoading(false);
          }
       };
       fetchData();
@@ -61,7 +76,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
          let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/media/posts/user/${userId}`
+               `http://192.168.0.100:5000/api/media/posts/user/${userId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -100,6 +115,28 @@ const UserProfileScreen = ({ navigation, route }: any) => {
       setPosts(allPosts?.slice(currentIndex, lastIndex));
    }, [pageNumber]);
 
+
+     const handleFollow = async () => {
+      try {
+         let { data } = await axios.put(
+            `http://192.168.0.100:5000/api/media/follows/`,
+            { followerId: currentUser.id, followingId: user?.personal.id },
+            { headers: { Accept: "application/json" } }
+         );
+         if (data.status == "success") {
+            console.log(data.data);
+            setFollowed(data.data.followed);
+            Alert.alert("Success", data.message);
+         } else {
+            Alert.alert("Failed", data.message);
+         }
+         setLoading(false);
+      } catch (err) {
+         Alert.alert("Failed", String(err));
+         setLoading(false);
+      }
+   };
+
    return (
       <ScrollView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
          {!user && (
@@ -127,25 +164,32 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      {user?.personal?.fullName}
                   </Text>
                </View>
-               <ScrollView horizontal style={styles.mediaContainer}>
+                <ScrollView horizontal style={styles.mediaContainer}>
                   <View style={{ alignItems: "center", margin: 4 }}>
                      <Text
                         style={{
                            textAlign: "center",
-                           fontFamily: "Poppins_500Medium",
+                           fontFamily: "Poppins_400Regular",
+                           color: theme.colors.secondary,
+                           fontSize: 16,
                         }}>
-                        5.2k
+                        {user?.followers?.count}
                      </Text>
                      <Button
+                        style={{ backgroundColor: "#fff" }}
                         onPress={() =>
-                           navigation.navigate("FollowersScreen", { user })
+                           navigation.navigate("FollowersScreen", {
+                              user: user?.personal,
+                           })
                         }
-                        mode="contained-tonal">
+                        mode="elevated">
                         <Text
                            style={{
-                              fontWeight: "bold",
+                              // fontWeight: "bold",
                               textAlign: "center",
-                              fontFamily: "Poppins_500Medium",
+                              fontFamily: "Poppins_400Regular",
+                              color: theme.colors.secondary,
+                              fontSize: 15,
                            }}>
                            Followers
                         </Text>
@@ -156,36 +200,72 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      <Text
                         style={{
                            textAlign: "center",
-                           fontFamily: "Poppins_500Medium",
+                           fontFamily: "Poppins_400Regular",
+                           // color:theme.colors.secondary,
+                           fontSize: 16,
                         }}>
-                        220
+                        {user?.followings?.count}
                      </Text>
-                     <Button mode="contained-tonal">
+                     <Button
+                        style={{ backgroundColor: "#fff" }}
+                        onPress={() =>
+                           navigation.navigate("FollowingsScreen", {
+                              user: user?.personal,
+                           })
+                        }
+                        mode="elevated">
                         <Text
                            style={{
-                              fontWeight: "bold",
                               textAlign: "center",
-                              fontFamily: "Poppins_300Light",
+                              fontFamily: "Poppins_400Regular",
+                              color: theme.colors.secondary,
+                              //  color:theme.colors.secondary,
+                              fontSize: 15,
                            }}>
                            Following
                         </Text>
                      </Button>
                   </View>
-
+                  {/* <View style={{ alignItems: "center",margin:4}}>
+               <Text
+                  style={{
+                     textAlign: "center",
+                     fontFamily: "Poppins_400Regular",
+                  }}>
+                  200
+               </Text>
+               <Button mode="elevated">
+                  <Text
+                     style={{
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        fontFamily: "Poppins_400Regular",
+                     }}>
+                     Posts
+                  </Text>
+               </Button>
+               
+            </View> */}
                   <View style={{ alignItems: "center", margin: 4 }}>
                      <Text
                         style={{
                            textAlign: "center",
-                           fontFamily: "Poppins_500Medium",
+                           fontFamily: "Poppins_400Regular",
+                           //  color:theme.colors.secondary,
+                           fontSize: 15,
                         }}>
-                        200
+                        {user?.sales?.count}
                      </Text>
-                     <Button mode="contained-tonal">
+                     <Button
+                        style={{ backgroundColor: "#fff" }}
+                        mode="elevated">
                         <Text
                            style={{
-                              fontWeight: "bold",
+                              // fontWeight: "bold",
                               textAlign: "center",
-                              fontFamily: "Poppins_300Light",
+                              fontFamily: "Poppins_400Regular",
+                              color: theme.colors.secondary,
+                              fontSize: 15,
                            }}>
                            Sales
                         </Text>
@@ -195,25 +275,41 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      <Text
                         style={{
                            textAlign: "center",
-                           fontFamily: "Poppins_500Medium",
+                           fontFamily: "Poppins_400Regular",
+                           // color:theme.colors.secondary,
+                           fontSize: 15,
                         }}>
-                        200
+                        {user?.affiliates?.count}
                      </Text>
-                     <Button mode="contained-tonal">
+                     <Button
+                        style={{ backgroundColor: "#fff" }}
+                        mode="elevated">
                         <Text
                            style={{
-                              fontWeight: "bold",
+                              // fontWeight: "bold",
                               textAlign: "center",
-                              fontFamily: "Poppins_300Light",
+                              fontFamily: "Poppins_400Regular",
+                              color: theme.colors.secondary,
                            }}>
                            Affiliate Product
                         </Text>
                      </Button>
                   </View>
                </ScrollView>
-               <Button onPress={() => navigation.navigate("ChatScreen",{user:user?.personal})}>
-                  message
+               <View style={{flex:1,flexDirection:"row",justifyContent:"center",paddingHorizontal:3,gap:2,marginBottom:10}}>
+                <Button
+                labelStyle={{color:theme.colors.primary}}
+                     onPress={handleFollow}
+                    style={{flex:1,borderColor:theme.colors.primary}}
+                     mode={followed ? "outlined" : 'contained-tonal'}>
+                     {followed ? "unfollow" : "follow"}
+                  </Button>
+               <Button mode='contained'  style={{flex:2}} onPress={() => navigation.navigate("ChatScreen",{user:user?.personal})}>
+                  <AntDesign name='message1' />  message
                </Button>
+
+               </View>
+              
             </>
          )}
 

@@ -29,6 +29,7 @@ import {
    MaterialCommunityIcons,
    Feather,
    Ionicons,
+   MaterialIcons,
 } from "@expo/vector-icons";
 import axios from "axios";
 import ProductComments from "../components/Marketing/ProductComments";
@@ -97,7 +98,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          let productId = route.params.productId;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.106:5000/api/marketing/products/${productId}`
+               `http://192.168.0.100:5000/api/marketing/products/${productId}`
             );
             if (data.status == "success") {
                console.log("Product",data.data);
@@ -122,7 +123,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          let productId = route.params.productId;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.106:5000/api/marketing/products/cl/${productId}`
+               `http://192.168.0.100:5000/api/marketing/products/cl/${productId}`
             );
             if (data.status == "success") {
                   console.log(data.data);
@@ -147,7 +148,6 @@ const ProductScreen = ({ navigation, route }: any) => {
 
    useEffect(function () {
       console.log("Fetching user");
-      setLoading(true);
       let userId = route.params.userId;
       console.log("USERID",userId)
       let fetchData = async () => {
@@ -155,7 +155,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/auth/users/${userId}`,
+               `http://192.168.0.100:5000/api/auth/users/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -202,7 +202,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       }
       try{
          let { data } = await axios.post(
-            `http://192.168.0.106:5000/api/marketing/products/request/`,
+            `http://192.168.0.100:5000/api/marketing/products/request/`,
              requestObj
          );
          if(data.status == 'success'){
@@ -232,7 +232,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       }
       try{
          let { data } = await axios.post(
-            `http://192.168.0.106:5000/api/marketing/affiliates/`,
+            `http://192.168.0.100:5000/api/marketing/affiliates/`,
              requestObj
          );
          if(data.status == 'success'){
@@ -262,7 +262,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.106:5000/api/marketing/products/comments/`,
+            `http://192.168.0.100:5000/api/marketing/products/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -293,7 +293,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(buyObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.106:5000/api/marketing/buy`,
+            `http://192.168.0.100:5000/api/marketing/buy`,
             buyObj
          );
          if (data.status == "success") {
@@ -316,7 +316,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       try {
          let activeUserId = 1;
          let { data } = await axios.put(
-            `http://192.168.0.106:5000/api/marketing/products/likes/`,
+            `http://192.168.0.100:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
@@ -505,18 +505,19 @@ const ProductScreen = ({ navigation, route }: any) => {
                   </View>
                  
                </View>
-                <View style={{ flexDirection: "row",justifyContent:"space-evenly"}}>
-                     <Button loading={loading} disabled={loading} onPress={handleProductRequest} mode="contained">Add to cart</Button>
-                     <Button loading={loading2} disabled={loading2} onPress={handleBuy} mode="contained">Buy</Button>
+                <View style={{ flexDirection: "row",gap:3}}>
+                     <Button style={{flex:1}} loading={loading} disabled={loading} onPress={handleProductRequest} mode="contained"><MaterialIcons size={23} name='add-shopping-cart' /></Button>
+                     <Button style={{flex:1}} loading={loading2} disabled={loading2} onPress={handleBuy} mode="contained">Buy</Button>
                     
                     {
                      product.userId !== currentUser.id && !(product.affiliateId?.includes(currentUser?.id)) && 
                      <Button
+                     
                        loading={loading1}
                        disabled={loading1}
                        onPress={handleProductAffiliate}
                         textColor={theme.colors.primary}
-                        style={{ marginHorizontal: 3 }}
+                        style={{ marginHorizontal: 3,flex:1 }}
                         mode="contained-tonal">
                         Affiliate
                      </Button>

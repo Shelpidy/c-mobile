@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View,Alert} from 'react-native'
+import { StyleSheet, Text, View,Alert,ScrollView} from 'react-native'
 import React, { useState,useEffect } from 'react'
 import UserComponent from '../components/UserComponent'
 import ProductComponent from '../components/Marketing/ProductComponent'
+import NotificationProductReviewComponent from '../components/Notification/NotificationProductReviewComponent'
 
 const ProductNotificationScreen = ({navigation,route}:any) => {
 
@@ -17,7 +18,7 @@ const ProductNotificationScreen = ({navigation,route}:any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.106:5000/api/notifications/product/${route.params.productId}`,
+               `http://192.168.0.100:5000/api/notifications/product/${route.params.productId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -41,11 +42,15 @@ const ProductNotificationScreen = ({navigation,route}:any) => {
    }, []);
 
   return (
-    <View>
+    <ScrollView style={{backgroundColor:"#f5f5f5"}}>
       <Text>ProductNotificationScreen</Text>
-      {owner && <UserComponent _user={owner} navigation={navigation} />} 
-      {product && <ProductComponent {...product} navigation={navigation}/>} 
-    </View>
+      {owner && 
+      <View>
+         <UserComponent _user={owner} navigation={navigation} />
+         {product && <NotificationProductReviewComponent buyerId = {owner?.id} props={product} />}
+      </View>} 
+
+    </ScrollView>
   ) 
 }
 

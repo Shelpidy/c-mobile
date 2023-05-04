@@ -9,7 +9,7 @@ import {
    Actions,
 } from "react-native-gifted-chat";
 import { Button, Divider, IconButton, useTheme } from "react-native-paper";
-import { View, Text, KeyboardAvoidingView, Platform,Alert, Image } from "react-native";
+import { View, Text, KeyboardAvoidingView, Platform,Alert, Image, Pressable } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import { io,Socket } from "socket.io-client";
@@ -58,7 +58,7 @@ useEffect(()=>{
   let secUser = route.params.user.id
   let activeUser = 1
   let roomId = generateRoomId(secUser,activeUser)
-  let newSocket = io(`http://192.168.0.106:8080/?roomId=${roomId}`);
+  let newSocket = io(`http://192.168.0.100:8080/?roomId=${roomId}`);
   setSocket(newSocket);
 
   // cleanup function to close the socket connection when the component unmounts
@@ -102,7 +102,7 @@ useEffect(()=>{
 
     let fetchData = async()=>{
       try{
-         let resp = await fetch(`http://192.168.0.106:8080/chats/${roomId}`,{ method: "GET" })
+         let resp = await fetch(`http://192.168.0.100:8080/chats/${roomId}`,{ method: "GET" })
          let chatMessages = await resp.json()
          console.log("Chats Messages",chatMessages)
          setMessages(chatMessages.reverse())
@@ -117,6 +117,8 @@ useEffect(()=>{
      fetchData()
      
    }, []);
+
+   
 
 
    const onSend = useCallback((message: IMessage) => {
@@ -142,6 +144,14 @@ useEffect(()=>{
     setTextValue(val)
    }
 
+   const gotoUserProfile = () => {
+      if (currentUser.id === secondUser?.id) {
+         navigation.navigate("ProfileScreen", { userId: secondUser?.id });
+      } else {
+         navigation.navigate("UserProfileScreen", { userId: secondUser?.id });
+      }
+   };
+
 
    if(currentUser.id == undefined){
     return<View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
@@ -156,10 +166,12 @@ useEffect(()=>{
                   alignItems: "center",
                   paddingVertical: 10,
                   paddingLeft:15
-               }}><Image
+               }}>
+                 <Pressable onPress={gotoUserProfile}>
+                  <Image
                      style={styles.profileImage}
                      source={{ uri: secondUser.profileImage }}
-                  /><View><TextShortener style={{fontFamily:"Poppins_500Medium",marginHorizontal:5}} text={secondUser.fullName} textLength={18} /></View></View>)}
+                  /></Pressable><View><TextShortener style={{fontFamily:"Poppins_500Medium",marginHorizontal:5}} text={secondUser.fullName} textLength={18} /></View></View>)}
          </View>
          <Divider/>
          <KeyboardAvoidingView style={{ flex: 1, marginBottom: 20 }}>

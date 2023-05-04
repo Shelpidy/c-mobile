@@ -21,7 +21,7 @@ type UserComponentProps = {
 };
 
 const UserComponent = ({ navigation, _user }: UserComponentProps) => {
-   const [poster, SetPoster] = useState<any>(null);
+
    const [user, SetUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
@@ -45,54 +45,17 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
       setCurrentUser(_currentUser);
    }, []);
 
-   //     useEffect(function () {
-   //       console.log("Fetching user");
-   //       let user:CurrentUser = {
-   //          id: 1,
-   //          email: "mexu.company@gmail.com",
-   //          accountNumber: "1COM10000000000",
-   //       }
-
-   //       setCurrentUser(user);
-
-   //       setLoading(true);
-   //       let fetchData = async () => {
-   //          // console.log("Fetching user")
-   //          //  let activeUserId = 1
-   //          try {
-   //             let response = await fetch(
-   //                `http://192.168.0.106:5000/api/auth/users/${user.id}`,
-   //                { method: "GET" }
-   //             );
-   //             let data = await response.json();
-   //             if (data.status == "success") {
-   //                console.log("Users-----", data.data);
-   //                SetPoster(data.data.personal);
-   //                // Alert.alert("Success",data.message)
-   //                setLoading(false);
-   //             } else {
-   //                Alert.alert("Failed", data.message);
-   //             }
-   //             setLoading(false);
-   //          } catch (err) {
-   //             console.log(err);
-   //             Alert.alert("Failed", String(err));
-   //             setLoading(false);
-   //          }
-   //       };
-   //       fetchData();
-   //    }, []);
-
+  
    const handleFollow = async () => {
       try {
          let { data } = await axios.put(
-            `http://192.168.0.106:5000/api/media/follows/`,
+            `http://192.168.0.100:5000/api/media/follows/`,
             { followerId: currentUser.id, followingId: user?.id },
             { headers: { Accept: "application/json" } }
          );
          if (data.status == "success") {
             console.log(data.data);
-            setFollowed(!followed);
+            setFollowed(data.data.followed);
             Alert.alert("Success", data.message);
          } else {
             Alert.alert("Failed", data.message);
@@ -105,10 +68,10 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
    };
 
    const gotoUserProfile = () => {
-      if (currentUser.id === poster.id) {
-         navigation.navigate("ProfileScreen", { userId: poster.id });
+      if (currentUser.id === user?.id) {
+         navigation.navigate("ProfileScreen", { userId: user?.id });
       } else {
-         navigation.navigate("UserProfileScreen", { userId: poster.id });
+         navigation.navigate("UserProfileScreen", { userId: user?.id });
       }
    };
 
