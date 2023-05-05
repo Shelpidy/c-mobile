@@ -27,6 +27,7 @@ import axios from "axios";
 import UpdatePostForm from "./UpdatePostForm";
 import { Pressable } from "react-native";
 import TextShortener from "../TextShortener";
+import { useCurrentUser } from "../../utils/CustomHooks";
 
 type NPostComponentProps = PostComponentProps & { navigation: any };
 type PostComment = Omit<CommentProps, "posterId">;
@@ -64,7 +65,7 @@ const PostComponent = (props: NPostComponentProps) => {
       postCommentReducer,
       initialState
    );
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [comments, setComments] = useState<Omit<CommentProps, "posterId">[]>(
       []
@@ -75,14 +76,7 @@ const PostComponent = (props: NPostComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
-   useEffect(() => {
-      // dispatchPostComment({ type: "", payload: "" });
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM10000000000",
-      });
-   }, []);
+   
 
    useEffect(function () {
       let fetchData = async () => {
@@ -145,7 +139,7 @@ const PostComponent = (props: NPostComponentProps) => {
 
 
    const gotoUserProfile = () => {
-      if (currentUser.id === poster.id) {
+      if (currentUser?.id === poster.id) {
          props.navigation.navigate("ProfileScreen", { userId: poster.id });
       } else {
          props.navigation.navigate("UserProfileScreen", { userId: poster.id });
@@ -155,7 +149,7 @@ const PostComponent = (props: NPostComponentProps) => {
    const handleLike = async (postId: number) => {
       console.log(postId);
       try {
-         let activeUserId = 1;
+         let activeUserId = currentUser?.id;
          let { data } = await axios.put(
             `http://192.168.0.100:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
@@ -240,7 +234,7 @@ const PostComponent = (props: NPostComponentProps) => {
                      paddingHorizontal: 1,
                      borderRadius: 3,
                   }}>
-                  {currentUser.id == props?.userId && (
+                  {currentUser?.id == props?.userId && (
                      <View>
                         <Button style={{backgroundColor:"#f9f9f9"}} onPress={() => setOpenModal(true)}>
                            <SimpleLineIcons name="options-vertical" />

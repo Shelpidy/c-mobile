@@ -6,39 +6,34 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Drawer } from 'react-native-drawer-layout';
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { Image } from "react-native";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 type CustomHeaderProps = {
    navigation: any;
 };
 
 const CustomHeader = ({ navigation }: CustomHeaderProps) => {
-   const [open, setOpen] = React.useState(false);
+
    const [loading, setLoading] = useState<boolean>(false);
    const [user, setUser] = useState<User>();
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const [activeTab,setActiveTab] = useState<number>(0)
    const theme = useTheme()
-
-   let _navigation = useNavigation();
-
-      useEffect(() => {
-      // dispatchPostComment({ type: "", payload: "" });
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM10000000000",
-      });
-   }, []);
 
      useEffect(function () {
       console.log("Fetching user");
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
-          let activeUserId = 1
+         let cUser = useCurrentUser()
+         if(!cUser){
+            navigation.navigate("AuthStack",{screen:'LoginScreen'})
+         }else{
+
+      
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${activeUserId}`,
+               `http://192.168.0.100:5000/api/auth/users/${cUser.id}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -56,7 +51,8 @@ const CustomHeader = ({ navigation }: CustomHeaderProps) => {
             Alert.alert("Failed", String(err));
             setLoading(false);
          }
-      };
+      }
+        };
       fetchData();
    }, []);
 
@@ -110,18 +106,14 @@ const CustomHeader = ({ navigation }: CustomHeaderProps) => {
       }
       }
 
-
-      
-     
-
    }
 
 
    return (
       <Appbar.Header style={{alignItems:"center"}}>
          {/* <Appbar.Content title="C" /> */}
-         {_navigation.canGoBack() && (
-            <Appbar.BackAction onPress={() => _navigation.goBack()} />
+         {navigation.canGoBack() && (
+            <Appbar.BackAction onPress={() => navigation.goBack()} />
          )}
          <Appbar.Action
          
@@ -144,7 +136,7 @@ const CustomHeader = ({ navigation }: CustomHeaderProps) => {
            <Appbar.Action icon={()=><Feather color={activeTab === 3?theme.colors.primary:theme.colors.secondary} size={20} name='shopping-cart'/>} onPress={() =>gotoNextScreen("ProductsRequestScreen")} />
            <Appbar.Action icon={()=><Feather color={activeTab === 4?theme.colors.primary:theme.colors.secondary} size={20} name='search'/>} onPress={() => gotoNextScreen("SearchScreen")} />
            {/* <Appbar.Action icon={()=><Feather size={20} name='users'/>} onPress={() =>setOpen(!open)} /> */}
-         <Appbar.Action  onPress={()=>gotoNextScreen("ProfileScreen",{userId:currentUser.id})} icon={()=>
+         <Appbar.Action  onPress={()=>gotoNextScreen("ProfileScreen",{userId:currentUser?.id})} icon={()=>
               <Image
                     resizeMode="cover"
                      style={styles.profileImage}

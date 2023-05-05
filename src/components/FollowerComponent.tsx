@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { Button, IconButton, useTheme } from "react-native-paper";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import axios from "axios";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,17 +25,10 @@ const FollowerComponent = ({
    const theme = useTheme();
    const [followed, setFollowed] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
-
+   const currentUser = useCurrentUser()
    useEffect(() => {
-      let _currentUser: CurrentUser = {
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM10000000000",
-         followingIds: [3],
-      };
-      setCurrentUser(_currentUser);
-      if (_currentUser.followingIds?.includes(user.id)) {
+      let _currentUser = useCurrentUser()
+      if (_currentUser?.followingIds?.includes(user.id)) {
          setFollowed(true);
       }
    }, []);
@@ -61,7 +55,7 @@ const FollowerComponent = ({
    };
 
    const gotoUserProfile = () => {
-      if (currentUser.id === user.id) {
+      if (currentUser?.id === user.id) {
          navigation.navigate("ProfileScreen", { userId: user.id });
       } else {
          navigation.navigate("UserProfileScreen", { userId: user.id });

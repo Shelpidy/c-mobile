@@ -14,6 +14,7 @@ import { Skeleton } from "@rneui/base";
 import { Button, useTheme } from "react-native-paper";
 import TextShortener from "./TextShortener";
 import axios from "axios";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 type UserComponentProps = {
    navigation: any;
@@ -24,25 +25,20 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
 
    const [user, SetUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const { width, height } = Dimensions.get("window");
    const [followed, setFollowed] = useState<boolean>(false);
 
    let theme = useTheme();
 
    useEffect(() => {
-      let _currentUser: CurrentUser = {
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM10000000000",
-         followingIds: [1, 2, 3],
-      };
-      if (_currentUser.followingIds?.includes(_user.id)) {
+      let _currentUser = useCurrentUser()
+      if (_currentUser?.followingIds?.includes(_user.id)) {
          setFollowed(true);
       }
       // dispatchPostComment({ type: "", payload: "" });
       SetUser(_user);
-      setCurrentUser(_currentUser);
+  
    }, []);
 
   
@@ -50,7 +46,7 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
       try {
          let { data } = await axios.put(
             `http://192.168.0.100:5000/api/media/follows/`,
-            { followerId: currentUser.id, followingId: user?.id },
+            { followerId: currentUser?.id, followingId: user?.id },
             { headers: { Accept: "application/json" } }
          );
          if (data.status == "success") {
@@ -68,7 +64,7 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
    };
 
    const gotoUserProfile = () => {
-      if (currentUser.id === user?.id) {
+      if (currentUser?.id === user?.id) {
          navigation.navigate("ProfileScreen", { userId: user?.id });
       } else {
          navigation.navigate("UserProfileScreen", { userId: user?.id });

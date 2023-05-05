@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React, { useState, useEffect } from "react"
 import { Button } from "react-native-paper";
 import { FontAwesome5 } from "@expo/vector-icons";
-import PostComment from "../components/MediaPosts/PostComment";
 import ProductComment from "../components/Marketing/ProductComment";
 
 
@@ -34,11 +33,6 @@ const ProductCommentsViewerScreen = ({
       setNumberOfPageLinks(numOfPageLinks);
    }, [route.params]);
 
-   //   useEffect(()=>{
-   //      const currentIndex = numberOfCommentsPerPage * (pageNumber - 1)
-   //      const lastIndex = currentIndex + numberOfCommentsPerPage
-   //      setComments(comments.slice(currentIndex,lastIndex))
-   //   },[pageNumber])
 
    return (
       <ScrollView style={styles.container}>

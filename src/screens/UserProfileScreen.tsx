@@ -13,6 +13,7 @@ import PostComponent from "../components/MediaPosts/PostComponent";
 import ProfileNavComponent from "../components/ProfileNavComponent";
 import axios from 'axios'
 import { AntDesign } from "@expo/vector-icons";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 const { width, height } = Dimensions.get("window");
 
@@ -25,7 +26,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const  currentUser = useCurrentUser()
    const [followed, setFollowed] = useState<boolean>(false);
 
 
@@ -38,13 +39,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
-              let _currentUser: CurrentUser = {
-                     id: 1,
-                     email: "mexu.company@gmail.com",
-                     accountNumber: "1COM10000000000",
-                     followingIds: [1, 2, 3],
-                  };
-            setCurrentUser(_currentUser);
+            let _currentUser = useCurrentUser()
             let response = await fetch(
                `http://192.168.0.100:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
@@ -54,7 +49,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                console.log("Users-----", data.data);
                setUser(data.data);
               
-                  if (_currentUser.followingIds?.includes(data.data?.personal)) {
+                  if (_currentUser?.followingIds?.includes(data.data?.personal)) {
                      setFollowed(true);
                   }
                      } else {
@@ -120,7 +115,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
       try {
          let { data } = await axios.put(
             `http://192.168.0.100:5000/api/media/follows/`,
-            { followerId: currentUser.id, followingId: user?.personal.id },
+            { followerId: currentUser?.id, followingId: user?.personal.id },
             { headers: { Accept: "application/json" } }
          );
          if (data.status == "success") {

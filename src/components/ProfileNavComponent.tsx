@@ -8,24 +8,17 @@ import {
    MaterialIcons,
 } from "@expo/vector-icons";
 import { Button, useTheme } from "react-native-paper";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 const { width } = Dimensions.get("window");
 
 const ProfileNavComponent = ({ navigation, user }: any) => {
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const theme = useTheme();
 
-   useEffect(() => {
-      // dispatchPostComment({ type: "", payload: "" });
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM10000000000",
-      });
-   }, []);
    return (
       <View style={styles.navs}>
-         {currentUser.id === user?.id && (
+         {currentUser?.id === user?.id && (
             <View style={styles.navLink}>
                <AntDesign
                   name="setting"
@@ -45,13 +38,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
             </View>
          )}
 
-         {/* <View style={styles.navLink}>
-            <MaterialCommunityIcons name="cog" />
-            <Text style={{ fontFamily: "Poppins_500Medium" }}>Posts</Text>
-            <Button  onPress={() => navigation.navigate("UserPostScreen",{user})}>
-               <Entypo name="chevron-thin-right" />
-            </Button>
-         </View> */}
+       
          <View style={styles.navLink}>
             <Feather
                name="shopping-cart"
@@ -72,7 +59,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                <Entypo name="chevron-thin-right" />
             </Button>
          </View>
-         {currentUser.id === user?.id && (
+         {currentUser?.id === user?.id && (
             <View style={styles.navLink}>
                <MaterialCommunityIcons
                   name="transfer"
@@ -92,7 +79,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                </Button>
             </View>
          )}
-         {currentUser.id === user?.id && (
+         {currentUser?.id === user?.id && (
             <View style={styles.navLink}>
                <MaterialIcons
                   name="account-balance"
@@ -114,7 +101,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                </Button>
             </View>
          )}
-         {currentUser.id === user?.id && (
+         {currentUser?.id === user?.id && (
             <View style={styles.navLink}>
                <Feather name="users" size={20} color={theme.colors.secondary} />
                <Text
@@ -129,7 +116,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                </Button>
             </View>
          )}
-         {currentUser.id === user?.id && (
+         {currentUser?.id === user?.id && (
             <View style={styles.navLink}>
                <AntDesign
                   name="logout"

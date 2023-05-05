@@ -15,6 +15,7 @@ import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import { io,Socket } from "socket.io-client";
 import { StyleSheet } from "react-native";
 import TextShortener from "../components/TextShortener";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 
 
@@ -25,10 +26,9 @@ const ChatScreen = ({ navigation, route }: any) => {
    const [fileUri, setFileUri] = useState<any>(null);
    const [textValue,setTextValue] = useState<string>("")
    const [loading,setLoading] = useState<boolean>(true)
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const [secondUser,setSecondUser] = useState<User>()
-  const [socket, setSocket] = useState<Socket | null>(null);
-
+   const [socket, setSocket] = useState<Socket | null>(null);
 
 
    const toggleEmojiPicker = () => {
@@ -41,17 +41,11 @@ const ChatScreen = ({ navigation, route }: any) => {
        return Number(`${maxId}${minId}`)
     }
 
-
   useEffect(() => {
     let secUser = route.params.user
     console.log(secUser)
     setSecondUser(secUser)
-      // dispatchPostComment({ type: "", payload: "" });
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM10000000000",
-      });
+
    }, []);
 
 useEffect(()=>{
@@ -70,7 +64,8 @@ useEffect(()=>{
 
 useEffect(()=>{
     let secUser = route.params.user.id
-    let activeUser = 1
+    let _currentUser = useCurrentUser()
+    let activeUser = _currentUser?.id
     let roomId = generateRoomId(secUser,activeUser)
     console.log(roomId)
     console.log("Socket connecting")
@@ -97,7 +92,8 @@ useEffect(()=>{
    useEffect(()=>{
     console.log("Fetching chats")
     let secUser = route.params.user.id
-    let activeUser = 1
+    let _currentUser = useCurrentUser()
+    let activeUser = _currentUser?.id
     let roomId = generateRoomId(secUser,activeUser)
 
     let fetchData = async()=>{
@@ -123,7 +119,7 @@ useEffect(()=>{
 
    const onSend = useCallback((message: IMessage) => {
       let secUser = route.params.user.id
-      let activeUser = 1
+      let activeUser = currentUser?.id
       let roomId = generateRoomId(secUser,activeUser)
       let sendData = {
          senderId:route.params.user.id,
@@ -145,7 +141,7 @@ useEffect(()=>{
    }
 
    const gotoUserProfile = () => {
-      if (currentUser.id === secondUser?.id) {
+      if (currentUser?.id === secondUser?.id) {
          navigation.navigate("ProfileScreen", { userId: secondUser?.id });
       } else {
          navigation.navigate("UserProfileScreen", { userId: secondUser?.id });
@@ -153,7 +149,7 @@ useEffect(()=>{
    };
 
 
-   if(currentUser.id == undefined){
+   if(currentUser?.id == undefined){
     return<View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
           <Text>Loading...</Text>
     </View>

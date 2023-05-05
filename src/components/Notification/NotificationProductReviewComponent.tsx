@@ -25,6 +25,7 @@ import {
 } from "@expo/vector-icons";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import { useCurrentUser } from "../../utils/CustomHooks";
 // import UpdateProductForm from "./UpdateProduct";
 
 // type ProductComment = Omit<CommentProps, "posterId">;
@@ -65,20 +66,13 @@ type NotificationProductReviewComponentProps = {
 
 const NotificationProductReviewComponent = ({props,buyerId}:NotificationProductReviewComponentProps) => {
 
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const [poster, SetPoster] = useState<any>();
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
    const navigation = useNavigation<any>()
 
-   useEffect(() => {
-      // dispatchPostComment({ type: "", payload: "" });
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM30000000000",
-      });
-   }, []);
+ 
 
    useEffect(function () {
       console.log("Fetching user");

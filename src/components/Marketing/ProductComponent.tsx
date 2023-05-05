@@ -16,14 +16,12 @@ import ProductComments from "./ProductComments";
 // import { postProductComments, postLikes, users } from "../../data";
 import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
 import {
-   AntDesign,
-   Entypo,
-   FontAwesome,
-   MaterialCommunityIcons,
+
    Ionicons,
    Feather,
 } from "@expo/vector-icons";
 import axios from "axios";
+import { useCurrentUser } from "../../utils/CustomHooks";
 // import UpdateProductForm from "./UpdateProduct";
 
 // type ProductComment = Omit<CommentProps, "posterId">;
@@ -61,7 +59,7 @@ const ProductComponent = (props: ProductComponentProps) => {
       postCommentReducer,
       initialState
    );
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [productComments, setProductComments] = useState<ProductComment[]>([]);
    const [likes, setLikes] = useState<ProductLike[] | null>(null);
@@ -70,19 +68,11 @@ const ProductComponent = (props: ProductComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
-   useEffect(() => {
-      // dispatchPostComment({ type: "", payload: "" });
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM30000000000",
-      });
-   }, []);
 
    useEffect(function () {
       let fetchData = async () => {
-         let activeUserId = 1;
          try {
+            let cUser = useCurrentUser()
             let { data } = await axios.get(
                `http://192.168.0.100:5000/api/marketing/products/cl/${props.id}`
             );
@@ -92,7 +82,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                let cs = data.data.comments;
                setProductComments(cs);
                setLikes(ls);
-               if (ls.map((like) => like.userId).includes(activeUserId)) {
+               if (ls.map((like) => like.userId).includes(cUser?.id)) {
                   setLiked(true);
                }
                // Alert.alert("Success",data.message)
@@ -142,7 +132,7 @@ const ProductComponent = (props: ProductComponentProps) => {
    const handleLike = async (productId: number) => {
       console.log(productId);
       try {
-         let activeUserId = 1;
+         let activeUserId = currentUser?.id;
          let { data } = await axios.put(
             `http://192.168.0.100:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
@@ -174,7 +164,7 @@ const ProductComponent = (props: ProductComponentProps) => {
    };
 
      const gotoUserProfile = () => {
-      if (currentUser.id === poster.id) {
+      if (currentUser?.id === poster.id) {
          props.navigation.navigate("ProfileScreen", { userId: poster.id });
       } else {
          props.navigation.navigate("UserProfileScreen", { userId: poster.id });
@@ -236,7 +226,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                      paddingHorizontal: 1,
                      borderRadius: 3,
                   }}>
-                  {currentUser.id == props?.userId && (
+                  {currentUser?.id == props?.userId && (
                      <View>
                         <Button onPress={() => setOpenModal(true)}>
                            <Feather name="edit" /> Edit Post

@@ -5,9 +5,10 @@ import { Feather, SimpleLineIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import { useCurrentUser } from "../../utils/CustomHooks";
 
 const Comment = (props: CommentProps) => {
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [commentor, setCommentor] = useState<any>(null);
    const [loading, setLoading] = useState<any>(false);
@@ -42,17 +43,13 @@ const Comment = (props: CommentProps) => {
          }
       };
       fetchData();
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM30000000000",
-      });
+      
    }, []);
 
    const handleEditComment = () => {};
 
     const gotoUserProfile = () => {
-      if (currentUser.id === commentor.id) {
+      if (currentUser?.id === commentor.id) {
          navigation.navigate("ProfileScreen", { userId: commentor.id });
       } else {
          navigation.navigate("UserProfileScreen", { userId: commentor.id });
@@ -116,8 +113,8 @@ const Comment = (props: CommentProps) => {
                            paddingHorizontal: 5,
                            borderRadius: 3,
                         }}>
-                        {(currentUser.id == props?.userId ||
-                           currentUser.id == props?.posterId) && (
+                        {(currentUser?.id == props?.userId ||
+                           currentUser?.id == props?.posterId) && (
                            <View style={{ flexDirection: "row" }}>
                                <Button onPress={() => setOpenModal(true)}>
                                   <SimpleLineIcons name="options-vertical" />

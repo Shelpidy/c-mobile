@@ -15,13 +15,14 @@ import { AntDesign } from "@expo/vector-icons";
 import NotificationComponent from "../components/TransactionNotificationComponent";
 import ProductNotificationComponent from "../components/ProductNotificationComponent";
 import TransactionNotificationComponent from "../components/TransactionNotificationComponent";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 const { width, height } = Dimensions.get("screen");
 
 const NotificationScreen = ({navigation}:any) => {
    const [notifications, setNotifications] = useState<CustomNotification[] | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const theme = useTheme()
 
    useEffect(function () {
@@ -29,7 +30,8 @@ const NotificationScreen = ({navigation}:any) => {
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
-         let activeUserId = 1;
+         let _currentUser = useCurrentUser()
+         let activeUserId = _currentUser?.id;
          try {
             let response = await fetch(
                `http://192.168.0.100:5000/api/notifications/${activeUserId}`,

@@ -4,6 +4,7 @@ import axios from "axios";
 import ProductComponent from "../components/Marketing/ProductComponent";
 import SearchForm from "../components/SearchForm";
 import PostProductFormNav from "../components/PostProductFormNav";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 const UserProductScreen = ({ navigation, route }: any) => {
    const [products, setProducts] = useState<ProductComponentProps[]>([]);
@@ -18,7 +19,8 @@ const UserProductScreen = ({ navigation, route }: any) => {
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
-         let activeUserId = 1;
+         let _currentUser = useCurrentUser()
+         let activeUserId = _currentUser?.id;
          setOwner(route.params.user);
          console.log("Product userId", route.params.user.id);
          try {

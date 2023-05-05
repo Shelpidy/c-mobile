@@ -4,6 +4,7 @@ import SearchForm from "../components/SearchForm";
 import PostProductFormNav from "../components/PostProductFormNav";
 import ProductRequestComponent from "../components/Marketing/ProductRequestComponent";
 import { ActivityIndicator } from "react-native-paper";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 // import { Products as _fetchedPost } from "../../data";
 
@@ -19,7 +20,7 @@ const ProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
       useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+
    const [refresh,setRefresh] = useState<number>(0);
 
    
@@ -27,7 +28,8 @@ const ProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
-         let activeUserId = 1;
+         let _currentUser = useCurrentUser()
+         let activeUserId = _currentUser?.id;
          try {
             let response = await fetch(
                `http://192.168.0.100:5000/api/marketing/products/request/${activeUserId}`

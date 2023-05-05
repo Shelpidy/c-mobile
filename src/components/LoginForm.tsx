@@ -1,25 +1,84 @@
-import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Dimensions, StyleSheet, Text, View,Alert } from "react-native";
 import { Button, TextInput, useTheme } from "react-native-paper";
+import * as Device from 'expo-device'
+import axios from "axios";
+import { v4 as uuidv4 } from 'uuid';
+import SensitiveInfo from 'react-native-sensitive-info';
+import { usePushNotificationToken } from "../utils/CustomHooks";
+
+
 
 type LoginFormProps = {
    navigation: any;
 };
+
+type LoginObject = {
+   password:string
+   email:string
+   deviceId:any,
+   deviceName:string | null
+   notificationToken:string
+} 
 
 const { width, height } = Dimensions.get("window");
 
 const LoginForm = ({ navigation }: LoginFormProps) => {
    let theme = useTheme();
    const [showPassword, setShowPassword] = React.useState<boolean>(false);
+   const [password,setPassword] = useState<string>("")
+   const [email,setEmail] = useState<string>("")
+   const notificationToken = usePushNotificationToken<string>()
+   const [loading,setLoading] = useState<boolean>(false)
 
    const handleLogin = () => {
-      navigation.navigate("HomeStack", { screen: "HomeScreen" });
+       let fetchData = async () => {
+         // console.log("Fetching user")
+         //  let activeUserId = 1
+         try {
+               setLoading(true)
+              let loginObj:LoginObject= {
+                  password,
+                  email,
+                  deviceId:String(new Date().getMilliseconds()),
+                  deviceName:Device.deviceName,
+                  notificationToken
+               }
+               console.log(loginObj)
+            let response = await fetch(
+               `http://192.168.0.100:5000/api/auth/users/login`,{method:"POST",body:JSON.stringify(loginObj)}
+              
+            );
+           
+            let data = await response.json();
+            if (data.status == 'success') {
+               console.log("Login Token", data.token);
+                try{
+                  //  await SensitiveInfo.setItem('loginToken',data.token,{})
+                }catch(err){
+                  console.log(err)
+                }
+                setLoading(false);
+            } else {
+               console.log(data)
+               Alert.alert("Login Failed", data.message);
+            }
+            setLoading(false);
+         } catch (err) {
+            console.log(err);
+            Alert.alert("Login Failed", String(err));
+            setLoading(false);
+         }
+      };
+      fetchData();
    };
+
 
    return (
       <View>
          <View style={styles.form}>
             <TextInput
+              onChangeText={(v)=> setEmail(v)}
                mode="outlined"
                style={styles.input}
                label="Email"
@@ -30,6 +89,7 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                      icon="email"></TextInput.Icon>
                }></TextInput>
             <TextInput
+              onChangeText={(v)=> setPassword(v)}
                mode="outlined"
                style={styles.input}
                label="Password"
@@ -43,6 +103,8 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                      }></TextInput.Icon>
                }></TextInput>
             <Button
+               loading={loading}
+               disabled={loading}
                onPress={handleLogin}
                mode="contained"
                style={{ marginTop: 15 }}>

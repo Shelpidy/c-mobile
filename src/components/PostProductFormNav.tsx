@@ -11,6 +11,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { Fontisto } from "@expo/vector-icons";
 import { Skeleton } from "@rneui/base";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 type PostProductFormNavProps = {
    navigation: any;
@@ -20,34 +21,21 @@ type PostProductFormNavProps = {
 const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
    const [poster, SetPoster] = useState<any>(null);
    const [loading, setLoading] = useState<boolean>(false);
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const { width, height } = Dimensions.get("window");
 
-   useEffect(() => {
-      // dispatchPostComment({ type: "", payload: "" });
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM10000000000",
-      });
-   }, []);
+   
 
    useEffect(function () {
       console.log("Fetching user");
-      let user: CurrentUser = {
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM10000000000",
-      };
-      setCurrentUser(user);
-
+      let user = useCurrentUser()
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${user.id}`,
+               `http://192.168.0.100:5000/api/auth/users/${user?.id}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -70,7 +58,7 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
    }, []);
 
    const gotoUserProfile = () => {
-      if (currentUser.id === poster.id) {
+      if (currentUser?.id === poster.id) {
          navigation.navigate("ProfileScreen", { userId: poster.id });
       } else {
          navigation.navigate("UserProfileScreen", { userId: poster.id });

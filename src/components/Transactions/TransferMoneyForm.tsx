@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Dimensions, StyleSheet, Text, View, Alert } from "react-native";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import axios from "axios";
+import { useCurrentUser } from "../../utils/CustomHooks";
 
 type TransferMoneyFormProps = {
    navigation: any;
@@ -14,24 +15,16 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
    const [showPassword, setShowPassword] = React.useState<boolean>(false);
    const [transfereeAccountNumber, setTransfereeAccountNumber] =
       useState<string>("");
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const [amount, setAmount] = useState<string>("");
    const [loading, setLoading] = useState<boolean>(false);
-
-   useEffect(() => {
-      setCurrentUser({
-         id: 1,
-         accountNumber: "1COM1000000000",
-         email: "teax@gmail.com",
-      });
-   }, []);
 
    const handleTransferMoney = async () => {
       setLoading(true);
 
       let postObj = {
          transfereeAccountNumber,
-         transferorAccountNumber: currentUser.accountNumber,
+         transferorAccountNumber: currentUser?.accountNumber,
          amount,
       };
       try {

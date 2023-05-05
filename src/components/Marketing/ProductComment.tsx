@@ -3,10 +3,11 @@ import React, { useEffect, useState } from "react";
 import { users } from "../../data";
 import { Feather, SimpleLineIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
+import { useCurrentUser } from "../../utils/CustomHooks";
 
 
 const Comment = (props: ProductCommentProps) => {
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [commentor, setCommentor] = useState<any>(null);
    const [loading, setLoading] = useState<any>(false);
@@ -39,24 +40,12 @@ const Comment = (props: ProductCommentProps) => {
          }
       };
       fetchData();
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM30000000000",
-      });
+      
    }, []);
 
    const handleEditComment = () => {};
 
-   // useEffect(() => {
-   //    setCommentor(users.find((user) => user.id === props.userId));
-   //    // console.log(commentor)
-   //    setCurrentUser({
-   //       id: props?.id,
-   //       email: "mexu.company@gmail.com",
-   //       accountNumber: "1COM30000000000",
-   //    });
-   // }, [users]);
+ 
    if (!commentor) {
       return (
          <View>
@@ -116,8 +105,8 @@ const Comment = (props: ProductCommentProps) => {
                            paddingHorizontal: 5,
                            borderRadius: 3,
                         }}>
-                        {(currentUser.id == props?.userId ||
-                           currentUser.id == props?.posterId) && (
+                        {(currentUser?.id == props?.userId ||
+                           currentUser?.id == props?.posterId) && (
                            <View style={{ flexDirection: "row" }}>
                               <Button onPress={() => setOpenModal(true)}>
                                   <SimpleLineIcons name="options-vertical" />

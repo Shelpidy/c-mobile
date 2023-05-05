@@ -33,6 +33,7 @@ import {
 } from "@expo/vector-icons";
 import axios from "axios";
 import ProductComments from "../components/Marketing/ProductComments";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 const initialState: ProductComment = {};
 
@@ -68,7 +69,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       productCommentReducer,
       initialState
    );
-   const [currentUser, setCurrentUser] = useState<any>({});
+   const currentUser = useCurrentUser();
    const [product, setproduct] = useState<ProductComponentProps | null>(null);
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [comments, setComments] = useState<ProductComment[]>([]);
@@ -84,12 +85,7 @@ const ProductScreen = ({ navigation, route }: any) => {
    useEffect(() => {
       setAffiliateId(route.params.affiliateId)
       console.log("AffiliateId",route.params.affiliateId)
-      dispatchproductComment({ type: "", payload: "" });
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM10000000000",
-      });
+    
    }, []);
 
 
@@ -119,7 +115,8 @@ const ProductScreen = ({ navigation, route }: any) => {
 
    useEffect(function () {
       let fetchData = async () => {
-         let activeUserId = 1;
+         let _currentUser = useCurrentUser()
+         let activeUserId = _currentUser?.id;
          let productId = route.params.productId;
          try {
             let { data } = await axios.get(
@@ -177,19 +174,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       fetchData();
    }, []);
 
-   // useEffect(() => {
-   //    setLikes(productLikes.filter((like) => like.productId === product.id));
-   //    setComments(
-   //       productComments.filter((comment) => comment.productId === product.id)
-   //    );
-
-   //    // GET COMMENTS AND LIKES
-   // }, [users, productComments, productLikes]);
-
-   // useEffect(() => {
-   //    Setproducter(users.find((user) => user.id === product.userId));
-   // }, [users]);
-
+ 
    const handleProductRequest = async()=>{
       if(affiliateId){
          Alert.alert("","Affiliated product can not be added to shopping cart.")
@@ -253,7 +238,7 @@ const ProductScreen = ({ navigation, route }: any) => {
 
    const handleComment = async () => {
       setLoading(true);
-      let activeUserId = 1;
+      let activeUserId = currentUser?.id;
       let commentObj = {
          ...productCommentState,
          productId: product?.id,
@@ -283,12 +268,12 @@ const ProductScreen = ({ navigation, route }: any) => {
    
    const handleBuy = async () => {
       setLoading2(true);
-      let activeUserId = 1;
+   
       let buyObj:MakePurchaseParams = {
          affiliateId:JSON.parse(String(product?.affiliateId))[0],
          productId: product?.id,
          userId: product?.userId,
-         buyerId:currentUser.id
+         buyerId:currentUser?.id
       };
       console.log(buyObj);
       try {
@@ -331,7 +316,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                   {
                      id: likes.length,
                      productId: likes[0]?.productId,
-                     userId: currentUser.id,
+                     userId: currentUser?.id,
                      createdAt: new Date(),
                      updatedAt: new Date(),
                   },
@@ -404,7 +389,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                      paddingHorizontal: 1,
                      borderRadius: 3,
                   }}>
-                  {currentUser.id == product?.userId && (
+                  {currentUser?.id == product?.userId && (
                      <View>
                         <Button onPress={() => setOpenModal(true)}>
                            <Feather name="edit" /> Edit product
@@ -510,7 +495,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                      <Button style={{flex:1}} loading={loading2} disabled={loading2} onPress={handleBuy} mode="contained">Buy</Button>
                     
                     {
-                     product.userId !== currentUser.id && !(product.affiliateId?.includes(currentUser?.id)) && 
+                     currentUser && product.userId !== currentUser.id && !(product.affiliateId?.includes(currentUser.id)) && 
                      <Button
                      
                        loading={loading1}

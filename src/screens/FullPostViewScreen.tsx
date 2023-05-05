@@ -29,6 +29,7 @@ import {
    SimpleLineIcons,
 } from "@expo/vector-icons";
 import axios from "axios";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 type FullPostComponentpost = { navigation: any; route: any };
 type PostComment = Omit<CommentProps, "posterId">;
@@ -66,7 +67,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       postCommentReducer,
       initialState
    );
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const [post, setPost] = useState<PostComponentProps>();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [comments, setComments] = useState<Omit<CommentProps, "posterId">[]>(
@@ -80,14 +81,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
    const [textValue,setTextValue] = useState<string>("")
    const theme = useTheme();
 
-   useEffect(() => {
-      dispatchPostComment({ type: "", payload: "" });
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM30000000000",
-      });
-   }, []);
+  
 
    useEffect(() => {
       setPost(route.params);
@@ -96,8 +90,9 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
 
    useEffect(function () {
       let fetchData = async () => {
-         let activeUserId = 1;
-         let postId = route.params.id;
+      let _currentUser = useCurrentUser()
+      let activeUserId = _currentUser?.id
+      let postId = route.params.id;
          try {
             let { data } = await axios.get(
                `http://192.168.0.100:5000/api/media/posts/cl/${postId}`
@@ -164,7 +159,8 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
 
    const handleComment = async () => {
       setLoading(true);
-      let activeUserId = 1;
+
+      let activeUserId = currentUser?.id;
       let commentObj = {
          ...postCommentState,
          postId: post?.id,
@@ -194,7 +190,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
    const handleLike = async (postId: number) => {
       console.log(postId);
       try {
-         let activeUserId = 1;
+         let activeUserId = currentUser?.id;
          let { data } = await axios.put(
             `http://192.168.0.100:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
@@ -211,7 +207,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                   {
                      id: likes.length,
                      postId: likes[0].postId,
-                     userId: currentUser.id,
+                     userId: currentUser?.id,
                      createdAt: new Date(),
                      updatedAt: new Date(),
                   },
@@ -285,7 +281,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                      paddingHorizontal: 1,
                      borderRadius: 3,
                   }}>
-                  {currentUser.id == post?.userId && (
+                  {currentUser?.id == post?.userId && (
                      <View>
                         <Button style={{backgroundColor:"#f9f9f9"}} onPress={() => setOpenModal(true)}>
                            <SimpleLineIcons name='options-vertical' />

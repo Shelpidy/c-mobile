@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import ProductComponent from "../components/Marketing/ProductComponent";
 import SearchForm from "../components/SearchForm";
 import PostProductFormNav from "../components/PostProductFormNav";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 // import { Products as _fetchedPost } from "../../data";
 
@@ -18,12 +19,19 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+  
+
+   useEffect(()=>{
+      let currentUser = useCurrentUser()
+       if(!currentUser){
+            navigation.navigate("HomeStack",{screen:"LoginScreen"})
+         }
+   },[])
 
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
-         let activeUserId = 1;
+
          try {
             let response = await fetch(
                "http://192.168.0.100:5000/api/marketing/products"

@@ -26,6 +26,7 @@ import {
 import axios from "axios";
 import TextShortener from "../TextShortener";
 import { Skeleton } from "@rneui/base";
+import { useCurrentUser } from "../../utils/CustomHooks";
 
 
 const initialState: Partial<MakePurchaseParams> = {};
@@ -73,7 +74,7 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
       buyProductReducer,
       initialState
    );
-   const [currentUser, setCurrentUser] = useState<CurrentUser>({});
+   const currentUser = useCurrentUser()
    const [likes, setLikes] = useState<ProductLike[] | null>(null);
    const [poster, SetPoster] = useState<any>();
    const [liked, setLiked] = useState<boolean>(false);
@@ -82,14 +83,6 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
    const [loading2, setLoading2] = useState<boolean>(false);
    const theme = useTheme();
 
-   useEffect(() => {
-      // dispatchbuyProduct({ type: "", payload: "" });
-      setCurrentUser({
-         id: 1,
-         email: "mexu.company@gmail.com",
-         accountNumber: "1COM30000000000",
-      });
-   }, []);
 
 
    useEffect(function () {
@@ -123,7 +116,7 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
     const handleDelete = async () => {
       setLoading1(true);
       let productId = props.id
-      let userId = currentUser.id
+      let userId = currentUser?.id
       try {
          let { data } = await axios.delete(
             `http://192.168.0.100:5000/api/marketing/products/request/${productId}/${userId}`,
@@ -147,12 +140,12 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
 
     const handleBuy = async () => {
       setLoading2(true);
-      let activeUserId = 1;
+
       let buyObj:MakePurchaseParams = {
          affiliateId:null,
          productId: props?.id,
          userId: props?.userId,
-         buyerId:currentUser.id
+         buyerId:currentUser?.id
       };
       console.log(buyObj);
       try {
@@ -230,8 +223,8 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
                style={[styles.productPrice, { color: theme.colors.primary }]}>
                C{props?.price}
             </Text>
-            <Button onPress={handleBuy} mode='contained'>Buy</Button>
-            <Button onPress={handleDelete} mode='text'><Feather name="x"/></Button>
+            <Button loading={loading2} disabled={loading2} onPress={handleBuy} mode='contained'>Buy</Button>
+            <Button loading={loading1} disabled={loading1} onPress={handleDelete} mode='text'><Feather name="x"/></Button>
 
          </View>
       </View>
