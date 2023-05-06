@@ -22,30 +22,27 @@ type UserComponentProps = {
 };
 
 const UserComponent = ({ navigation, _user }: UserComponentProps) => {
-
    const [user, SetUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const { width, height } = Dimensions.get("window");
    const [followed, setFollowed] = useState<boolean>(false);
 
    let theme = useTheme();
 
    useEffect(() => {
-      let _currentUser = useCurrentUser()
-      if (_currentUser?.followingIds?.includes(_user.id)) {
+      if (currentUser?.followingIds?.includes(_user.id)) {
          setFollowed(true);
       }
       // dispatchPostComment({ type: "", payload: "" });
       SetUser(_user);
-  
-   }, []);
+   }, [currentUser]);
+   
 
-  
    const handleFollow = async () => {
       try {
          let { data } = await axios.put(
-            `http://192.168.0.100:5000/api/media/follows/`,
+            `http://192.168.175.183:5000/api/media/follows/`,
             { followerId: currentUser?.id, followingId: user?.id },
             { headers: { Accept: "application/json" } }
          );

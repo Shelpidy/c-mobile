@@ -15,11 +15,7 @@ import TextViewer from "../TextViewer";
 import ProductComments from "./ProductComments";
 // import { postProductComments, postLikes, users } from "../../data";
 import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
-import {
-
-   Ionicons,
-   Feather,
-} from "@expo/vector-icons";
+import { Ionicons, Feather } from "@expo/vector-icons";
 import axios from "axios";
 import { useCurrentUser } from "../../utils/CustomHooks";
 // import UpdateProductForm from "./UpdateProduct";
@@ -59,7 +55,7 @@ const ProductComponent = (props: ProductComponentProps) => {
       postCommentReducer,
       initialState
    );
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [productComments, setProductComments] = useState<ProductComment[]>([]);
    const [likes, setLikes] = useState<ProductLike[] | null>(null);
@@ -68,21 +64,19 @@ const ProductComponent = (props: ProductComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
-
    useEffect(function () {
       let fetchData = async () => {
          try {
-            let cUser = useCurrentUser()
             let { data } = await axios.get(
-               `http://192.168.0.100:5000/api/marketing/products/cl/${props.id}`
+               `http://192.168.175.183:5000/api/marketing/products/cl/${props?.id}`
             );
             if (data.status == "success") {
-               console.log("Comments and Likes -----", data.data);
+               // console.log("Comments and Likes -----", data.data);
                let ls: any[] = data.data.likes;
                let cs = data.data.comments;
                setProductComments(cs);
                setLikes(ls);
-               if (ls.map((like) => like.userId).includes(cUser?.id)) {
+               if (ls.map((like) => like.userId).includes(currentUser?.id)) {
                   setLiked(true);
                }
                // Alert.alert("Success",data.message)
@@ -96,23 +90,23 @@ const ProductComponent = (props: ProductComponentProps) => {
          }
       };
       fetchData();
-   }, []);
+   }, [currentUser,props]);
 
    useEffect(function () {
-      console.log("Fetching user");
+      // console.log("Fetching user");s
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${props.userId}`,
+               `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
             if (data.status == "success") {
                // console.log("Users-----", data.data);
-               SetPoster(data.data.personal);
+               // SetPoster(data.data.personal);
                // Alert.alert("Success",data.message)
                setLoading(false);
             } else {
@@ -126,15 +120,14 @@ const ProductComponent = (props: ProductComponentProps) => {
          }
       };
       fetchData();
-   }, []);
+   }, [props]);
 
-   
    const handleLike = async (productId: number) => {
       console.log(productId);
       try {
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.0.100:5000/api/marketing/products/likes/`,
+            `http://192.168.175.183:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
@@ -163,7 +156,7 @@ const ProductComponent = (props: ProductComponentProps) => {
       }
    };
 
-     const gotoUserProfile = () => {
+   const gotoUserProfile = () => {
       if (currentUser?.id === poster.id) {
          props.navigation.navigate("ProfileScreen", { userId: poster.id });
       } else {
@@ -207,13 +200,12 @@ const ProductComponent = (props: ProductComponentProps) => {
                   padding: 8,
                }}>
                <Pressable onPress={gotoUserProfile}>
-                   <Image
-                  style={styles.profileImage}
-                  source={{ uri: poster.profileImage }}
-               />
-
+                  <Image
+                     style={styles.profileImage}
+                     source={{ uri: poster.profileImage }}
+                  />
                </Pressable>
-              
+
                <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
                   {poster.firstName} {poster.middleName} {poster.lastName}
                </Text>
@@ -320,7 +312,10 @@ const ProductComponent = (props: ProductComponentProps) => {
                      // textColor={theme.colors.primary}
                      onPress={() =>
                         props.navigation.navigate("ProductScreen", {
-                           productId:props.id,userId:props.userId,affiliateId:props?.affiliateId && props.affiliateId[0]
+                           productId: props.id,
+                           userId: props.userId,
+                           affiliateId:
+                              props?.affiliateId && props.affiliateId[0],
                         })
                      }
                      mode="contained">

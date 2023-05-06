@@ -1,4 +1,12 @@
-import { Modal, StyleSheet, Text, View, Image, Alert,Pressable } from "react-native";
+import {
+   Modal,
+   StyleSheet,
+   Text,
+   View,
+   Image,
+   Alert,
+   Pressable,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { users } from "../../data";
 import { Feather, SimpleLineIcons } from "@expo/vector-icons";
@@ -13,7 +21,7 @@ const Comment = (props: CommentProps) => {
    const [commentor, setCommentor] = useState<any>(null);
    const [loading, setLoading] = useState<any>(false);
 
-   const navigation = useNavigation<any>()
+   const navigation = useNavigation<any>();
 
    useEffect(function () {
       console.log("Fetching user");
@@ -23,7 +31,7 @@ const Comment = (props: CommentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${props.userId}`,
+               `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -43,19 +51,17 @@ const Comment = (props: CommentProps) => {
          }
       };
       fetchData();
-      
-   }, []);
+   }, [props]);
 
    const handleEditComment = () => {};
 
-    const gotoUserProfile = () => {
+   const gotoUserProfile = () => {
       if (currentUser?.id === commentor.id) {
          navigation.navigate("ProfileScreen", { userId: commentor.id });
       } else {
          navigation.navigate("UserProfileScreen", { userId: commentor.id });
       }
    };
-
 
    return (
       <View style={styles.container}>
@@ -81,14 +87,13 @@ const Comment = (props: CommentProps) => {
          {commentor && (
             <View>
                <View style={styles.commentorMedia}>
-                  <Pressable onPress={gotoUserProfile} >
-                      <Image
-                     style={styles.profileImage}
-                     source={{ uri: commentor.profileImage }}
-                  />
-
+                  <Pressable onPress={gotoUserProfile}>
+                     <Image
+                        style={styles.profileImage}
+                        source={{ uri: commentor.profileImage }}
+                     />
                   </Pressable>
-                 
+
                   <View
                      style={{
                         backgroundColor: "#f5f5f5",
@@ -101,7 +106,11 @@ const Comment = (props: CommentProps) => {
                         {commentor.firstName} {commentor.middleName}{" "}
                         {commentor.lastName}
                      </Text>
-                     <Text style={{ fontFamily: "Poppins_300Light",paddingHorizontal:5 }}>
+                     <Text
+                        style={{
+                           fontFamily: "Poppins_300Light",
+                           paddingHorizontal: 5,
+                        }}>
                         {props.text}
                      </Text>
                      {/* <Text>Comment Likes</Text>  */}
@@ -116,8 +125,8 @@ const Comment = (props: CommentProps) => {
                         {(currentUser?.id == props?.userId ||
                            currentUser?.id == props?.posterId) && (
                            <View style={{ flexDirection: "row" }}>
-                               <Button onPress={() => setOpenModal(true)}>
-                                  <SimpleLineIcons name="options-vertical" />
+                              <Button onPress={() => setOpenModal(true)}>
+                                 <SimpleLineIcons name="options-vertical" />
                               </Button>
                            </View>
                         )}

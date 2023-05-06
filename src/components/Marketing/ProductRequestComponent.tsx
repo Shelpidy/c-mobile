@@ -14,7 +14,13 @@ import VideoPlayer from "../VideoPlayer";
 import TextViewer from "../TextViewer";
 import ProductComments from "./ProductComments";
 // import { postProductComments, postLikes, users } from "../../data";
-import { TextInput, useTheme, Button, IconButton, Divider } from "react-native-paper";
+import {
+   TextInput,
+   useTheme,
+   Button,
+   IconButton,
+   Divider,
+} from "react-native-paper";
 import {
    AntDesign,
    Entypo,
@@ -28,10 +34,8 @@ import TextShortener from "../TextShortener";
 import { Skeleton } from "@rneui/base";
 import { useCurrentUser } from "../../utils/CustomHooks";
 
-
 const initialState: Partial<MakePurchaseParams> = {};
 const { width } = Dimensions.get("window");
-
 
 const buyProductReducer = (
    state: Partial<MakePurchaseParams> = initialState,
@@ -53,7 +57,7 @@ const buyProductReducer = (
             ...state,
             affiliateId: action.payload,
          };
-    case "BUYERID":
+      case "BUYERID":
          return {
             ...state,
             buyerId: action.payload,
@@ -64,17 +68,20 @@ const buyProductReducer = (
 };
 
 type ProductRequestComponent = {
-    props: ProductComponentProps
-    navigation:any
-    refreshRequest:()=> void
-}
+   props: ProductComponentProps;
+   navigation: any;
+   refreshRequest: () => void;
+};
 
-const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent) => {
+const ProductRequestComponent = ({
+   props,
+   refreshRequest,
+}: ProductRequestComponent) => {
    const [productParams, dispatchProductParams] = useReducer(
       buyProductReducer,
       initialState
    );
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const [likes, setLikes] = useState<ProductLike[] | null>(null);
    const [poster, SetPoster] = useState<any>();
    const [liked, setLiked] = useState<boolean>(false);
@@ -83,15 +90,13 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
    const [loading2, setLoading2] = useState<boolean>(false);
    const theme = useTheme();
 
-
-
    useEffect(function () {
       console.log("Fetching user");
       setLoading(true);
       let fetchData = async () => {
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${props.userId}`,
+               `http://192.168.175.183:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -113,20 +118,20 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
       fetchData();
    }, []);
 
-    const handleDelete = async () => {
+   const handleDelete = async () => {
       setLoading1(true);
-      let productId = props.id
-      let userId = currentUser?.id
+      let productId = props.id;
+      let userId = currentUser?.id;
       try {
          let { data } = await axios.delete(
-            `http://192.168.0.100:5000/api/marketing/products/request/${productId}/${userId}`,
+            `http://192.168.175.183:5000/api/marketing/products/request/${productId}/${userId}`
          );
          if (data.status == "success") {
             console.log(data.data);
             // setComments([...comments, data.data]);
             // dispatchproductComment({ type: "TEXT", payload: "" });
-            Alert.alert("Success",data.message)
-            refreshRequest()
+            Alert.alert("Success", data.message);
+            refreshRequest();
          } else {
             Alert.alert("Failed", data.message);
          }
@@ -136,28 +141,27 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
          setLoading1(false);
       }
    };
-   
 
-    const handleBuy = async () => {
+   const handleBuy = async () => {
       setLoading2(true);
 
-      let buyObj:MakePurchaseParams = {
-         affiliateId:null,
+      let buyObj: MakePurchaseParams = {
+         affiliateId: null,
          productId: props?.id,
          userId: props?.userId,
-         buyerId:currentUser?.id
+         buyerId: currentUser?.id,
       };
       console.log(buyObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.100:5000/api/marketing/buy`,
+            `http://192.168.175.183:5000/api/marketing/buy`,
             buyObj
          );
          if (data.status == "success") {
             console.log(data.data);
             // setComments([...comments, data.data]);
             // dispatchproductComment({ type: "TEXT", payload: "" });
-            Alert.alert("Success",data.message)
+            Alert.alert("Success", data.message);
          } else {
             Alert.alert("Failed", data.message);
          }
@@ -170,18 +174,26 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
 
    if (!props.images) {
       return (
-        <View style={{padding:4}}>
-             <View style={{flexDirection:"row",marginVertical:4}}>
-            <Skeleton animation='wave'  width={45} height={45} circle  />
-            <Skeleton style={{borderRadius:5,paddingHorizontal:2}} animation='wave' width={305} height={45}/>
+         <View style={{ padding: 4 }}>
+            <View style={{ flexDirection: "row", marginVertical: 4 }}>
+               <Skeleton animation="wave" width={45} height={45} circle />
+               <Skeleton
+                  style={{ borderRadius: 5, paddingHorizontal: 2 }}
+                  animation="wave"
+                  width={305}
+                  height={45}
+               />
+            </View>
+            <View style={{ flexDirection: "row", marginVertical: 5 }}>
+               <Skeleton animation="wave" width={60} height={60} circle />
+               <Skeleton
+                  style={{ borderRadius: 5, paddingHorizontal: 2 }}
+                  animation="wave"
+                  width={290}
+                  height={60}
+               />
+            </View>
          </View>
-          <View style={{flexDirection:"row",marginVertical:5}}>
-            <Skeleton animation='wave'  width={60} height={60} circle  />
-            <Skeleton style={{borderRadius:5,paddingHorizontal:2}} animation='wave' width={290} height={60}/>
-         </View>
-
-        </View>
-        
       );
    }
 
@@ -193,7 +205,7 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
                   flexDirection: "row",
                   alignItems: "center",
                   padding: 8,
-                  backgroundColor:"#f9f9f9"
+                  backgroundColor: "#f9f9f9",
                }}>
                <Image
                   style={styles.profileImage}
@@ -204,28 +216,47 @@ const ProductRequestComponent = ({props,refreshRequest}:ProductRequestComponent)
                </Text>
             </View>
          )}
-        {/* <Divider/> */}
+         {/* <Divider/> */}
          <View
             style={{
                flexDirection: "row",
                marginVertical: 5,
                alignItems: "center",
-               justifyContent:"space-around",
-               
+               justifyContent: "space-around",
             }}>
-                <Image
-                style={styles.stockImage}
-                source={{ uri: JSON.parse(String(props.images))[0]}}
+            <Image
+               style={styles.stockImage}
+               source={{ uri: JSON.parse(String(props.images))[0] }}
+            />
+            <Text style={styles.productName}>
+               <TextShortener
+                  style={{
+                     textAlignVertical: "center",
+                     fontFamily: "Poppins_300Light",
+                  }}
+                  text={props.productName}
+                  textLength={10}
                />
-            <Text style={styles.productName}><TextShortener style={{textAlignVertical:"center",fontFamily:"Poppins_300Light"}} text={props.productName} textLength={10} /></Text>
+            </Text>
 
             <Text
                style={[styles.productPrice, { color: theme.colors.primary }]}>
                C{props?.price}
             </Text>
-            <Button loading={loading2} disabled={loading2} onPress={handleBuy} mode='contained'>Buy</Button>
-            <Button loading={loading1} disabled={loading1} onPress={handleDelete} mode='text'><Feather name="x"/></Button>
-
+            <Button
+               loading={loading2}
+               disabled={loading2}
+               onPress={handleBuy}
+               mode="contained">
+               Buy
+            </Button>
+            <Button
+               loading={loading1}
+               disabled={loading1}
+               onPress={handleDelete}
+               mode="text">
+               <Feather name="x" />
+            </Button>
          </View>
       </View>
    );
@@ -239,7 +270,7 @@ const styles = StyleSheet.create({
       // marginHorizontal:6,
       marginVertical: 4,
       borderRadius: 4,
-    //   paddingVertical: 10,
+      //   paddingVertical: 10,
       borderWidth: 1,
       borderColor: "#f3f3f3",
    },
@@ -297,9 +328,9 @@ const styles = StyleSheet.create({
       height: 35,
       borderRadius: 20,
    },
-    stockImage: {
+   stockImage: {
       width: 50,
       height: 50,
-      borderRadius:25
+      borderRadius: 25,
    },
 });

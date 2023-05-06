@@ -56,23 +56,22 @@ const postCommentReducer = (
       default:
          return state;
    }
-   
 };
 
 type NotificationProductReviewComponentProps = {
-    props: ProductComponentProps
-    buyerId:number
-}
+   props: ProductComponentProps;
+   buyerId: number;
+};
 
-const NotificationProductReviewComponent = ({props,buyerId}:NotificationProductReviewComponentProps) => {
-
-   const currentUser = useCurrentUser()
+const NotificationProductReviewComponent = ({
+   props,
+   buyerId,
+}: NotificationProductReviewComponentProps) => {
+   const currentUser = useCurrentUser();
    const [poster, SetPoster] = useState<any>();
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
-   const navigation = useNavigation<any>()
-
- 
+   const navigation = useNavigation<any>();
 
    useEffect(function () {
       console.log("Fetching user");
@@ -82,7 +81,7 @@ const NotificationProductReviewComponent = ({props,buyerId}:NotificationProductR
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${props.userId}`,
+               `http://192.168.175.183:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -103,9 +102,6 @@ const NotificationProductReviewComponent = ({props,buyerId}:NotificationProductR
       };
       fetchData();
    }, []);
-
-   
- 
 
    if (!poster) {
       return (
@@ -131,7 +127,6 @@ const NotificationProductReviewComponent = ({props,buyerId}:NotificationProductR
                <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
                   {poster.firstName} {poster.middleName} {poster.lastName}
                </Text>
-
             </View>
          )}
          <View>
@@ -172,28 +167,32 @@ const NotificationProductReviewComponent = ({props,buyerId}:NotificationProductR
                   styles.likeCommentAmountCon,
                   { borderColor: theme.colors.secondary },
                ]}>
-               <View style={{ flex: 1,flexDirection:"row"}}>
+               <View style={{ flex: 1, flexDirection: "row" }}>
                   <Button
                      // textColor={theme.colors.primary}
-                     style={{flex:1,borderColor:theme.colors.primary}}
+                     style={{ flex: 1, borderColor: theme.colors.primary }}
                      onPress={() =>
                         navigation.navigate("ProductScreen", {
-                           productId:props.id,userId:props.userId,affiliateId:props?.affiliateId && props.affiliateId[0]
+                           productId: props.id,
+                           userId: props.userId,
+                           affiliateId:
+                              props?.affiliateId && props.affiliateId[0],
                         })
                      }
-                     mode='outlined'>
+                     mode="outlined">
                      Preview
                   </Button>
                   <Button
-                  style={{marginHorizontal:5,flex:1}}
+                     style={{ marginHorizontal: 5, flex: 1 }}
                      // textColor={theme.colors.primary}
                      onPress={() =>
                         navigation.navigate("ChatScreen", {
-                            userId:buyerId
+                           userId: buyerId,
                         })
                      }
-                     mode='contained'>
-                        <AntDesign name="message1" style={{marginRight:2}} /> Message
+                     mode="contained">
+                     <AntDesign name="message1" style={{ marginRight: 2 }} />{" "}
+                     Message
                   </Button>
                </View>
                {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}

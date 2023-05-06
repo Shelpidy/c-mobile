@@ -1,10 +1,8 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react";
 import { Button } from "react-native-paper";
 import { FontAwesome5 } from "@expo/vector-icons";
 import ProductComment from "../components/Marketing/ProductComment";
-
-
 
 type CommentsViewerScreenProps = {
    navigation: any;
@@ -32,7 +30,6 @@ const ProductCommentsViewerScreen = ({
       );
       setNumberOfPageLinks(numOfPageLinks);
    }, [route.params]);
-
 
    return (
       <ScrollView style={styles.container}>

@@ -5,20 +5,22 @@ import FindFriendComponent from "./FindFriendComponent";
 import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { ActivityIndicator } from "react-native-paper";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 const FindFriendsComponent = ({ navigation }: any) => {
    const [users, setUsers] = useState<User[]>();
    const [loading, setLoading] = useState<boolean>(false);
+   const currentUser = useCurrentUser()
 
    useEffect(function () {
-      console.log("Fetching user");
+      console.log("Fetching ff user");
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
-         let activeUserId = 1;
+         let activeUserId = currentUser?.id;
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/media/unfollowing/${activeUserId}`,
+               `http://192.168.175.183:5000/api/media/unfollowing/${activeUserId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -38,7 +40,7 @@ const FindFriendsComponent = ({ navigation }: any) => {
          }
       };
       fetchData();
-   }, []);
+   }, [currentUser]);
 
    if (loading)
       return (

@@ -67,7 +67,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       postCommentReducer,
       initialState
    );
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const [post, setPost] = useState<PostComponentProps>();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [comments, setComments] = useState<Omit<CommentProps, "posterId">[]>(
@@ -78,10 +78,8 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
    const [liked, setLiked] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
-   const [textValue,setTextValue] = useState<string>("")
+   const [textValue, setTextValue] = useState<string>("");
    const theme = useTheme();
-
-  
 
    useEffect(() => {
       setPost(route.params);
@@ -90,12 +88,11 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
 
    useEffect(function () {
       let fetchData = async () => {
-      let _currentUser = useCurrentUser()
-      let activeUserId = _currentUser?.id
-      let postId = route.params.id;
+         let activeUserId = currentUser?.id;
+         let postId = route.params.id;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.100:5000/api/media/posts/cl/${postId}`
+               `http://192.168.175.183:5000/api/media/posts/cl/${postId}`
             );
             if (data.status == "success") {
                console.log(data.data);
@@ -116,7 +113,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
          }
       };
       fetchData();
-   }, []);
+   }, [currentUser]);
 
    useEffect(function () {
       console.log("Fetching user");
@@ -127,7 +124,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${userId}`,
+               `http://192.168.175.183:5000/api/auth/users/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -147,15 +144,15 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
          }
       };
       fetchData();
-   }, []);
+   }, [route]);
 
    const toggleEmojiPicker = () => {
       setShowEmojiPicker(!showEmojiPicker);
    };
 
-   const handleEmojiSelect =(emoji:any)=>{
-    setTextValue(textValue+emoji)
-   }
+   const handleEmojiSelect = (emoji: any) => {
+      setTextValue(textValue + emoji);
+   };
 
    const handleComment = async () => {
       setLoading(true);
@@ -169,7 +166,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.100:5000/api/media/posts/comments/`,
+            `http://192.168.175.183:5000/api/media/posts/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -192,7 +189,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       try {
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.0.100:5000/api/media/posts/likes/`,
+            `http://192.168.175.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -237,119 +234,123 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
 
    return (
       <View>
-      <ScrollView style={styles.postContainer}>
-         <Modal visible={openModal}>
-            
-            <View
-               style={{
-                  flex: 1,
-                  backgroundColor: "#ffffff88",
-                  justifyContent: "center",
-                  alignItems: "center",
-               }}>
-               <View
-                  style={{
-                     backgroundColor: "#ffffff",
-                     padding: 5,
-                     borderRadius: 4,
-                  }}>
-                  <Button onPress={() => setOpenModal(false)}>Back</Button>
-                  <Text>Comment Editor</Text>
-               </View>
-            </View>
-         </Modal>
-         {poster && (
-            <View
-               style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: 8,
-               }}>
-               <Image
-                  style={styles.profileImage}
-                  source={{ uri: poster.profileImage }}
-               />
-               <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
-                  {poster.firstName} {poster.middleName} {poster.lastName}
-               </Text>
+         <ScrollView style={styles.postContainer}>
+            <Modal visible={openModal}>
                <View
                   style={{
                      flex: 1,
-                     justifyContent: "flex-end",
-                     alignItems: "flex-end",
-                     marginBottom: 2,
-                     paddingHorizontal: 1,
-                     borderRadius: 3,
+                     backgroundColor: "#ffffff88",
+                     justifyContent: "center",
+                     alignItems: "center",
                   }}>
-                  {currentUser?.id == post?.userId && (
-                     <View>
-                        <Button style={{backgroundColor:"#f9f9f9"}} onPress={() => setOpenModal(true)}>
-                           <SimpleLineIcons name='options-vertical' />
-                        </Button>
-                     </View>
-                  )}
+                  <View
+                     style={{
+                        backgroundColor: "#ffffff",
+                        padding: 5,
+                        borderRadius: 4,
+                     }}>
+                     <Button onPress={() => setOpenModal(false)}>Back</Button>
+                     <Text>Comment Editor</Text>
+                  </View>
                </View>
-            </View>
-         )}
-         <View>
-            {post?.images && <ImagesViewer images={post?.images} />}
-            {/* {post?.video && <VideoPlayer video={post?.video}/>} */}
-         </View>
-         {post?.title && <Text style={styles.title}>{post?.title}</Text>}
-       
-         {post?.text && <TextViewer text={post.text} />}
-         <View>
-            <View
-               style={[
-                  styles.likeCommentAmountCon,
-                  { borderColor: theme.colors.secondary },
-               ]}>
+            </Modal>
+            {poster && (
                <View
                   style={{
                      flexDirection: "row",
                      alignItems: "center",
-                     justifyContent: "flex-start",
+                     padding: 8,
                   }}>
-                  <Pressable
-                     disabled={loading}
-                     onPress={() => handleLike(post.id)}>
-                     <Ionicons
-                        size={30}
-                        color={theme.colors.secondary}
-                        name={liked ? "heart-sharp" : "heart-outline"}
-                     />
-                  </Pressable>
-                  {/* <IconButton
+                  <Image
+                     style={styles.profileImage}
+                     source={{ uri: poster.profileImage }}
+                  />
+                  <Text
+                     style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
+                     {poster.firstName} {poster.middleName} {poster.lastName}
+                  </Text>
+                  <View
+                     style={{
+                        flex: 1,
+                        justifyContent: "flex-end",
+                        alignItems: "flex-end",
+                        marginBottom: 2,
+                        paddingHorizontal: 1,
+                        borderRadius: 3,
+                     }}>
+                     {currentUser?.id == post?.userId && (
+                        <View>
+                           <Button
+                              style={{ backgroundColor: "#f9f9f9" }}
+                              onPress={() => setOpenModal(true)}>
+                              <SimpleLineIcons name="options-vertical" />
+                           </Button>
+                        </View>
+                     )}
+                  </View>
+               </View>
+            )}
+            <View>
+               {post?.images && <ImagesViewer images={post?.images} />}
+               {/* {post?.video && <VideoPlayer video={post?.video}/>} */}
+            </View>
+            {post?.title && <Text style={styles.title}>{post?.title}</Text>}
+
+            {post?.text && <TextViewer text={post.text} />}
+            <View>
+               <View
+                  style={[
+                     styles.likeCommentAmountCon,
+                     { borderColor: theme.colors.secondary },
+                  ]}>
+                  <View
+                     style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                     }}>
+                     <Pressable
+                        disabled={loading}
+                        onPress={() => handleLike(post.id)}>
+                        <Ionicons
+                           size={30}
+                           color={theme.colors.secondary}
+                           name={liked ? "heart-sharp" : "heart-outline"}
+                        />
+                     </Pressable>
+                     {/* <IconButton
                      disabled={loading}
                      onPress={() => handleLike(post.id)}
                      mode="outlined"
                      size={20}
                      icon={liked ? "heart" : "heart-outline"}
                   /> */}
-                  <Text style={styles.commentAmountText}>{likes.length}</Text>
+                     <Text style={styles.commentAmountText}>
+                        {likes.length}
+                     </Text>
+                  </View>
+                  <View
+                     style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                     }}>
+                     <Pressable>
+                        <Ionicons
+                           size={30}
+                           color={theme.colors.secondary}
+                           name="chatbox-outline"
+                        />
+                     </Pressable>
+
+                     <Text style={styles.commentAmountText}>
+                        {comments.length}
+                     </Text>
+                  </View>
+                  {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
                </View>
-               <View
-                  style={{
-                     flexDirection: "row",
-                     alignItems: "center",
-                     justifyContent: "flex-start",
-                  }}>
-                  <Pressable>
-                     <Ionicons
-                        size={30}
-                        color={theme.colors.secondary}
-                        name="chatbox-outline"
-                     />
-                  </Pressable>
-                
-                  <Text style={styles.commentAmountText}>
-                     {comments.length}
-                  </Text>
-               </View>
-               {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
-            </View>
-           
-            {/* <Modal visible={showEmojiPicker}>
+
+               {/* <Modal visible={showEmojiPicker}>
                   <View style={{flex:1,backgroundColor:"#000000ff"}}>  
                      <View>
 
@@ -370,51 +371,62 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                   
                   </View>
             </Modal> */}
-            <KeyboardAvoidingView style={styles.commentBox}>
-               <TextInput
-                  value={textValue}
-                  onChangeText={(v) =>
-                      setTextValue(v)
-                  }
-                  style={[
-                     styles.commentInputField,
-                     { color: theme.colors.primary },
-                  ]}
-                  right={
-                     <TextInput.Icon
-                        disabled={loading}
-                        onPress={handleComment}
-                        icon="send"
-                     />
-                  }
-                  mode="outlined"
-                  multiline
-               />
-               <Entypo onPress= {toggleEmojiPicker} size={26} name="emoji-neutral" />
-            </KeyboardAvoidingView>
-            <View style={{ padding: 5, marginBottom: 10 }}>
-               <Comments
-                  posterId={post?.userId}
-                  navigation={navigation}
-                  comments={comments}
+               <KeyboardAvoidingView style={styles.commentBox}>
+                  <TextInput
+                     value={textValue}
+                     onChangeText={(v) => setTextValue(v)}
+                     style={[
+                        styles.commentInputField,
+                        { color: theme.colors.primary },
+                     ]}
+                     right={
+                        <TextInput.Icon
+                           disabled={loading}
+                           onPress={handleComment}
+                           icon="send"
+                        />
+                     }
+                     mode="outlined"
+                     multiline
+                  />
+                  <Entypo
+                     onPress={toggleEmojiPicker}
+                     size={26}
+                     name="emoji-neutral"
+                  />
+               </KeyboardAvoidingView>
+               <View style={{ padding: 5, marginBottom: 10 }}>
+                  <Comments
+                     posterId={post?.userId}
+                     navigation={navigation}
+                     comments={comments}
+                  />
+               </View>
+            </View>
+         </ScrollView>
+         {showEmojiPicker && (
+            <View
+               style={{
+                  position: "absolute",
+                  flex: 1,
+                  top: 60,
+                  left: 0,
+                  right: 0,
+                  height: 350,
+                  zIndex: 10,
+                  backgroundColor: "#ffffff",
+               }}>
+               <EmojiSelector
+                  onEmojiSelected={handleEmojiSelect}
+                  showHistory={true}
+                  showSearchBar={false}
+                  showTabs={false}
+                  showSectionTitles={false}
+                  category={Categories.all}
+                  columns={8}
                />
             </View>
-         </View>
-      </ScrollView>
-       {
-               showEmojiPicker && 
-               <View style={{position:"absolute",flex:1,top:60,left:0,right:0,height:350,zIndex:10,backgroundColor:"#ffffff"}}>
-                   <EmojiSelector
-                        onEmojiSelected={handleEmojiSelect}
-                           showHistory={true}
-                           showSearchBar={false}
-                           showTabs={false}
-                           showSectionTitles={false}
-                           category={Categories.all}
-                           columns={8}
-                        />
-               </View>
-            }
+         )}
       </View>
    );
 };

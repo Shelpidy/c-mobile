@@ -40,7 +40,9 @@ const ImagesViewer: any = ({ images }: ImageViewerProps) => {
             <ScrollView horizontal={true} style={{ width: "100%" }}>
                {JSON.parse(postImages).map((image: string, index: number) => {
                   return (
-                     <Pressable key={index.toString()} onPress={() => setImgIndex(index)}>
+                     <Pressable
+                        key={index.toString()}
+                        onPress={() => setImgIndex(index)}>
                         {/* <Text>Image Listing kkk kkfkfkkk</Text> */}
                         <Image
                            resizeMode="cover"

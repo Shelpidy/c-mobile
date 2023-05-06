@@ -10,6 +10,7 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 // } from "@siposdani87/expo-rich-text-editor";
 import axios from "axios";
 import { ImagePicker } from "expo-image-multiple-picker";
+import { useCurrentUser } from "../../utils/CustomHooks";
 
 type Post = Partial<Omit<PostComponentProps, "id" | "updatedAt" | "createdAt">>;
 
@@ -44,8 +45,7 @@ const UpdatePostForm = (post: NPostComponentProps) => {
    const [postState, postDispatch] = useReducer(postReducer, initialState);
    const [imageOpen, setImageOpen] = useState(false);
    const [videoOpen, setVideoOpen] = useState(false);
-   // const [album, setAlbum] = useState<Album | undefined>()
-   // const [assets, setAssets] = useState<Asset[]>([])
+   const currentUser = useCurrentUser()
    const theme = useTheme();
 
    useEffect(() => {
@@ -59,11 +59,10 @@ const UpdatePostForm = (post: NPostComponentProps) => {
 
    const handleUpdate = async () => {
       setLoading(true);
-      let activeUserId = 1;
       let postObj = { ...postState };
       try {
          let response = await axios.put(
-            "http://192.168.0.100:5000/api/media/posts/",
+            "http://192.168.175.183:5000/api/media/posts/",
             postObj
          );
          if (response.status === 202) {

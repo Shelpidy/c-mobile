@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import SearchForm from "../components/SearchForm";
 import PostProductFormNav from "../components/PostProductFormNav";
 import ProductRequestComponent from "../components/Marketing/ProductRequestComponent";
-import axios from "axios"
+import axios from "axios";
 
 // import { Products as _fetchedPost } from "../../data";
 
@@ -21,42 +21,46 @@ const UserProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const [loading2, setLoading2] = useState<boolean>(false);
    const [currentUser, setCurrentUser] = useState<CurrentUser>({});
-   const [refresh,setRefresh] = useState<number>(0);
+   const [refresh, setRefresh] = useState<number>(0);
 
-   useEffect(function () {
-      setLoading(true);
-      let fetchData = async () => {
-         let activeUserId = 1;
-         try {
-            let response = await fetch(
-               `http://192.168.0.100:5000/api/marketing/products/request/${activeUserId}`
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               console.log(data.data);
-               // setProducts(data.data);
-               let fetchedPost: ProductComponentProps[] = data.data;
-               let numOfPageLinks = Math.ceil(
-                  fetchedPost.length / numberOfProductsPerPage
+   useEffect(
+      function () {
+         setLoading(true);
+         let fetchData = async () => {
+            let activeUserId = 1;
+            try {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/marketing/products/request/${activeUserId}`
                );
-               // console.log(fetchedPost);
-               setAllProducts(fetchedPost);
-               setNumberOfPageLinks(numOfPageLinks);
-               const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
-               const lastIndex = currentIndex + numberOfProductsPerPage;
-               setProducts(data.data.slice(currentIndex, lastIndex));
-               // Alert.alert("Success",data.message)
-            } else {
-               Alert.alert("Failed", data.message);
+               let data = await response.json();
+               if (data.status == "success") {
+                  console.log(data.data);
+                  // setProducts(data.data);
+                  let fetchedPost: ProductComponentProps[] = data.data;
+                  let numOfPageLinks = Math.ceil(
+                     fetchedPost.length / numberOfProductsPerPage
+                  );
+                  // console.log(fetchedPost);
+                  setAllProducts(fetchedPost);
+                  setNumberOfPageLinks(numOfPageLinks);
+                  const currentIndex =
+                     numberOfProductsPerPage * (pageNumber - 1);
+                  const lastIndex = currentIndex + numberOfProductsPerPage;
+                  setProducts(data.data.slice(currentIndex, lastIndex));
+                  // Alert.alert("Success",data.message)
+               } else {
+                  Alert.alert("Failed", data.message);
+               }
+               setLoading(false);
+            } catch (err) {
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [refresh]);
+         };
+         fetchData();
+      },
+      [refresh]
+   );
 
    useEffect(() => {
       const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
@@ -73,9 +77,6 @@ const UserProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
       );
    }
 
-  
-
-
    const searchProducts = (_token: string) => {
       console.log("From product", _token);
       let token = _token.toLowerCase();
@@ -89,7 +90,7 @@ const UserProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
    };
 
    return (
-      <ScrollView style={{backgroundColor:"#f9f9f9"}}>
+      <ScrollView style={{ backgroundColor: "#f9f9f9" }}>
          {/* <Text>ProductsComponent {Products.length}</Text> */}
          <PostProductFormNav page="product" navigation={navigation} />
          <SearchForm setSearchValue={searchProducts} />
@@ -97,8 +98,8 @@ const UserProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
             return (
                <ProductRequestComponent
                   key={String(product.id)}
-                  props = {product}
-                  refreshRequest={()=> setRefresh(refresh + 1)}
+                  props={product}
+                  refreshRequest={() => setRefresh(refresh + 1)}
                   navigation={navigation}
                />
             );

@@ -13,7 +13,7 @@ import { useCurrentUser } from "../utils/CustomHooks";
 const { width } = Dimensions.get("window");
 
 const ProfileNavComponent = ({ navigation, user }: any) => {
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const theme = useTheme();
 
    return (
@@ -38,7 +38,6 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
             </View>
          )}
 
-       
          <View style={styles.navLink}>
             <Feather
                name="shopping-cart"

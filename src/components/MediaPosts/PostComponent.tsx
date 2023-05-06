@@ -65,7 +65,7 @@ const PostComponent = (props: NPostComponentProps) => {
       postCommentReducer,
       initialState
    );
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [comments, setComments] = useState<Omit<CommentProps, "posterId">[]>(
       []
@@ -76,14 +76,12 @@ const PostComponent = (props: NPostComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
-   
-
    useEffect(function () {
       let fetchData = async () => {
-         let activeUserId = 1;
+         let activeUserId = currentUser?.id;
          try {
             let { data } = await axios.get(
-               `http://192.168.0.100:5000/api/media/posts/cl/${props.id}`
+               `http://192.168.175.183:5000/api/media/posts/cl/${props?.id}`
             );
             if (data.status == "success") {
                // console.log(data.data);
@@ -105,7 +103,7 @@ const PostComponent = (props: NPostComponentProps) => {
          }
       };
       fetchData();
-   }, []);
+   }, [currentUser,props]);
 
    useEffect(function () {
       console.log("Fetching user");
@@ -115,7 +113,7 @@ const PostComponent = (props: NPostComponentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${props.userId}`,
+               `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -135,8 +133,7 @@ const PostComponent = (props: NPostComponentProps) => {
          }
       };
       fetchData();
-   }, [])
-
+   }, [props]);
 
    const gotoUserProfile = () => {
       if (currentUser?.id === poster.id) {
@@ -151,7 +148,7 @@ const PostComponent = (props: NPostComponentProps) => {
       try {
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.0.100:5000/api/media/posts/likes/`,
+            `http://192.168.175.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -236,7 +233,9 @@ const PostComponent = (props: NPostComponentProps) => {
                   }}>
                   {currentUser?.id == props?.userId && (
                      <View>
-                        <Button style={{backgroundColor:"#f9f9f9"}} onPress={() => setOpenModal(true)}>
+                        <Button
+                           style={{ backgroundColor: "#f9f9f9" }}
+                           onPress={() => setOpenModal(true)}>
                            <SimpleLineIcons name="options-vertical" />
                         </Button>
                      </View>
@@ -248,9 +247,18 @@ const PostComponent = (props: NPostComponentProps) => {
             {props.images && <ImagesViewer images={props.images} />}
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>
-         {props.title && <Text style={styles.title}>{props?.title}</Text> }
-         
-         {props?.text && <TextShortener style={{marginHorizontal:8,fontFamily:"Poppins_300Light"}} text={props.text} onPressViewMore={()=>props.navigation.navigate("FullPostViewScreen",{...props})} showViewMore={true} textLength={100}></TextShortener>}
+         {props.title && <Text style={styles.title}>{props?.title}</Text>}
+
+         {props?.text && (
+            <TextShortener
+               style={{ marginHorizontal: 8, fontFamily: "Poppins_300Light" }}
+               text={props.text}
+               onPressViewMore={() =>
+                  props.navigation.navigate("FullPostViewScreen", { ...props })
+               }
+               showViewMore={true}
+               textLength={100}></TextShortener>
+         )}
          <View>
             <View
                style={[
@@ -272,7 +280,7 @@ const PostComponent = (props: NPostComponentProps) => {
                         name={liked ? "heart-sharp" : "heart-outline"}
                      />
                   </Pressable>
-                 
+
                   <Text style={styles.commentAmountText}>{likes.length}</Text>
                </View>
                <View
@@ -288,14 +296,13 @@ const PostComponent = (props: NPostComponentProps) => {
                         name="chatbox-outline"
                      />
                   </Pressable>
-                 
+
                   <Text style={styles.commentAmountText}>
                      {comments.length}
                   </Text>
                </View>
-            
             </View>
-           
+
             <View style={{ padding: 5 }}>
                <Comments
                   posterId={props.userId}

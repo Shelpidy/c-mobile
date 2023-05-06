@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useEffect } from "react";
 import { Button } from "react-native-paper";
 import PostsComponent from "../components/MediaPosts/PostsComponent";
@@ -14,13 +14,11 @@ type HomeScreenProps = {
 };
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
-     
-   useEffect(()=>{
-      let currentUser = useCurrentUser()
-       if(!currentUser){
-            navigation.navigate("HomeStack",{screen:"LoginScreen"})
-         }
-   },[])
+   const currentUser = useCurrentUser()
+
+   if (!currentUser) {
+      return <View><ActivityIndicator/></View>
+   }
 
    return (
       <ScrollView style={styles.container}>

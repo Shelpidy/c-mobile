@@ -1,10 +1,10 @@
 declare type CurrentUser = {
-  id: number;
-  email: string;
-  accountNumber: string;
-  deviceId: string;
-  followingIds: number[];
-}
+   id: number;
+   email: string;
+   accountNumber: string;
+   deviceId: string;
+   followingIds: number[];
+};
 
 declare type CommentProps = {
    id?: number;
@@ -76,7 +76,7 @@ declare type ProductComponentProps = {
    description: string;
    images: string[];
    price: string;
-   affiliateId?:number[] | null
+   affiliateId?: number[] | null;
    initialPrice: string | null;
    affiliatePrice: string | null;
    sizes: string[] | null;
@@ -118,7 +118,7 @@ declare type Product = {
    description: string;
    images: string[];
    price: string;
-   affiliateId:number | number[] | null
+   affiliateId: number | number[] | null;
    initialPrice: string;
    affiliatePrice: string | null;
    sizes: string[];
@@ -151,20 +151,20 @@ declare type IMessage = {
 };
 
 declare type MakePurchaseParams = {
-     productId:any,
-     affiliateId:any,
-     userId:any,
-     buyerId:any
-}
+   productId: any;
+   affiliateId: any;
+   userId: any;
+   buyerId: any;
+};
 
 declare type CustomNotification = {
-        id:number
-        userId:number
-        title:string
-        message:string
-        readStatus:boolean
-        notificationFrom:number
-        createdAt:Date
-        notificationType:string
-        updatedAt:Date | null
-    }
+   id: number;
+   userId: number;
+   title: string;
+   message: string;
+   readStatus: boolean;
+   notificationFrom: number;
+   createdAt: Date;
+   notificationType: string;
+   updatedAt: Date | null;
+};

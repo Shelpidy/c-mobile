@@ -93,8 +93,12 @@ const HomeStack = (props: HomeStackProps) => {
             name="UserRequestScreen"
             component={UserRequestScreen}></Stack.Screen>
          <Stack.Screen name="ChatScreen" component={ChatScreen}></Stack.Screen>
-         <Stack.Screen name="SearchScreen" component={SearchScreen}></Stack.Screen>
-         <Stack.Screen name="ProductNotificationScreen" component={ProductNotificationScreen}></Stack.Screen>
+         <Stack.Screen
+            name="SearchScreen"
+            component={SearchScreen}></Stack.Screen>
+         <Stack.Screen
+            name="ProductNotificationScreen"
+            component={ProductNotificationScreen}></Stack.Screen>
       </Stack.Navigator>
    );
 };

@@ -47,7 +47,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.175.183:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -75,7 +75,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
          let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/media/posts/user/${userId}`
+               `http://192.168.175.183:5000/api/media/posts/user/${userId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -102,7 +102,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
          }
       };
       fetchData();
-   }, []);
+   }, [route]);
 
    useEffect(() => {
       const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
@@ -112,7 +112,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
 
    return (
       <ScrollView
-         style={{ flex: 1, backgroundColor: "#fafafa", paddingTop: 10 }}>
+         style={{ flex: 1, backgroundColor: "#f6f6f6", paddingTop: 10 }}>
          {!user && (
             <View>
                <ActivityIndicator />
@@ -132,7 +132,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                   <Text
                      style={{
                         textAlign: "center",
-                        marginVertical: 10,
+                        marginTop: 10,
                         fontFamily: "Poppins_500Medium",
                      }}>
                      {user?.personal?.fullName}
@@ -156,7 +156,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                               user: user?.personal,
                            })
                         }
-                        mode="elevated">
+                       >
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -187,7 +187,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                               user: user?.personal,
                            })
                         }
-                        mode="elevated">
+                       >
                         <Text
                            style={{
                               textAlign: "center",
@@ -208,7 +208,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                   }}>
                   200
                </Text>
-               <Button mode="elevated">
+               <Button>
                   <Text
                      style={{
                         fontWeight: "bold",
@@ -232,7 +232,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                      </Text>
                      <Button
                         style={{ backgroundColor: "#fff" }}
-                        mode="elevated">
+                       >
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -257,7 +257,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                      </Text>
                      <Button
                         style={{ backgroundColor: "#fff" }}
-                        mode="elevated">
+                       >
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -279,12 +279,13 @@ const ProfileScreen = ({ navigation, route }: any) => {
                user={user?.personal}
             />
          </View>
-         <SearchForm setSearchValue={(v) => searchPosts(v)} />
+        
          {!posts && (
             <View>
                <ActivityIndicator />
             </View>
          )}
+         {posts && posts.length > 1 && <SearchForm setSearchValue={(v) => searchPosts(v)} />}
          {posts &&
             posts.map((post) => {
                return (

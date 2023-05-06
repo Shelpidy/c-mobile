@@ -1,16 +1,15 @@
-import { StyleSheet, Text, View,Alert,ScrollView} from 'react-native'
-import React, { useState,useEffect } from 'react'
-import UserComponent from '../components/UserComponent'
-import ProductComponent from '../components/Marketing/ProductComponent'
-import NotificationProductReviewComponent from '../components/Notification/NotificationProductReviewComponent'
+import { StyleSheet, Text, View, Alert, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import UserComponent from "../components/UserComponent";
+import ProductComponent from "../components/Marketing/ProductComponent";
+import NotificationProductReviewComponent from "../components/Notification/NotificationProductReviewComponent";
 
-const ProductNotificationScreen = ({navigation,route}:any) => {
+const ProductNotificationScreen = ({ navigation, route }: any) => {
+   const [owner, setOwner] = useState<User | null>(null);
+   const [product, setProduct] = useState<ProductComponentProps | null>(null);
+   const [loading, setLoading] = useState<boolean>(false);
 
-  const [owner,setOwner] = useState<User | null>(null)
-  const [product,setProduct] = useState<ProductComponentProps | null>(null)
-  const [loading,setLoading] = useState<boolean>(false)
-
-    useEffect(function () {
+   useEffect(function () {
       console.log("Fetching user");
       setLoading(true);
       let fetchData = async () => {
@@ -18,14 +17,14 @@ const ProductNotificationScreen = ({navigation,route}:any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/notifications/product/${route.params.productId}`,
+               `http://192.168.175.183:5000/api/notifications/product/${route.params.productId}`,
                { method: "GET" }
             );
             let data = await response.json();
             if (data.status == "success") {
                console.log("Data-----", data.data);
                setOwner(data.data.owner);
-               setProduct(data.data.product)
+               setProduct(data.data.product);
                // Alert.alert("Success",data.message)
                setLoading(false);
             } else {
@@ -39,21 +38,26 @@ const ProductNotificationScreen = ({navigation,route}:any) => {
          }
       };
       fetchData();
-   }, []);
+   }, [route.params]);
 
-  return (
-    <ScrollView style={{backgroundColor:"#f5f5f5"}}>
-      <Text>ProductNotificationScreen</Text>
-      {owner && 
-      <View>
-         <UserComponent _user={owner} navigation={navigation} />
-         {product && <NotificationProductReviewComponent buyerId = {owner?.id} props={product} />}
-      </View>} 
+   return (
+      <ScrollView style={{ backgroundColor: "#f5f5f5" }}>
+         <Text>ProductNotificationScreen</Text>
+         {owner && (
+            <View>
+               <UserComponent _user={owner} navigation={navigation} />
+               {product && (
+                  <NotificationProductReviewComponent
+                     buyerId={owner?.id}
+                     props={product}
+                  />
+               )}
+            </View>
+         )}
+      </ScrollView>
+   );
+};
 
-    </ScrollView>
-  ) 
-}
+export default ProductNotificationScreen;
 
-export default ProductNotificationScreen
-
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

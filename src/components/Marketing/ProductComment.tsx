@@ -5,9 +5,8 @@ import { Feather, SimpleLineIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
 import { useCurrentUser } from "../../utils/CustomHooks";
 
-
 const Comment = (props: ProductCommentProps) => {
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [commentor, setCommentor] = useState<any>(null);
    const [loading, setLoading] = useState<any>(false);
@@ -20,7 +19,7 @@ const Comment = (props: ProductCommentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${props.userId}`,
+               `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -40,12 +39,10 @@ const Comment = (props: ProductCommentProps) => {
          }
       };
       fetchData();
-      
-   }, []);
+   }, [props]);
 
    const handleEditComment = () => {};
 
- 
    if (!commentor) {
       return (
          <View>
@@ -93,7 +90,11 @@ const Comment = (props: ProductCommentProps) => {
                         {commentor.firstName} {commentor.middleName}{" "}
                         {commentor.lastName}
                      </Text>
-                     <Text style={{ fontFamily: "Poppins_300Light",paddingHorizontal:5 }}>
+                     <Text
+                        style={{
+                           fontFamily: "Poppins_300Light",
+                           paddingHorizontal: 5,
+                        }}>
                         {props.text}
                      </Text>
                      {/* <Text>Comment Likes</Text>  */}
@@ -109,7 +110,7 @@ const Comment = (props: ProductCommentProps) => {
                            currentUser?.id == props?.posterId) && (
                            <View style={{ flexDirection: "row" }}>
                               <Button onPress={() => setOpenModal(true)}>
-                                  <SimpleLineIcons name="options-vertical" />
+                                 <SimpleLineIcons name="options-vertical" />
                               </Button>
                            </View>
                         )}

@@ -21,21 +21,19 @@ type PostProductFormNavProps = {
 const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
    const [poster, SetPoster] = useState<any>(null);
    const [loading, setLoading] = useState<boolean>(false);
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const { width, height } = Dimensions.get("window");
 
-   
-
    useEffect(function () {
-      console.log("Fetching user");
-      let user = useCurrentUser()
+      console.log("Fetching a user");
+      let user = currentUser;
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${user?.id}`,
+               `http://192.168.175.183:5000/api/auth/users/${user?.id}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -55,7 +53,7 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
          }
       };
       fetchData();
-   }, []);
+   }, [currentUser]);
 
    const gotoUserProfile = () => {
       if (currentUser?.id === poster.id) {
@@ -67,9 +65,19 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
 
    if (!poster) {
       return (
-         <View style={{justifyContent:"center",flexDirection:"row",marginVertical:5}}>
-             <Skeleton height={50} animation="wave" circle width={50} />
-             <Skeleton height={50} style={{borderRadius:20,marginLeft:4}} animation="wave" width={300} />
+         <View
+            style={{
+               justifyContent: "center",
+               flexDirection: "row",
+               marginVertical: 5,
+            }}>
+            <Skeleton height={50} animation="wave" circle width={50} />
+            <Skeleton
+               height={50}
+               style={{ borderRadius: 20, marginLeft: 4 }}
+               animation="wave"
+               width={300}
+            />
          </View>
       );
    }

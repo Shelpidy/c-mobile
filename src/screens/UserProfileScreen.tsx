@@ -11,7 +11,7 @@ import {
 import { ActivityIndicator, Button, useTheme } from "react-native-paper";
 import PostComponent from "../components/MediaPosts/PostComponent";
 import ProfileNavComponent from "../components/ProfileNavComponent";
-import axios from 'axios'
+import axios from "axios";
 import { AntDesign } from "@expo/vector-icons";
 import { useCurrentUser } from "../utils/CustomHooks";
 
@@ -26,11 +26,9 @@ const UserProfileScreen = ({ navigation, route }: any) => {
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
-   const  currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const [followed, setFollowed] = useState<boolean>(false);
 
-
-     
    useEffect(function () {
       console.log("Fetching user");
       console.log(route.params.userId);
@@ -39,39 +37,39 @@ const UserProfileScreen = ({ navigation, route }: any) => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
-            let _currentUser = useCurrentUser()
+           
             let response = await fetch(
-               `http://192.168.0.100:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.175.183:5000/api/auth/users/${route.params?.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
             if (data.status == "success") {
                console.log("Users-----", data.data);
                setUser(data.data);
-              
-                  if (_currentUser?.followingIds?.includes(data.data?.personal)) {
-                     setFollowed(true);
-                  }
-                     } else {
-                        Alert.alert("Failed", data.message);
-                     }
-                     setLoading(false);
-                  } catch (err) {
-                     console.log(err);
-                     Alert.alert("Failed", String(err));
-                     setLoading(false);
+
+               if (currentUser?.followingIds?.includes(data.data?.personal)) {
+                  setFollowed(true);
+               }
+            } else {
+               Alert.alert("Failed", data.message);
+            }
+            setLoading(false);
+         } catch (err) {
+            console.log(err);
+            Alert.alert("Failed", String(err));
+            setLoading(false);
          }
       };
       fetchData();
-   }, []);
+   }, [currentUser,route.params]);
 
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
-         let userId = route.params.userId;
+         let userId = route.params?.userId;
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/media/posts/user/${userId}`
+               `http://192.168.175.183:5000/api/media/posts/user/${userId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -102,7 +100,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
          }
       };
       fetchData();
-   }, []);
+   }, [route]);
 
    useEffect(() => {
       const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
@@ -110,11 +108,10 @@ const UserProfileScreen = ({ navigation, route }: any) => {
       setPosts(allPosts?.slice(currentIndex, lastIndex));
    }, [pageNumber]);
 
-
-     const handleFollow = async () => {
+   const handleFollow = async () => {
       try {
          let { data } = await axios.put(
-            `http://192.168.0.100:5000/api/media/follows/`,
+            `http://192.168.175.183:5000/api/media/follows/`,
             { followerId: currentUser?.id, followingId: user?.personal.id },
             { headers: { Accept: "application/json" } }
          );
@@ -133,7 +130,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
    };
 
    return (
-      <ScrollView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
+      <ScrollView style={{ flex: 1, backgroundColor: "#f6f6f6",paddingTop:5 }}>
          {!user && (
             <View>
                <ActivityIndicator />
@@ -153,13 +150,13 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                   <Text
                      style={{
                         textAlign: "center",
-                        marginVertical: 10,
+                        marginTop: 10,
                         fontFamily: "Poppins_600SemiBold",
                      }}>
                      {user?.personal?.fullName}
                   </Text>
                </View>
-                <ScrollView horizontal style={styles.mediaContainer}>
+               <ScrollView horizontal style={styles.mediaContainer}>
                   <View style={{ alignItems: "center", margin: 4 }}>
                      <Text
                         style={{
@@ -171,13 +168,13 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                         {user?.followers?.count}
                      </Text>
                      <Button
-                        style={{ backgroundColor: "#fff" }}
+                         style={{ backgroundColor: "#fff" }}
                         onPress={() =>
                            navigation.navigate("FollowersScreen", {
                               user: user?.personal,
                            })
                         }
-                        mode="elevated">
+                        >
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -208,7 +205,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                               user: user?.personal,
                            })
                         }
-                        mode="elevated">
+                    >
                         <Text
                            style={{
                               textAlign: "center",
@@ -253,7 +250,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      </Text>
                      <Button
                         style={{ backgroundColor: "#fff" }}
-                        mode="elevated">
+                    >
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -278,7 +275,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      </Text>
                      <Button
                         style={{ backgroundColor: "#fff" }}
-                        mode="elevated">
+                    >
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -291,20 +288,33 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      </Button>
                   </View>
                </ScrollView>
-               <View style={{flex:1,flexDirection:"row",justifyContent:"center",paddingHorizontal:3,gap:2,marginBottom:10}}>
-                <Button
-                labelStyle={{color:theme.colors.primary}}
+               <View
+                  style={{
+                     flex: 1,
+                     flexDirection: "row",
+                     justifyContent: "center",
+                     paddingHorizontal: 3,
+                     gap: 2,
+                     marginBottom: 10,
+                  }}>
+                  <Button
+                     labelStyle={{ color: theme.colors.primary }}
                      onPress={handleFollow}
-                    style={{flex:1,borderColor:theme.colors.primary}}
-                     mode={followed ? "outlined" : 'contained-tonal'}>
+                     style={{ flex: 1, borderColor: theme.colors.primary }}
+                     mode={followed ? "outlined" : "contained-tonal"}>
                      {followed ? "unfollow" : "follow"}
                   </Button>
-               <Button mode='contained'  style={{flex:2}} onPress={() => navigation.navigate("ChatScreen",{user:user?.personal})}>
-                  <AntDesign name='message1' />  message
-               </Button>
-
+                  <Button
+                     mode="contained"
+                     style={{ flex: 2 }}
+                     onPress={() =>
+                        navigation.navigate("ChatScreen", {
+                           user: user?.personal,
+                        })
+                     }>
+                     <AntDesign name="message1" /> message
+                  </Button>
                </View>
-              
             </>
          )}
 

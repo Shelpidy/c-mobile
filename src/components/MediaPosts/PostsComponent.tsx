@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import PostComponent from "./PostComponent";
 import axios from "axios";
 import { posts as _fetchedPost } from "../../data";
+import { useCurrentUser } from "../../utils/CustomHooks";
 
 type PostsComponentProps = {
    navigation?: any;
@@ -15,14 +16,15 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
+   const currentUser = useCurrentUser()
 
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
-         let activeUserId = 1;
+         let activeUserId = currentUser?.id;
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/media/posts/${activeUserId}`
+               `http://192.168.175.183:5000/api/media/posts/${activeUserId}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -49,7 +51,8 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
          }
       };
       fetchData();
-   }, []);
+   }, [currentUser]);
+
    useEffect(() => {
       const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
       const lastIndex = currentIndex + numberOfPostsPerPage;

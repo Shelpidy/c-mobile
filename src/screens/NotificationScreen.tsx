@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Skeleton, ThemeConsumer } from "@rneui/themed";
-import { Button, useTheme,ActivityIndicator } from "react-native-paper";
+import { Button, useTheme, ActivityIndicator } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
 import NotificationComponent from "../components/TransactionNotificationComponent";
 import ProductNotificationComponent from "../components/ProductNotificationComponent";
@@ -19,22 +19,22 @@ import { useCurrentUser } from "../utils/CustomHooks";
 
 const { width, height } = Dimensions.get("screen");
 
-const NotificationScreen = ({navigation}:any) => {
-   const [notifications, setNotifications] = useState<CustomNotification[] | null>(null);
+const NotificationScreen = ({ navigation }: any) => {
+   const [notifications, setNotifications] = useState<
+      CustomNotification[] | null
+   >(null);
    const [loading, setLoading] = useState<boolean>(false);
-   const currentUser = useCurrentUser()
-   const theme = useTheme()
+   const currentUser = useCurrentUser();
+   const theme = useTheme();
 
    useEffect(function () {
       console.log("Fetching user");
       setLoading(true);
       let fetchData = async () => {
-         // console.log("Fetching user")
-         let _currentUser = useCurrentUser()
-         let activeUserId = _currentUser?.id;
+         let activeUserId = currentUser?.id;
          try {
             let response = await fetch(
-               `http://192.168.0.100:5000/api/notifications/${activeUserId}`,
+               `http://192.168.175.183:5000/api/notifications/${activeUserId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -54,31 +54,41 @@ const NotificationScreen = ({navigation}:any) => {
          }
       };
       fetchData();
-   }, []);
-
+   }, [currentUser]);
 
    if (!notifications) {
       return (
-          <View style={styles.notContainer}>
+         <View style={styles.notContainer}>
             <ActivityIndicator></ActivityIndicator>
-          </View>
+         </View>
       );
    }
    return (
       <ScrollView style={styles.container}>
          {notifications.map((notification) => {
-            if(notification.title === 'Buy Transaction'){
-               return(<ProductNotificationComponent key={String(notification.id)} notification={notification} navigation={navigation}  />)
+            if (notification.title === "Buy Transaction") {
+               return (
+                  <ProductNotificationComponent
+                     key={String(notification.id)}
+                     notification={notification}
+                     navigation={navigation}
+                  />
+               );
+            } else if (notification.title === "Money Transaction") {
+               return (
+                  <TransactionNotificationComponent
+                     key={String(notification.id)}
+                     notification={notification}
+                     navigation={navigation}
+                  />
+               );
+            } else {
+               return (
+                  <View>
+                     <Text>No other notification</Text>
+                  </View>
+               );
             }
-            else if(notification.title === 'Money Transaction'){
-               return <TransactionNotificationComponent  key={String(notification.id)} notification={notification} navigation={navigation}  />
-               
-            }
-            else{
-               return <View><Text>No other notification</Text></View>
-            }
-        
-         
          })}
       </ScrollView>
    );
@@ -88,13 +98,12 @@ export default NotificationScreen;
 
 const styles = StyleSheet.create({
    container: {
-      backgroundColor: "#f5f5f5"
-      
+      backgroundColor: "#f5f5f5",
    },
    notContainer: {
       backgroundColor: "#ffffff",
-      flex:1,
-      justifyContent:"center",
-      alignItems:"center"
-   }
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+   },
 });

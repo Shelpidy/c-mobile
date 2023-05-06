@@ -19,22 +19,13 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
-  
-
-   useEffect(()=>{
-      let currentUser = useCurrentUser()
-       if(!currentUser){
-            navigation.navigate("HomeStack",{screen:"LoginScreen"})
-         }
-   },[])
 
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
-
          try {
             let response = await fetch(
-               "http://192.168.0.100:5000/api/marketing/products"
+               "http://192.168.175.183:5000/api/marketing/products"
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -62,6 +53,8 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       };
       fetchData();
    }, []);
+
+
    useEffect(() => {
       const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
       const lastIndex = currentIndex + numberOfProductsPerPage;
@@ -90,7 +83,7 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
    };
 
    return (
-      <ScrollView style={{backgroundColor:"#f9f9f9"}}>
+      <ScrollView style={{ backgroundColor: "#f9f9f9" }}>
          {/* <Text>ProductsComponent {Products.length}</Text> */}
          <PostProductFormNav page="product" navigation={navigation} />
          <SearchForm setSearchValue={searchProducts} />

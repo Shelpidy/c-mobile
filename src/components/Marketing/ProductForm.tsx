@@ -10,6 +10,7 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 // } from "@siposdani87/expo-rich-text-editor";
 import axios from "axios";
 import { ImagePicker } from "expo-image-multiple-picker";
+import { useCurrentUser } from "../../utils/CustomHooks";
 
 type Post = Partial<Omit<PostComponentProps, "id" | "updatedAt" | "createdAt">>;
 
@@ -40,17 +41,18 @@ const ProductForm = () => {
    const [postState, postDispatch] = useReducer(postReducer, initialState);
    const [imageOpen, setImageOpen] = useState(false);
    const [videoOpen, setVideoOpen] = useState(false);
+   const currentUser = useCurrentUser()
    // const [album, setAlbum] = useState<Album | undefined>()
    // const [assets, setAssets] = useState<Asset[]>([])
    const theme = useTheme();
 
    const handlePost = async () => {
       setLoading(true);
-      let activeUserId = 1;
+      let activeUserId = currentUser?.id;
       let postObj = { ...postState, userId: activeUserId };
       try {
          let response = await axios.post(
-            "http://192.168.0.100:5000/api/media/posts/",
+            "http://192.168.175.183:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {

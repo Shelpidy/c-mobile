@@ -25,18 +25,19 @@ const FollowerComponent = ({
    const theme = useTheme();
    const [followed, setFollowed] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
+
+
    useEffect(() => {
-      let _currentUser = useCurrentUser()
-      if (_currentUser?.followingIds?.includes(user.id)) {
+      if (currentUser?.followingIds?.includes(user.id)) {
          setFollowed(true);
       }
-   }, []);
+   }, [currentUser]);
 
    const handleFollow = async (userId: number) => {
       try {
          let { data } = await axios.put(
-            `http://192.168.0.100:5000/api/media/follows/`,
+            `http://192.168.175.183:5000/api/media/follows/`,
             { followerId: 1, followingId: userId },
             { headers: { Accept: "application/json" } }
          );
