@@ -21,9 +21,10 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
    useEffect(function () {
       setLoading(true);
       let fetchData = async () => {
-         let activeUserId = currentUser?.id;
          try {
-            let response = await fetch(
+             if(currentUser){
+                let activeUserId = currentUser?.id;
+                let response = await fetch(
                `http://192.168.175.183:5000/api/media/posts/${activeUserId}`
             );
             let data = await response.json();
@@ -44,6 +45,9 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
             } else {
                Alert.alert("Failed", data.message);
             }
+            
+             }
+        
             setLoading(false);
          } catch (err) {
             Alert.alert("Failed", String(err));

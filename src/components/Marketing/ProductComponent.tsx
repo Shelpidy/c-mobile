@@ -10,12 +10,11 @@ import {
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../ImagesViewer";
-import VideoPlayer from "../VideoPlayer";
-import TextViewer from "../TextViewer";
+import TextShortener from "../TextShortener";
 import ProductComments from "./ProductComments";
 // import { postProductComments, postLikes, users } from "../../data";
 import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Ionicons, Feather,SimpleLineIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { useCurrentUser } from "../../utils/CustomHooks";
 // import UpdateProductForm from "./UpdateProduct";
@@ -67,7 +66,8 @@ const ProductComponent = (props: ProductComponentProps) => {
    useEffect(function () {
       let fetchData = async () => {
          try {
-            let { data } = await axios.get(
+            if(props){
+                let { data } = await axios.get(
                `http://192.168.175.183:5000/api/marketing/products/cl/${props?.id}`
             );
             if (data.status == "success") {
@@ -83,6 +83,9 @@ const ProductComponent = (props: ProductComponentProps) => {
             } else {
                Alert.alert("Failed", data.message);
             }
+
+            }
+           
             setLoading(false);
          } catch (err) {
             Alert.alert("Failed", String(err));
@@ -99,19 +102,25 @@ const ProductComponent = (props: ProductComponentProps) => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
-            let response = await fetch(
+            if(props){
+                 let response = await fetch(
                `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
                { method: "GET" }
             );
-            let data = await response.json();
-            if (data.status == "success") {
+          
+            if (response.ok) {
+                 let data = await response.json();
                // console.log("Users-----", data.data);
-               // SetPoster(data.data.personal);
+               SetPoster(data.data.personal);
                // Alert.alert("Success",data.message)
                setLoading(false);
             } else {
+                 let data = await response.json();
                Alert.alert("Failed", data.message);
             }
+
+            }
+          
             setLoading(false);
          } catch (err) {
             console.log(err);
@@ -219,9 +228,11 @@ const ProductComponent = (props: ProductComponentProps) => {
                      borderRadius: 3,
                   }}>
                   {currentUser?.id == props?.userId && (
-                     <View>
-                        <Button onPress={() => setOpenModal(true)}>
-                           <Feather name="edit" /> Edit Post
+                      <View>
+                        <Button
+                           style={{ backgroundColor: "#f9f9f9" }}
+                           onPress={() => setOpenModal(true)}>
+                           <SimpleLineIcons name="options-vertical" />
                         </Button>
                      </View>
                   )}
@@ -259,7 +270,21 @@ const ProductComponent = (props: ProductComponentProps) => {
             {/* <Button  mode='contained'>Affiliate</Button> */}
          </View>
 
-         {props?.description && <TextViewer text={props.description} />}
+          {props?.description && (
+            <TextShortener
+               style={{ marginHorizontal: 8, fontFamily: "Poppins_300Light" }}
+               text={props.description}
+                 onPressViewMore = {() =>
+                        props.navigation.navigate("ProductScreen", {
+                           productId: props.id,
+                           userId: props.userId,
+                           affiliateId:
+                              props?.affiliateId && props.affiliateId[0],
+                        })
+                     }
+               showViewMore={true}
+               textLength={100}></TextShortener>
+         )}
          <View>
             <View
                style={[
@@ -295,6 +320,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                      flexDirection: "row",
                      alignItems: "center",
                      justifyContent: "flex-start",
+                    
                   }}>
                   <Pressable>
                      <Ionicons
@@ -387,8 +413,9 @@ const styles = StyleSheet.create({
    likeCommentAmountCon: {
       flexDirection: "row",
       // justifyContent: "space-between",
-      gap: 25,
-      padding: 10,
+      gap: 13,
+      paddingHorizontal: 10,
+      paddingVertical:6,
       // borderWidth:1,
       marginLeft: 10,
       borderRadius: 20,

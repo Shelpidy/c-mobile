@@ -37,16 +37,17 @@ const ProductNotificationComponent = ({
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.175.183:5000/api/marketing/products/${notification.notificationFrom}`,
+               `http://192.168.175.183:5000/api/marketing/products/${notification?.notificationFrom}`,
                { method: "GET" }
             );
-            let data = await response.json();
-            if (data.status == "success") {
+            if (response.ok) {
+               let data = await response.json();
                console.log("Products-----", data.data);
                setNotFrom(data.data);
                // Alert.alert("Success",data.message)
                setLoading(false);
             } else {
+               let data = await response.json();
                Alert.alert("Failed", data.message);
             }
             setLoading(false);
@@ -57,7 +58,7 @@ const ProductNotificationComponent = ({
          }
       };
       fetchData();
-   }, []);
+   }, [notification]);
 
    const handleNotification = async () => {
       let notId = notification.id;

@@ -9,6 +9,7 @@ import {
    ScrollView,
    Pressable,
    KeyboardAvoidingView,
+   TextInput
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../components/ImagesViewer";
@@ -16,7 +17,7 @@ import VideoPlayer from "../components/VideoPlayer";
 import TextViewer from "../components/TextViewer";
 import Comments from "../components/MediaPosts/Comments";
 import { postComments, postLikes, users } from "../data";
-import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
+import {useTheme, Button, IconButton } from "react-native-paper";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import {
    AntDesign,
@@ -371,7 +372,41 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                   
                   </View>
             </Modal> */}
-               <KeyboardAvoidingView style={styles.commentBox}>
+                <View
+         style={{
+            paddingHorizontal: 15,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+         }}>
+         <TextInput
+            value={textValue}
+            placeholder="Comment here..."
+            onChangeText={(v) =>setTextValue(v)}
+            style={{
+               flex: 1,
+               backgroundColor:"#f6f6f6",
+               borderTopLeftRadius: 20,
+               borderBottomLeftRadius: 20,
+               height: 50,
+               paddingHorizontal: 25,
+            }}
+         />
+         <Pressable
+            onPress={handleComment}
+            style={{
+               paddingHorizontal: 20,
+               height: 50,
+               alignItems: "center",
+               justifyContent: "center",
+               borderTopRightRadius: 20,
+               borderBottomRightRadius: 20,
+               backgroundColor:"#f6f6f6",
+            }}>
+            <FontAwesome color={theme.colors.primary} name="comment-o" size={23} />
+         </Pressable>
+      </View>
+               {/* <KeyboardAvoidingView style={styles.commentBox}>
                   <TextInput
                      value={textValue}
                      onChangeText={(v) => setTextValue(v)}
@@ -394,7 +429,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                      size={26}
                      name="emoji-neutral"
                   />
-               </KeyboardAvoidingView>
+               </KeyboardAvoidingView> */}
                <View style={{ padding: 5, marginBottom: 10 }}>
                   <Comments
                      posterId={post?.userId}

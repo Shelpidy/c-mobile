@@ -30,7 +30,8 @@ const Comment = (props: CommentProps) => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
-            let response = await fetch(
+            if(props){
+                 let response = await fetch(
                `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
                { method: "GET" }
             );
@@ -43,6 +44,9 @@ const Comment = (props: CommentProps) => {
             } else {
                Alert.alert("Failed", data.message);
             }
+
+            }
+          
             setLoading(false);
          } catch (err) {
             console.log(err);
@@ -98,14 +102,25 @@ const Comment = (props: CommentProps) => {
                      style={{
                         backgroundColor: "#f5f5f5",
                         flex: 1,
-                        borderRadius: 5,
-                        paddingHorizontal: 4,
+                        borderRadius: 30,
+                        paddingHorizontal: 15,
                         paddingVertical: 6,
                      }}>
-                     <Text style={styles.userFullName}>
-                        {commentor.firstName} {commentor.middleName}{" "}
-                        {commentor.lastName}
-                     </Text>
+                     <View style={{flex:1,flexDirection:'row',alignItems:"center",justifyContent:"space-between"}}>
+                         <Text style={styles.userFullName}>
+                           {commentor.firstName} {commentor.middleName}{" "}
+                           {commentor.lastName}
+                        </Text>
+                           {(currentUser?.id == props?.userId ||
+                           currentUser?.id == props?.posterId) && (
+                           <View style={{ flexDirection: "row" }}>
+                              <Button style={{backgroundColor:"#fff"}} onPress={() => setOpenModal(true)}>
+                                 <SimpleLineIcons name="options-vertical" />
+                              </Button>
+                           </View>
+                        )}
+                     </View>
+                    
                      <Text
                         style={{
                            fontFamily: "Poppins_300Light",
@@ -122,14 +137,7 @@ const Comment = (props: CommentProps) => {
                            paddingHorizontal: 5,
                            borderRadius: 3,
                         }}>
-                        {(currentUser?.id == props?.userId ||
-                           currentUser?.id == props?.posterId) && (
-                           <View style={{ flexDirection: "row" }}>
-                              <Button onPress={() => setOpenModal(true)}>
-                                 <SimpleLineIcons name="options-vertical" />
-                              </Button>
-                           </View>
-                        )}
+                       
                      </View>
                   </View>
                </View>

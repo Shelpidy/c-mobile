@@ -32,7 +32,6 @@ const UserProfileScreen = ({ navigation, route }: any) => {
    useEffect(function () {
       console.log("Fetching user");
       console.log(route.params.userId);
-      setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
@@ -61,10 +60,9 @@ const UserProfileScreen = ({ navigation, route }: any) => {
          }
       };
       fetchData();
-   }, [currentUser,route.params]);
+   }, [currentUser,route.params,followed]);
 
    useEffect(function () {
-      setLoading(true);
       let fetchData = async () => {
          let userId = route.params?.userId;
          try {
@@ -109,6 +107,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
    }, [pageNumber]);
 
    const handleFollow = async () => {
+      setLoading(true)
       try {
          let { data } = await axios.put(
             `http://192.168.175.183:5000/api/media/follows/`,
@@ -298,6 +297,8 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      marginBottom: 10,
                   }}>
                   <Button
+                     loading = {loading}
+                     disabled={loading}
                      labelStyle={{ color: theme.colors.primary }}
                      onPress={handleFollow}
                      style={{ flex: 1, borderColor: theme.colors.primary }}

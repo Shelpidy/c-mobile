@@ -80,7 +80,8 @@ const PostComponent = (props: NPostComponentProps) => {
       let fetchData = async () => {
          let activeUserId = currentUser?.id;
          try {
-            let { data } = await axios.get(
+            if(props){
+                  let { data } = await axios.get(
                `http://192.168.175.183:5000/api/media/posts/cl/${props?.id}`
             );
             if (data.status == "success") {
@@ -96,6 +97,9 @@ const PostComponent = (props: NPostComponentProps) => {
             } else {
                Alert.alert("Failed", data.message);
             }
+
+            }
+         
             setLoading(false);
          } catch (err) {
             Alert.alert("Failed", String(err));
@@ -112,7 +116,8 @@ const PostComponent = (props: NPostComponentProps) => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
-            let response = await fetch(
+            if(props){
+                 let response = await fetch(
                `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
                { method: "GET" }
             );
@@ -125,6 +130,9 @@ const PostComponent = (props: NPostComponentProps) => {
             } else {
                Alert.alert("Failed", data.message);
             }
+
+            }
+          
             setLoading(false);
          } catch (err) {
             console.log(err);
@@ -346,8 +354,9 @@ const styles = StyleSheet.create({
    likeCommentAmountCon: {
       flexDirection: "row",
       // justifyContent: "space-between",
-      gap: 25,
-      padding: 10,
+      gap: 20,
+      paddingHorizontal: 10,
+      paddingVertical:4,
       // borderWidth:1,
       marginLeft: 10,
       borderRadius: 20,

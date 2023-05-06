@@ -17,9 +17,11 @@ const FindFriendsComponent = ({ navigation }: any) => {
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
-         let activeUserId = currentUser?.id;
+       
          try {
-            let response = await fetch(
+            if(currentUser){
+               let activeUserId = currentUser?.id;
+               let response = await fetch(
                `http://192.168.175.183:5000/api/media/unfollowing/${activeUserId}`,
                { method: "GET" }
             );
@@ -32,6 +34,9 @@ const FindFriendsComponent = ({ navigation }: any) => {
             } else {
                Alert.alert("Failed", data.message);
             }
+
+            }
+           
             setLoading(false);
          } catch (err) {
             console.log(err);

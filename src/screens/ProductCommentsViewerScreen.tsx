@@ -60,7 +60,7 @@ export default ProductCommentsViewerScreen;
 const styles = StyleSheet.create({
    container: {
       backgroundColor: "#fff",
-      paddingVertical: 10,
-      paddingHorizontal: 15,
+      paddingVertical: 2,
+      paddingHorizontal: 10,
    },
 });

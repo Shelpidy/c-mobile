@@ -17,6 +17,7 @@ import {
    Alert,
    Image,
    Pressable,
+   TextInput
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
@@ -25,8 +26,54 @@ import { StyleSheet } from "react-native";
 import TextShortener from "../components/TextShortener";
 import { useCurrentUser } from "../utils/CustomHooks";
 
+
+type ChatBoxProps = {
+   onSend:()=> void
+   onTextInput:(v:string)=> void
+}
+
+const ChatBox = ({onSend,onTextInput}:ChatBoxProps)=>{
+   
+   const theme = useTheme()
+   return(
+          <View
+         style={{
+            paddingHorizontal: 15,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+         }}>
+         <TextInput
+            placeholder="Type here..."
+            onChangeText={(v) =>onTextInput(v)}
+            style={{
+               flex: 1,
+               backgroundColor:"#f6f6f6",
+               borderTopLeftRadius: 20,
+               borderBottomLeftRadius: 20,
+               height: 50,
+               paddingHorizontal: 25,
+            }}
+         />
+         <Pressable
+            onPress={onSend}
+            style={{
+               paddingHorizontal: 20,
+               height: 50,
+               alignItems: "center",
+               justifyContent: "center",
+               borderTopRightRadius: 20,
+               borderBottomRightRadius: 20,
+               backgroundColor:"#f6f6f6",
+            }}>
+            <FontAwesome color={theme.colors.primary} name="send-o" size={23} />
+         </Pressable>
+      </View>
+   )
+}
+
 const ChatScreen = ({ navigation, route }: any) => {
-   const [messages, setMessages] = useState<IMessage[]>([]);
+   const [messages, setMessages] = useState<IMessage[] | null >(null);
    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
    const theme = useTheme();
    const [fileUri, setFileUri] = useState<any>(null);
@@ -35,6 +82,8 @@ const ChatScreen = ({ navigation, route }: any) => {
    const currentUser = useCurrentUser();
    const [secondUser, setSecondUser] = useState<User>();
    const [socket, setSocket] = useState<Socket | null>(null);
+
+
 
    const toggleEmojiPicker = () => {
       setShowEmojiPicker(!showEmojiPicker);
@@ -80,8 +129,13 @@ const ChatScreen = ({ navigation, route }: any) => {
 
          socket.on(String(roomId), (message: any) => {
             console.log("From Server", message);
-            setMessages((previousMessages) =>
-               GiftedChat.append(previousMessages, message)
+            setMessages((previousMessages) =>{
+               if(previousMessages) { 
+                  return GiftedChat.append(previousMessages, message)
+               }
+               return  GiftedChat.append([], message)
+            }
+           
             );
          });
       }
@@ -111,23 +165,22 @@ const ChatScreen = ({ navigation, route }: any) => {
       fetchData();
    }, [currentUser]);
 
-   const onSend = useCallback(
-      (message: IMessage) => {
+   const onSend = () => {
          let secUser = route.params.user.id;
          let activeUser = currentUser?.id;
          let roomId = generateRoomId(secUser, activeUser);
          let sendData = {
             senderId: route.params.user.id,
-            receipientId: message.user._id,
-            text: message.text,
+            receipientId: currentUser?.id,
+            text: textValue,
             roomId: roomId,
          };
          console.log(sendData, roomId);
+         setTextValue("")
 
          socket?.emit(String(roomId), sendData);
-      },
-      [socket]
-   );
+      }
+      
 
    const handleEmojiSelect = (emoji: any) => {
       setTextValue(textValue + emoji);
@@ -145,7 +198,7 @@ const ChatScreen = ({ navigation, route }: any) => {
       }
    };
 
-   if (!currentUser) {
+   if (!messages || !currentUser) {
       return (
          <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -186,49 +239,7 @@ const ChatScreen = ({ navigation, route }: any) => {
          <Divider />
          <KeyboardAvoidingView style={{ flex: 1, marginBottom: 20 }}>
             <GiftedChat
-               // renderActions={(props) => {
-               //    return (
-               //       <Actions {...props}>
-               //          <Button>F</Button>
-               //         <View>  <Button onPress={toggleEmojiPicker} mode='contained'>E</Button></View>
-
-               //       </Actions>
-               //    );
-               // }}
-
-               renderChatFooter={() => {
-                  if (showEmojiPicker)
-                     return (
-                        <EmojiSelector
-                           onEmojiSelected={handleEmojiSelect}
-                           showHistory={true}
-                           showSearchBar={false}
-                           showTabs={false}
-                           showSectionTitles={false}
-                           category={Categories.all}
-                           columns={8}
-                        />
-                     );
-               }}
-               renderComposer={(props) => {
-                  return (
-                     <Composer
-                        {...props}
-                        textInputStyle={{
-                           backgroundColor: theme.colors.inverseOnSurface, // set your desired background color here
-                           borderRadius: 20,
-                           paddingLeft: 20,
-                           paddingRight: 10,
-                           alignItems: "center",
-                           justifyContent: "center",
-                           marginTop: 8,
-                           paddingBottom: 5,
-                           marginRight: 5,
-                        }}
-                        placeholder="Type a message..."
-                     />
-                  );
-               }}
+               renderInputToolbar={()=> <ChatBox onSend={onSend} onTextInput={(v)=> setTextValue(v)} />}
                renderBubble={(props) => {
                   return (
                      <Bubble
@@ -249,27 +260,11 @@ const ChatScreen = ({ navigation, route }: any) => {
                   );
                }}
                inverted
-               renderSend={(props) => (
-                  <Send
-                     {...props}
-                     containerStyle={{
-                        alignItems: "center",
-                        justifyContent: "center",
-                        paddingRight: 15,
-                     }}>
-                     <FontAwesome
-                        color={theme.colors.primary}
-                        name="send-o"
-                        size={23}
-                     />
-                  </Send>
-               )}
+           
                messages={messages}
-               onInputTextChanged={handleChatInput}
-               text={textValue}
-               onSend={(messages) => onSend(messages[0])}
+              
                user={{
-                  _id: 3,
+                  _id: currentUser?.id,
                }}
             />
          </KeyboardAvoidingView>

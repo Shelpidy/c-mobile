@@ -26,19 +26,25 @@ const CustomHeader = () => {
       let fetchData = async () => {
          // console.log("Fetching user")
             try {
-               let response = await fetch(
+               if(currentUser){
+                   let response = await fetch(
                   `http://192.168.175.183:5000/api/auth/users/${currentUser?.id}`,
                   { method: "GET" }
                );
-               let data = await response.json();
-               if (data.status == "success") {
+            
+               if (response.ok) {
+                  let data = await response.json();
                   // console.log("Users-----", data.data);
                   setUser(data.data.personal);
                   // Alert.alert("Success",data.message)
                   setLoading(false);
                } else {
+                  let data = await response.json();
                   Alert.alert("Failed", data.message);
                }
+
+               }
+              
                setLoading(false);
             } catch (err) {
                console.log(err);

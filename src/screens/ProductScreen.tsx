@@ -8,6 +8,7 @@ import {
    Alert,
    ScrollView,
    Pressable,
+   TextInput
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../components/ImagesViewer";
@@ -16,7 +17,6 @@ import TextViewer from "../components/TextViewer";
 // import Comments from "../components/marketingproducts/Comments";
 // import { productComments, productLikes, users } from "../data";
 import {
-   TextInput,
    useTheme,
    Button,
    IconButton,
@@ -25,11 +25,10 @@ import {
 import {
    AntDesign,
    Entypo,
-   FontAwesome,
-   MaterialCommunityIcons,
-   Feather,
+ SimpleLineIcons,
    Ionicons,
    MaterialIcons,
+   FontAwesome,
 } from "@expo/vector-icons";
 import axios from "axios";
 import ProductComments from "../components/Marketing/ProductComments";
@@ -95,7 +94,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                `http://192.168.175.183:5000/api/marketing/products/${productId}`
             );
             if (data.status == "success") {
-               console.log("Product", data.data);
+               // console.log("Product", data.data);
                setproduct(data.data);
             } else {
                Alert.alert("Failed", data.message);
@@ -118,7 +117,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                `http://192.168.175.183:5000/api/marketing/products/cl/${productId}`
             );
             if (data.status == "success") {
-               console.log(data.data);
+               // console.log(data.data);
                let ls: any[] = data.data.likes;
                setComments(data.data.comments);
                setLikes(data.data.likes);
@@ -177,7 +176,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          );
          return;
       }
-      setLoading(true);
+      setLoading1(true);
       let requestObj = {
          userId: route.params.userId,
          productId: route.params.productId,
@@ -192,14 +191,14 @@ const ProductScreen = ({ navigation, route }: any) => {
                "Success",
                "You have successfully added a product to Shopping-Cart"
             );
-            setLoading(false);
+            setLoading1(false);
          } else {
             Alert.alert("Failed", data.message);
-            setLoading(false);
+            setLoading1(false);
          }
       } catch (err) {
          Alert.alert("Failed", String(err));
-         setLoading(false);
+         setLoading1(false);
       }
    };
 
@@ -261,7 +260,9 @@ const ProductScreen = ({ navigation, route }: any) => {
    };
 
    const handleBuy = async () => {
-      setLoading2(true);
+      
+      try {
+         setLoading2(true);
 
       let buyObj: MakePurchaseParams = {
          affiliateId: JSON.parse(String(product?.affiliateId))[0],
@@ -270,7 +271,6 @@ const ProductScreen = ({ navigation, route }: any) => {
          buyerId: currentUser?.id,
       };
       console.log(buyObj);
-      try {
          let { data } = await axios.post(
             `http://192.168.175.183:5000/api/marketing/buy`,
             buyObj
@@ -384,9 +384,11 @@ const ProductScreen = ({ navigation, route }: any) => {
                      borderRadius: 3,
                   }}>
                   {currentUser?.id == product?.userId && (
-                     <View>
-                        <Button onPress={() => setOpenModal(true)}>
-                           <Feather name="edit" /> Edit product
+                      <View>
+                        <Button
+                           style={{ backgroundColor: "#f9f9f9" }}
+                           onPress={() => setOpenModal(true)}>
+                           <SimpleLineIcons name="options-vertical" />
                         </Button>
                      </View>
                   )}
@@ -402,7 +404,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          <View
             style={{
                flexDirection: "column",
-               marginVertical: 5,
+               marginVertical: 0,
                justifyContent: "space-evenly",
                //    alignItems: "center",
             }}>
@@ -424,7 +426,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                <Text
                   style={[
                      styles.productPrice,
-                     { color: theme.colors.primary, fontSize: 25 },
+                     { color: theme.colors.primary, fontSize: 20 },
                   ]}>
                   C{product?.price}
                </Text>
@@ -483,11 +485,11 @@ const ProductScreen = ({ navigation, route }: any) => {
                      </Text>
                   </View>
                </View>
-               <View style={{ flexDirection: "row", gap: 3 }}>
+               <View style={{ flexDirection: "row", gap: 8,paddingHorizontal:10 }}>
                   <Button
                      style={{ flex: 1 }}
-                     loading={loading}
-                     disabled={loading}
+                     loading={loading1}
+                     disabled={loading1}
                      onPress={handleProductRequest}
                      mode="contained">
                      <MaterialIcons size={23} name="add-shopping-cart" />
@@ -587,8 +589,43 @@ const ProductScreen = ({ navigation, route }: any) => {
                </View>
                <Divider />
             </View>
-            <View style={styles.commentBox}>
+      <View
+         style={{
+            paddingHorizontal: 15,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+         }}>
+         <TextInput
+            value={productCommentState.text}
+            placeholder="Comment here..."
+            onChangeText={(v) =>  dispatchproductComment({ type: "TEXT", payload: v })}
+            style={{
+               flex: 1,
+               backgroundColor:"#f6f6f6",
+               borderTopLeftRadius: 20,
+               borderBottomLeftRadius: 20,
+               height: 50,
+               paddingHorizontal: 25,
+            }}
+         />
+         <Pressable
+            onPress={handleComment}
+            style={{
+               paddingHorizontal: 20,
+               height: 50,
+               alignItems: "center",
+               justifyContent: "center",
+               borderTopRightRadius: 20,
+               borderBottomRightRadius: 20,
+               backgroundColor:"#f6f6f6",
+            }}>
+            <FontAwesome color={theme.colors.primary} name="comment-o" size={23} />
+         </Pressable>
+      </View>
+            {/* <View style={styles.commentBox}>
                <TextInput
+          
                   value={productCommentState.text}
                   onChangeText={(v) =>
                      dispatchproductComment({ type: "TEXT", payload: v })
@@ -604,11 +641,11 @@ const ProductScreen = ({ navigation, route }: any) => {
                         icon="send"
                      />
                   }
-                  mode="outlined"
+                
                   multiline
                />
                <Entypo size={26} name="emoji-neutral" />
-            </View>
+            </View> */}
 
             <View style={{ padding: 5, marginBottom: 10 }}>
                <ProductComments
@@ -632,7 +669,7 @@ const styles = StyleSheet.create({
       borderRadius: 4,
       paddingTop: 10,
       borderWidth: 1,
-      borderColor: "#f3f3f3",
+
       // paddingBottom:20,
       // marginBottom:30
    },
@@ -642,6 +679,10 @@ const styles = StyleSheet.create({
       alignItems: "center",
       gap: 5,
       paddingHorizontal: 15,
+      borderWidth:0,
+
+      borderRadius:20,
+      
    },
    title: {
       fontFamily: "Poppins_700Bold",
@@ -650,13 +691,20 @@ const styles = StyleSheet.create({
       marginTop: 6,
    },
    commentInputField: {
-      flex: 1,
-      marginHorizontal: 5,
-   },
+       flex: 1,
+      backgroundColor: "#f4f4f4",
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      borderBottomRightRadius: 20,
+      borderBottomLeftRadius: 20,
+      height: 50,
+      paddingHorizontal: 25,
+      borderColor: '#ffffff',
+},
    likeCommentAmountCon: {
       flexDirection: "row",
       // justifyContent: "space-between",
-      gap: 25,
+      gap: 15,
       padding: 10,
       // borderWidth:1,
       marginLeft: 10,
