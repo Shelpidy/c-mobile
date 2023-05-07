@@ -23,39 +23,41 @@ const Comment = (props: CommentProps) => {
 
    const navigation = useNavigation<any>();
 
-   useEffect(function () {
-      console.log("Fetching user");
-      setLoading(true);
-      let fetchData = async () => {
-         // console.log("Fetching user")
-         //  let activeUserId = 1
-         try {
-            if(props){
-                 let response = await fetch(
-               `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
-               { method: "GET" }
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               // console.log("Users-----",data.data)
-               setCommentor(data.data.personal);
-               // Alert.alert("Success",data.message)
-               setLoading(false);
-            } else {
-               Alert.alert("Failed", data.message);
-            }
+   useEffect(
+      function () {
+         console.log("Fetching user");
+         setLoading(true);
+         let fetchData = async () => {
+            // console.log("Fetching user")
+            //  let activeUserId = 1
+            try {
+               if (props) {
+                  let response = await fetch(
+                     `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
+                     { method: "GET" }
+                  );
+                  let data = await response.json();
+                  if (data.status == "success") {
+                     // console.log("Users-----",data.data)
+                     setCommentor(data.data.personal);
+                     // Alert.alert("Success",data.message)
+                     setLoading(false);
+                  } else {
+                     Alert.alert("Failed", data.message);
+                  }
+               }
 
+               setLoading(false);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-          
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [props]);
+         };
+         fetchData();
+      },
+      [props]
+   );
 
    const handleEditComment = () => {};
 
@@ -106,21 +108,29 @@ const Comment = (props: CommentProps) => {
                         paddingHorizontal: 15,
                         paddingVertical: 6,
                      }}>
-                     <View style={{flex:1,flexDirection:'row',alignItems:"center",justifyContent:"space-between"}}>
-                         <Text style={styles.userFullName}>
+                     <View
+                        style={{
+                           flex: 1,
+                           flexDirection: "row",
+                           alignItems: "center",
+                           justifyContent: "space-between",
+                        }}>
+                        <Text style={styles.userFullName}>
                            {commentor.firstName} {commentor.middleName}{" "}
                            {commentor.lastName}
                         </Text>
-                           {(currentUser?.id == props?.userId ||
+                        {(currentUser?.id == props?.userId ||
                            currentUser?.id == props?.posterId) && (
                            <View style={{ flexDirection: "row" }}>
-                              <Button style={{backgroundColor:"#fff"}} onPress={() => setOpenModal(true)}>
+                              <Button
+                                 style={{ backgroundColor: "#fff" }}
+                                 onPress={() => setOpenModal(true)}>
                                  <SimpleLineIcons name="options-vertical" />
                               </Button>
                            </View>
                         )}
                      </View>
-                    
+
                      <Text
                         style={{
                            fontFamily: "Poppins_300Light",
@@ -136,9 +146,7 @@ const Comment = (props: CommentProps) => {
                            marginTop: 2,
                            paddingHorizontal: 5,
                            borderRadius: 3,
-                        }}>
-                       
-                     </View>
+                        }}></View>
                   </View>
                </View>
             </View>

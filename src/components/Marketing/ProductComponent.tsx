@@ -14,10 +14,10 @@ import TextShortener from "../TextShortener";
 import ProductComments from "./ProductComments";
 // import { postProductComments, postLikes, users } from "../../data";
 import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
-import { Ionicons, Feather,SimpleLineIcons } from "@expo/vector-icons";
+import { Ionicons, Feather, SimpleLineIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { useCurrentUser } from "../../utils/CustomHooks";
-// import UpdateProductForm from "./UpdateProduct";
+import UpdateProductForm from "./UpdateProduct";
 
 // type ProductComment = Omit<CommentProps, "posterId">;
 const initialState: ProductComment = {};
@@ -63,73 +63,79 @@ const ProductComponent = (props: ProductComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
-   useEffect(function () {
-      let fetchData = async () => {
-         try {
-            if(props){
-                let { data } = await axios.get(
-               `http://192.168.175.183:5000/api/marketing/products/cl/${props?.id}`
-            );
-            if (data.status == "success") {
-               // console.log("Comments and Likes -----", data.data);
-               let ls: any[] = data.data.likes;
-               let cs = data.data.comments;
-               setProductComments(cs);
-               setLikes(ls);
-               if (ls.map((like) => like.userId).includes(currentUser?.id)) {
-                  setLiked(true);
+   useEffect(
+      function () {
+         let fetchData = async () => {
+            try {
+               if (props) {
+                  let { data } = await axios.get(
+                     `http://192.168.175.183:5000/api/marketing/products/cl/${props?.id}`
+                  );
+                  if (data.status == "success") {
+                     // console.log("Comments and Likes -----", data.data);
+                     let ls: any[] = data.data.likes;
+                     let cs = data.data.comments;
+                     setProductComments(cs);
+                     setLikes(ls);
+                     if (
+                        ls.map((like) => like.userId).includes(currentUser?.id)
+                     ) {
+                        setLiked(true);
+                     }
+                     // Alert.alert("Success",data.message)
+                  } else {
+                     Alert.alert("Failed", data.message);
+                  }
                }
-               // Alert.alert("Success",data.message)
-            } else {
-               Alert.alert("Failed", data.message);
-            }
 
-            }
-           
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [currentUser,props]);
-
-   useEffect(function () {
-      // console.log("Fetching user");s
-      setLoading(true);
-      let fetchData = async () => {
-         // console.log("Fetching user")
-         //  let activeUserId = 1
-         try {
-            if(props){
-                 let response = await fetch(
-               `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
-               { method: "GET" }
-            );
-          
-            if (response.ok) {
-                 let data = await response.json();
-               // console.log("Users-----", data.data);
-               SetPoster(data.data.personal);
-               // Alert.alert("Success",data.message)
                setLoading(false);
-            } else {
-                 let data = await response.json();
-               Alert.alert("Failed", data.message);
+            } catch (err) {
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
+         };
+         fetchData();
+      },
+      [currentUser, props]
+   );
 
+   useEffect(
+      function () {
+         // console.log("Fetching user");s
+         setLoading(true);
+         let fetchData = async () => {
+            // console.log("Fetching user")
+            //  let activeUserId = 1
+            try {
+               if (props) {
+                  let response = await fetch(
+                     `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
+                     { method: "GET" }
+                  );
+
+                  if (response.ok) {
+                     let data = await response.json();
+                     // console.log("Users-----", data.data);
+                     SetPoster(data.data.personal);
+                     // Alert.alert("Success",data.message)
+                     setLoading(false);
+                  } else {
+                     let data = await response.json();
+                     Alert.alert("Failed", data.message);
+                  }
+               }
+
+               setLoading(false);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-          
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [props]);
+         };
+         fetchData();
+      },
+      [props]
+   );
 
    const handleLike = async (productId: number) => {
       console.log(productId);
@@ -183,6 +189,7 @@ const ProductComponent = (props: ProductComponentProps) => {
 
    return (
       <View style={styles.postContainer}>
+         
          <Modal visible={openModal}>
             <View
                style={{
@@ -197,7 +204,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                   <Button mode="text" onPress={() => setOpenModal(false)}>
                      <Feather size={26} name="x" />
                   </Button>
-                  {/* <UpdateProductForm {...props}/> */}
+                  <UpdateProductForm {...props}/>
                </View>
             </View>
          </Modal>
@@ -228,7 +235,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                      borderRadius: 3,
                   }}>
                   {currentUser?.id == props?.userId && (
-                      <View>
+                     <View>
                         <Button
                            style={{ backgroundColor: "#f9f9f9" }}
                            onPress={() => setOpenModal(true)}>
@@ -270,18 +277,17 @@ const ProductComponent = (props: ProductComponentProps) => {
             {/* <Button  mode='contained'>Affiliate</Button> */}
          </View>
 
-          {props?.description && (
+         {props?.description && (
             <TextShortener
                style={{ marginHorizontal: 8, fontFamily: "Poppins_300Light" }}
                text={props.description}
-                 onPressViewMore = {() =>
-                        props.navigation.navigate("ProductScreen", {
-                           productId: props.id,
-                           userId: props.userId,
-                           affiliateId:
-                              props?.affiliateId && props.affiliateId[0],
-                        })
-                     }
+               onPressViewMore={() =>
+                  props.navigation.navigate("ProductScreen", {
+                     productId: props.id,
+                     userId: props.userId,
+                     affiliateId: props?.affiliateId && props.affiliateId[0],
+                  })
+               }
                showViewMore={true}
                textLength={100}></TextShortener>
          )}
@@ -320,7 +326,6 @@ const ProductComponent = (props: ProductComponentProps) => {
                      flexDirection: "row",
                      alignItems: "center",
                      justifyContent: "flex-start",
-                    
                   }}>
                   <Pressable>
                      <Ionicons
@@ -415,7 +420,7 @@ const styles = StyleSheet.create({
       // justifyContent: "space-between",
       gap: 13,
       paddingHorizontal: 10,
-      paddingVertical:6,
+      paddingVertical: 6,
       // borderWidth:1,
       marginLeft: 10,
       borderRadius: 20,

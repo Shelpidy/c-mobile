@@ -16,46 +16,49 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
 
-   useEffect(function () {
-      setLoading(true);
-      let fetchData = async () => {
-         try {
-             if(currentUser){
-                let activeUserId = currentUser?.id;
-                let response = await fetch(
-               `http://192.168.175.183:5000/api/media/posts/${activeUserId}`
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               // console.log(data.data)
-               // setPosts(data.data);
-               let fetchedPost: PostComponentProps[] = data.data;
-               let numOfPageLinks = Math.ceil(
-                  fetchedPost.length / numberOfPostsPerPage
-               );
-               // console.log(fetchedPost);
-               setAllPosts(fetchedPost);
-               setNumberOfPageLinks(numOfPageLinks);
-               const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
-               const lastIndex = currentIndex + numberOfPostsPerPage;
-               setPosts(data.data.slice(currentIndex, lastIndex));
-               // Alert.alert("Success",data.message)
-            } else {
-               Alert.alert("Failed", data.message);
+   useEffect(
+      function () {
+         setLoading(true);
+         let fetchData = async () => {
+            try {
+               if (currentUser) {
+                  let activeUserId = currentUser?.id;
+                  let response = await fetch(
+                     `http://192.168.175.183:5000/api/media/posts/${activeUserId}`
+                  );
+                  let data = await response.json();
+                  if (data.status == "success") {
+                     // console.log(data.data)
+                     // setPosts(data.data);
+                     let fetchedPost: PostComponentProps[] = data.data;
+                     let numOfPageLinks = Math.ceil(
+                        fetchedPost.length / numberOfPostsPerPage
+                     );
+                     // console.log(fetchedPost);
+                     setAllPosts(fetchedPost);
+                     setNumberOfPageLinks(numOfPageLinks);
+                     const currentIndex =
+                        numberOfPostsPerPage * (pageNumber - 1);
+                     const lastIndex = currentIndex + numberOfPostsPerPage;
+                     setPosts(data.data.slice(currentIndex, lastIndex));
+                     // Alert.alert("Success",data.message)
+                  } else {
+                     Alert.alert("Failed", data.message);
+                  }
+               }
+
+               setLoading(false);
+            } catch (err) {
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            
-             }
-        
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [currentUser]);
+         };
+         fetchData();
+      },
+      [currentUser]
+   );
 
    useEffect(() => {
       const currentIndex = numberOfPostsPerPage * (pageNumber - 1);

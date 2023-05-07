@@ -11,22 +11,36 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { ImagePicker } from "expo-image-multiple-picker";
 import { useCurrentUser } from "../../utils/CustomHooks";
+import config from "../.././aws-config";
+import AWS from "aws-sdk";
 
-type Post = Partial<Omit<PostComponentProps, "id" | "updatedAt" | "createdAt">>;
+const s3 = new AWS.S3({
+   accessKeyId: config.accessKeyId,
+   secretAccessKey: config.secretAccessKey,
+   region: config.region,
+});
+
+type NewProduct = Partial<Product>;
 
 const initialState = {};
 
-const postReducer = (state: Post = initialState, action: Action) => {
+const productReducer = (state: NewProduct = initialState, action: Action) => {
    switch (action.type) {
-      case "TEXT":
-         return { ...state, text: action.payload };
-      case "TITLE":
+      case "NAME":
+         return { ...state, productName: action.payload };
+      case "DESCRIPTION":
          return {
             ...state,
-            title: action.payload,
+            description: action.payload,
          };
-      case "VIDEO":
-         return { ...state, video: action.payload };
+      case "CATEGORY":
+         return { ...state, category: action.payload };
+      case "SIZES":
+         return { ...state, sizes: action.payload };
+      case "NUMBERAVAILABLE":
+         return { ...state, numberAvailable: action.payload };
+      case "PRICE":
+         return { ...state, price: action.payload };
       case "IMAGES":
          return { ...state, images: action.payload };
       case "USERID":
@@ -38,71 +52,101 @@ const postReducer = (state: Post = initialState, action: Action) => {
 
 const ProductForm = () => {
    const [loading, setLoading] = useState<boolean>(false);
-   const [postState, postDispatch] = useReducer(postReducer, initialState);
+   const [productState, productDispatch] = useReducer(
+      productReducer,
+      initialState
+   );
    const [imageOpen, setImageOpen] = useState(false);
-   const [videoOpen, setVideoOpen] = useState(false);
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    // const [album, setAlbum] = useState<Album | undefined>()
    // const [assets, setAssets] = useState<Asset[]>([])
    const theme = useTheme();
 
-   const handlePost = async () => {
+   const handleProduct = async () => {
       setLoading(true);
       let activeUserId = currentUser?.id;
-      let postObj = { ...postState, userId: activeUserId };
+      let productObj = { ...productState, userId: activeUserId };
+
+      // Upload images to S3
+      const uploadedImageURLs = [];
+      for (const imageUri of productObj.images) {
+         const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
+         const imageKey = `${Date.now()}-${imageName}`;
+         const imageParams = {
+            Bucket: config.bucketName,
+            Key: imageKey,
+            Body: { uri: imageUri },
+         };
+
+         try {
+            const uploadResponse = await s3.upload(imageParams).promise();
+            uploadedImageURLs.push(uploadResponse.Location);
+         } catch (error) {
+            console.log("Image upload error:", error);
+            setLoading(false);
+            Alert.alert("Failed", "Image upload failed");
+            return;
+         }
+      }
+
+      // Update product with uploaded image URLs
+      productObj.images = uploadedImageURLs;
+
       try {
          let response = await axios.post(
-            "http://192.168.175.183:5000/api/media/posts/",
-            postObj
+            "http://192.168.175.183:5000/api/marketing/poroducts/",
+            productObj
          );
          if (response.status === 201) {
             console.log(response.data);
             setLoading(false);
-            Alert.alert("Successful", "Post successfully");
+            Alert.alert("Successful", "Uploaded product successfully");
          } else {
             setLoading(false);
-            Alert.alert("Failed", "Post Faile");
+            Alert.alert("Failed", "Upload Failed");
          }
       } catch (err) {
          setLoading(false);
          console.log(err);
       }
-
-      // console.log(postState);
    };
+
+   // const handleProduct = async () => {
+   //    setLoading(true);
+   //    let activeUserId = currentUser?.id;
+   //    let productObj = { ...productState, userId: activeUserId };
+   //    try {
+   //       let response = await axios.post(
+   //          "http://192.168.175.183:5000/api/marketing/poroducts/",
+   //          productObj
+   //       );
+   //       if (response.status === 201) {
+   //          console.log(response.data);
+   //          setLoading(false);
+   //          Alert.alert("Successful", "Uploaded product successfully");
+   //       } else {
+   //          setLoading(false);
+   //          Alert.alert("Failed", "Upload Failed");
+   //       }
+   //    } catch (err) {
+   //       setLoading(false);
+   //       console.log(err);
+   //    }
+
+   //    // console.log(postState);
+   // };
 
    const chooseImage = (assets: any[]) => {
       let imageSrcs = assets.map((asset) => asset.uri);
       console.log(imageSrcs);
-      postDispatch({ type: "IMAGES", payload: imageSrcs });
+      productDispatch({ type: "IMAGES", payload: imageSrcs });
       setImageOpen(false);
    };
 
    const cancelImage = () => {
+      // Alert.alert("No permission","canceling image picker")
       console.log("No permission, canceling image picker");
       setImageOpen(false);
-   };
-
-   const chooseVideo = (assets: any[]) => {
-      let videoSrc = assets[0]["uri"];
-      postDispatch({ type: "VIDEO", payload: videoSrc });
-      console.log(videoSrc);
-      setVideoOpen(false);
-   };
-
-   const cancelVideo = () => {
-      console.log("No permission, canceling image picker");
-      setImageOpen(false);
-   };
-
-   const onValueChangeContent = (v: string): void => {
-      console.log("onValueChange", v);
-      postDispatch({ type: "TEXT", payload: v });
-   };
-
-   const onValueChangeTitle = (v: string): void => {
-      console.log("onValueChange", v);
-      postDispatch({ type: "TITLE", payload: v });
    };
 
    return (
@@ -121,28 +165,51 @@ const ProductForm = () => {
                limit={8}
             />
          </Modal>
-         <Modal visible={videoOpen}>
-            <ImagePicker
-               onSave={chooseVideo}
-               onCancel={cancelVideo}
-               video
-               timeSlider
-               image={false}
-            />
-         </Modal>
          <View style={styles.formContainer}>
             <TextInput
-               onChangeText={onValueChangeTitle}
+               onChangeText={(v) =>
+                  productDispatch({ type: "NAME", payload: v })
+               }
                mode="outlined"
-               label="Title"
+               label="Product Name"
             />
 
             <TextInput
-               onChangeText={onValueChangeContent}
+               onChangeText={(v) =>
+                  productDispatch({ type: "DESCRIPTION", payload: v })
+               }
                mode="outlined"
-               label="Content"
+               label="Description"
                multiline
                numberOfLines={5}
+            />
+            <TextInput
+               onChangeText={(v) =>
+                  productDispatch({ type: "CATEGORY", payload: v })
+               }
+               mode="outlined"
+               label="Category"
+            />
+            <TextInput
+               onChangeText={(v) =>
+                  productDispatch({ type: "SIZES", payload: v })
+               }
+               mode="outlined"
+               label="Sizes"
+            />
+            <TextInput
+               onChangeText={(v) =>
+                  productDispatch({ type: "PRICE", payload: v })
+               }
+               mode="outlined"
+               label="Price"
+            />
+            <TextInput
+               onChangeText={(v) =>
+                  productDispatch({ type: "NUMBERAVAILABLE", payload: v })
+               }
+               mode="outlined"
+               label="Number Available"
             />
             <Text
                style={{
@@ -150,7 +217,7 @@ const ProductForm = () => {
                   marginTop: 10,
                   fontFamily: "Poppins_300Light",
                }}>
-               Choose Image or Video
+               Choose Images
             </Text>
             <View style={styles.buttonGroup}>
                <Button
@@ -159,17 +226,11 @@ const ProductForm = () => {
                   onPress={() => setImageOpen(true)}>
                   <AntDesign size={20} name="picture" />
                </Button>
-               <Button
-                  style={styles.button}
-                  mode="contained-tonal"
-                  onPress={() => setVideoOpen(true)}>
-                  <AntDesign size={20} name="videocamera" />
-               </Button>
             </View>
 
             <Button
                mode="contained"
-               onPress={handlePost}
+               onPress={handleProduct}
                disabled={loading}
                loading={loading}>
                Upload <AntDesign size={20} name="upload" />

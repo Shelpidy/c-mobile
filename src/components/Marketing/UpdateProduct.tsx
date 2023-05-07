@@ -1,186 +1,256 @@
-// import { StyleSheet, Text, View,Alert,Modal} from "react-native";
-// import React, { useState, useEffect, useReducer, useMemo } from "react";
-// import { Button,TextInput, useTheme } from "react-native-paper";
-// import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-// // import {
-// //    RichTextEditor,
-// //    RichTextViewer,
-// //    ActionMap,
-// //    ActionKey,
-// // } from "@siposdani87/expo-rich-text-editor";
-// import axios from "axios";
-// import { ImagePicker } from "expo-image-multiple-picker";
+import { StyleSheet, Text, View, Alert, Modal } from "react-native";
+import React, { useState, useEffect, useReducer, useMemo } from "react";
+import { Button, TextInput, useTheme } from "react-native-paper";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+// import {
+//    RichTextEditor,
+//    RichTextViewer,
+//    ActionMap,
+//    ActionKey,
+// } from "@siposdani87/expo-rich-text-editor";
+import axios from "axios";
+import { ImagePicker } from "expo-image-multiple-picker";
+import { useCurrentUser } from "../../utils/CustomHooks";
+import config from "../.././aws-config";
+import AWS from "aws-sdk";
 
-// type ReducerProduct = Partial<Omit<Product, "id" | "updatedAt" | "createdAt">>;
+const s3 = new AWS.S3({
+   accessKeyId: config.accessKeyId,
+   secretAccessKey: config.secretAccessKey,
+   region: config.region,
+});
 
-// const initialState = {};
+type NewProduct = Partial<Product>;
 
-// const productReducer = (state: ReducerProduct = initialState, action: Action) => {
-//    switch (action.type) {
-//       case "TEXT":
-//          return { ...state, text: action.payload };
-//       case "TITLE":
-//          return {
-//             ...state,
-//             title: action.payload,
-//          };
-//       case "VIDEO":
-//          return { ...state, video: action.payload };
-//       case "IMAGES":
-//          return { ...state, images: action.payload };
-//       case "ID":
-//          return { ...state, id: action.payload };
-//       case "USERID":
-//          return { ...state, userId: action.payload };
-//       default:
-//          return state;
-//    }
-// };
+const initialState = {};
 
-// type ProductProps = Product & { navigation: any };
+const productReducer = (state: NewProduct = initialState, action: Action) => {
+   switch (action.type) {
+      case "ID":
+         return { ...state, id: action.payload };
+      case "NAME":
+         return { ...state, productName: action.payload };
 
-// const UpdateProductForm = (product:ProductProps) => {
-//    const [loading, setLoading] = useState<boolean>(false);
-//    const [productState, productDispatch] = useReducer(productReducer, initialState);
-//    const [imageOpen, setImageOpen] = useState(false)
-//    const [videoOpen, setVideoOpen] = useState(false)
-//    // const [album, setAlbum] = useState<Album | undefined>()
-//    // const [assets, setAssets] = useState<Asset[]>([])
-//    const theme = useTheme();
+      case "DESCRIPTION":
+         return {
+            ...state,
+            description: action.payload,
+         };
+      case "CATEGORY":
+         return { ...state, category: action.payload };
+      case "SIZES":
+         return { ...state, sizes: action.payload };
+      case "NUMBERAVAILABLE":
+         return { ...state, numberAvailable: action.payload };
+      case "PRICE":
+         return { ...state, price: action.payload };
+      case "IMAGES":
+         return { ...state, images: action.payload };
+      case "USERID":
+         return { ...state, userId: action.payload };
+      default:
+         return state;
+   }
+};
 
-//    useEffect(()=>{
-//     // productDispatch({type:"TEXT",payload:product.text})
-//     // productDispatch({type:"TITLE",payload:product.title})
-//     // productDispatch({type:"TITLE",payload:product.title})
-//     // productDispatch({type:"IMAGES",payload:product.images})
-//     // productDispatch({type:"ID",payload:product.id})
-//     // productDispatch({type:"USERID",payload:product.userId})
-//    },[])
+type NProductComponentProps = ProductComponentProps & { navigation?: any };
 
-//    const handleUpdate = async () => {
-//       setLoading(true);
-//       let activeUserId = 1
-//       let postObj = {...productState}
-//       try{
-//         let response = await axios.put("http://192.168.175.183:5000/api/media/posts/",postObj)
-//         if(response.status === 202){
-//                console.log(response.data)
-//                setLoading(false)
-//                Alert.alert("Successful","Update successfully.")
-//         }else{
-//             setLoading(false)
-//              Alert.alert("Failed","Post Faile")
-//         }
-//       }catch(err){
-//         setLoading(false)
-//         console.log(err)
-//       }
+const UpdateProductForm = (product: NProductComponentProps) => {
+   const [loading, setLoading] = useState<boolean>(false);
+   const [productState, productDispatch] = useReducer(
+      productReducer,
+      initialState
+   );
+   const [imageOpen, setImageOpen] = useState(false);
+   const currentUser = useCurrentUser();
+   const theme = useTheme();
 
-//       // console.log(postState);
-//    };
+   useEffect(() => {
+      productDispatch({ type: "NAME", payload: product.productName });
+      productDispatch({ type: "DESCRIPTION", payload: product.description });
+      productDispatch({ type: "CATEGORY", payload: product.category });
+      productDispatch({ type: "IMAGES", payload: product.images });
+      productDispatch({ type: "ID", payload: product.id });
+      productDispatch({ type: "USERID", payload: product.userId });
+      productDispatch({
+         type: "NUMBERAVAILABLE",
+         payload: product.numberAvailable,
+      });
+      productDispatch({ type: "SIZES", payload: product.sizes });
+      productDispatch({ type: "PRICE", payload: product.sizes });
+   }, []);
 
-//    const chooseImage = (assets:any[]) => {
-//       let imageSrcs = assets.map(asset => asset.uri)
-//       console.log(imageSrcs)
-//       postDispatch({type:"IMAGES",payload:imageSrcs})
-//       setImageOpen(false)
-//    };
+   const handleUpdate = async () => {
+      setLoading(true);
+      let productObj = { ...productState };
 
-//    const cancelImage = () => {
-//       console.log("No permission, canceling image picker")
-//       setImageOpen(false)
-//    };
+      // Upload images to S3
+      const uploadedImageURLs = [];
+      for (const imageUri of productObj.images) {
+         const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
+         const imageKey = `${Date.now()}-${imageName}`;
+         const imageParams = {
+            Bucket: config.bucketName,
+            Key: imageKey,
+            Body: { uri: imageUri },
+         };
 
-//     const chooseVideo = (assets:any[]) => {
-//       let videoSrc = assets[0]['uri']
-//       postDispatch({type:"VIDEO",payload:videoSrc})
-//       console.log(videoSrc)
-//       setVideoOpen(false)
-//    };
+         try {
+            const uploadResponse = await s3.upload(imageParams).promise();
+            uploadedImageURLs.push(uploadResponse.Location);
+         } catch (error) {
+            console.log("Image upload error:", error);
+            setLoading(false);
+            Alert.alert("Failed", "Image upload failed");
+            return;
+         }
+      }
 
-//    const cancelVideo = () => {
-//       console.log("No permission, canceling image picker")
-//       setImageOpen(false)
-//    };
+      // Update product with uploaded image URLs
+      productObj.images = uploadedImageURLs;
 
-//    const onValueChangeContent = (v: string): void => {
-//       console.log("onValueChange", v);
-//       postDispatch({ type: "TEXT", payload: v });
-//    };
+      try {
+         let response = await axios.put(
+            "http://192.168.175.183:5000/api/marketing/products/",
+            productObj
+         );
+         if (response.status === 202) {
+            console.log(response.data);
+            setLoading(false);
+            Alert.alert("Successful", "Update product successfully.");
+         } else {
+            setLoading(false);
+            Alert.alert("Failed", "Product update failed");
+         }
+      } catch (err) {
+         setLoading(false);
+         console.log(err);
+      }
+   };
 
-//    const onValueChangeTitle = (v: string): void => {
-//       console.log("onValueChange", v);
-//       postDispatch({ type: "TITLE", payload: v });
-//    };
+   const chooseImage = (assets: any[]) => {
+      let imageSrcs = assets.map((asset) => asset.uri);
+      console.log(imageSrcs);
+      productDispatch({ type: "IMAGES", payload: imageSrcs });
+      setImageOpen(false);
+   };
 
-//    return (
-//       <View style={{borderRadius:3,margin:8,backgroundColor:"#ffffff"}}>
-//          <Modal visible={imageOpen}>
-//             <ImagePicker
-//             onSave={chooseImage}
-//             onCancel={cancelImage}
-//             multiple
-//             limit={8}
-//          />
+   const cancelImage = () => {
+      // Alert.alert("No permission","canceling image picker")
+      console.log("No permission, canceling image picker");
+      setImageOpen(false);
+   };
 
-//          </Modal>
-//           <Modal visible={videoOpen}>
-//          <ImagePicker
-//             onSave={chooseVideo}
-//             onCancel={cancelVideo}
-//             video
-//             timeSlider
-//             image={false}
-//          />
-//          </Modal>
-//          <View style={styles.formContainer}>
-//                  <Text style={{textAlign:"center",marginBottom:4,fontFamily:"Poppins_500Medium"}}>Update Post</Text>
-//                 <TextInput
-//             onChangeText={onValueChangeTitle}
-//             mode="outlined"
-//             label="Title"
-//             value={postState.title}
+   return (
+      <View
+         style={{
+            borderWidth: 2,
+            borderRadius: 5,
+            margin: 8,
+            borderColor: "#f5f5f5",
+         }}>
+         <Modal visible={imageOpen}>
+            <ImagePicker
+               onSave={chooseImage}
+               onCancel={cancelImage}
+               multiple
+               limit={8}
+            />
+         </Modal>
+         <View style={styles.formContainer}>
+            <TextInput
+               onChangeText={(v) =>
+                  productDispatch({ type: "NAME", payload: v })
+               }
+               mode="outlined"
+               label="Product Name"
+               value={productState.productName}
+            />
+            <TextInput
+               onChangeText={(v) =>
+                  productDispatch({ type: "DESCRIPTION", payload: v })
+               }
+               mode="outlined"
+               label="Description"
+               multiline
+               numberOfLines={5}
+               value={productState.description}
+            />
+            <TextInput
+               onChangeText={(v) =>
+                  productDispatch({ type: "CATEGORY", payload: v })
+               }
+               mode="outlined"
+               label="Category"
+               value={productState.category}
+            />
+            <TextInput
+               onChangeText={(v) =>
+                  productDispatch({ type: "SIZES", payload: v })
+               }
+               mode="outlined"
+               label="Sizes"
+               value={productState.sizes}
+            />
+            <TextInput
+               onChangeText={(v) =>
+                  productDispatch({ type: "PRICE", payload: v })
+               }
+               mode="outlined"
+               label="Price"
+               value={productState.price}
+            />
+            <TextInput
+               onChangeText={(v) =>
+                  productDispatch({ type: "NUMBERAVAILABLE", payload: v })
+               }
+               mode="outlined"
+               label="Number Available"
+               value={productState.numberAvailable}
+            />
+            <Text
+               style={{
+                  textAlign: "center",
+                  marginTop: 10,
+                  fontFamily: "Poppins_300Light",
+               }}>
+               Choose Images
+            </Text>
+            <View style={styles.buttonGroup}>
+               <Button
+                  style={styles.button}
+                  mode="contained-tonal"
+                  onPress={() => setImageOpen(true)}>
+                  <AntDesign size={20} name="picture" />
+               </Button>
+            </View>
 
-//          />
+            <Button
+               mode="contained"
+               onPress={handleUpdate}
+               disabled={loading}
+               loading={loading}>
+               Upload <AntDesign size={20} name="upload" />
+            </Button>
+         </View>
+      </View>
+   );
+};
 
-//           <TextInput
-//             onChangeText={onValueChangeContent}
-//             mode="outlined"
-//             label="Content"
-//             multiline
-//             numberOfLines={5}
-//             value={postState.text}
-//          />
-//          <Text style={{textAlign:"center",marginTop:10,fontFamily:"Poppins_300Light"}}>Choose Image or Video</Text>
-//          <View style={styles.buttonGroup}>
+export default UpdateProductForm;
 
-//            <Button style={styles.button} mode='contained-tonal' onPress={()=>setImageOpen(true)}><AntDesign size={20} name="picture" /></Button>
-//            <Button style={styles.button} mode='contained-tonal' onPress={()=>setVideoOpen(true)}><AntDesign size={20} name='videocamera' /></Button>
-//          </View>
-
-//          <Button mode='contained' onPress={handleUpdate} disabled={loading} loading={loading}>
-//             Update <AntDesign size={20} name="upload" />
-//          </Button>
-//          </View>
-
-//       </View>
-//    );
-// };
-
-// export default UpdateProductForm;
-
-// const styles = StyleSheet.create({
-//  formContainer:{
-//    padding:15,
-//    gap:5
-//  },
-//  buttonGroup:{
-//    flexDirection:"row",
-//    justifyContent:"space-evenly",
-//    marginVertical:10
-//  },
-//  button:{
-//    flex:1,
-//    marginHorizontal:3
-//  }
-// });
+const styles = StyleSheet.create({
+   formContainer: {
+      padding: 15,
+      gap: 5,
+   },
+   buttonGroup: {
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      marginVertical: 10,
+   },
+   button: {
+      flex: 1,
+      marginHorizontal: 3,
+   },
+});

@@ -20,7 +20,7 @@ const ProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
       useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const [refresh, setRefresh] = useState<number>(0);
 
    useEffect(
@@ -59,7 +59,7 @@ const ProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
          };
          fetchData();
       },
-      [refresh,currentUser]
+      [refresh, currentUser]
    );
 
    useEffect(() => {

@@ -2,12 +2,14 @@ import { StyleSheet, Text, View, Alert, Modal } from "react-native";
 import React, { useState, useEffect, useReducer, useMemo } from "react";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-// import {
-//    RichTextEditor,
-//    RichTextViewer,
-//    ActionMap,
-//    ActionKey,
-// } from "@siposdani87/expo-rich-text-editor";
+import config from "../.././aws-config";
+import AWS from "aws-sdk";
+
+const s3 = new AWS.S3({
+   accessKeyId: config.accessKeyId,
+   secretAccessKey: config.secretAccessKey,
+   region: config.region,
+});
 import axios from "axios";
 import { ImagePicker } from "expo-image-multiple-picker";
 import { useCurrentUser } from "../../utils/CustomHooks";
@@ -45,7 +47,7 @@ const UpdatePostForm = (post: NPostComponentProps) => {
    const [postState, postDispatch] = useReducer(postReducer, initialState);
    const [imageOpen, setImageOpen] = useState(false);
    const [videoOpen, setVideoOpen] = useState(false);
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const theme = useTheme();
 
    useEffect(() => {
@@ -55,11 +57,37 @@ const UpdatePostForm = (post: NPostComponentProps) => {
       postDispatch({ type: "IMAGES", payload: post.images });
       postDispatch({ type: "ID", payload: post.id });
       postDispatch({ type: "USERID", payload: post.userId });
-   }, []);
+   }, [post]);
 
    const handleUpdate = async () => {
       setLoading(true);
+
       let postObj = { ...postState };
+
+      // Upload images to S3
+      const uploadedImageURLs = [];
+      for (const imageUri of postObj.images) {
+         const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
+         const imageKey = `${Date.now()}-${imageName}`;
+         const imageParams = {
+            Bucket: config.bucketName,
+            Key: imageKey,
+            Body: { uri: imageUri },
+         };
+
+         try {
+            const uploadResponse = await s3.upload(imageParams).promise();
+            uploadedImageURLs.push(uploadResponse.Location);
+         } catch (error) {
+            console.log("Image upload error:", error);
+            setLoading(false);
+            Alert.alert("Failed", "Image upload failed");
+            return;
+         }
+      }
+
+      // Update product with uploaded image URLs
+      postObj.images = uploadedImageURLs;
       try {
          let response = await axios.put(
             "http://192.168.175.183:5000/api/media/posts/",

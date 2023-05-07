@@ -27,7 +27,6 @@ const FollowerComponent = ({
    const [loading, setLoading] = useState<boolean>(false);
    const currentUser = useCurrentUser();
 
-
    useEffect(() => {
       if (currentUser?.followingIds?.includes(user.id)) {
          setFollowed(true);

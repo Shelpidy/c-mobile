@@ -37,7 +37,6 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
       // dispatchPostComment({ type: "", payload: "" });
       SetUser(_user);
    }, [currentUser]);
-   
 
    const handleFollow = async () => {
       try {

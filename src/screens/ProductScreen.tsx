@@ -8,7 +8,7 @@ import {
    Alert,
    ScrollView,
    Pressable,
-   TextInput
+   TextInput,
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../components/ImagesViewer";
@@ -16,16 +16,11 @@ import VideoPlayer from "../components/VideoPlayer";
 import TextViewer from "../components/TextViewer";
 // import Comments from "../components/marketingproducts/Comments";
 // import { productComments, productLikes, users } from "../data";
-import {
-   useTheme,
-   Button,
-   IconButton,
-   Divider,
-} from "react-native-paper";
+import { useTheme, Button, IconButton, Divider } from "react-native-paper";
 import {
    AntDesign,
    Entypo,
- SimpleLineIcons,
+   SimpleLineIcons,
    Ionicons,
    MaterialIcons,
    FontAwesome,
@@ -86,87 +81,96 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log("AffiliateId", route.params.affiliateId);
    }, []);
 
-   useEffect(function () {
-      let fetchData = async () => {
-         let productId = route.params.productId;
-         try {
-            let { data } = await axios.get(
-               `http://192.168.175.183:5000/api/marketing/products/${productId}`
-            );
-            if (data.status == "success") {
-               // console.log("Product", data.data);
-               setproduct(data.data);
-            } else {
-               Alert.alert("Failed", data.message);
-            }
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [route.params]);
-
-   useEffect(function () {
-      let fetchData = async () => {
-         let activeUserId = currentUser?.id;
-         let productId = route.params.productId;
-         try {
-            let { data } = await axios.get(
-               `http://192.168.175.183:5000/api/marketing/products/cl/${productId}`
-            );
-            if (data.status == "success") {
-               // console.log(data.data);
-               let ls: any[] = data.data.likes;
-               setComments(data.data.comments);
-               setLikes(data.data.likes);
-               if (ls.map((like) => like.userId).includes(activeUserId)) {
-                  setLiked(true);
+   useEffect(
+      function () {
+         let fetchData = async () => {
+            let productId = route.params.productId;
+            try {
+               let { data } = await axios.get(
+                  `http://192.168.175.183:5000/api/marketing/products/${productId}`
+               );
+               if (data.status == "success") {
+                  // console.log("Product", data.data);
+                  setproduct(data.data);
+               } else {
+                  Alert.alert("Failed", data.message);
                }
-               // Alert.alert("Success",data.message)
-            } else {
-               Alert.alert("Failed", data.message);
-            }
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [currentUser,route.params]);
-
-   useEffect(function () {
-      console.log("Fetching user");
-      let userId = route.params.userId;
-      console.log("USERID", userId);
-      let fetchData = async () => {
-         // console.log("Fetching user")
-         //  let activeUserId = 1
-         try {
-            let response = await fetch(
-               `http://192.168.175.183:5000/api/auth/users/${userId}`,
-               { method: "GET" }
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               // console.log("Users-----",data.data)
-               Setproducter(data.data.personal);
-               // Alert.alert("Success",data.message)
                setLoading(false);
-            } else {
-               Alert.alert("Failed", data.message);
+            } catch (err) {
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [route.params]);
+         };
+         fetchData();
+      },
+      [route.params]
+   );
+
+   useEffect(
+      function () {
+         let fetchData = async () => {
+            let activeUserId = currentUser?.id;
+            let productId = route.params.productId;
+            try {
+               let { data } = await axios.get(
+                  `http://192.168.175.183:5000/api/marketing/products/cl/${productId}`
+               );
+               if (data.status == "success") {
+                  // console.log(data.data);
+                  let ls: any[] = data.data.likes;
+                  setComments(data.data.comments);
+                  setLikes(data.data.likes);
+                  if (ls.map((like) => like.userId).includes(activeUserId)) {
+                     setLiked(true);
+                  }
+                  // Alert.alert("Success",data.message)
+               } else {
+                  Alert.alert("Failed", data.message);
+               }
+               setLoading(false);
+            } catch (err) {
+               Alert.alert("Failed", String(err));
+               setLoading(false);
+            }
+         };
+         fetchData();
+      },
+      [currentUser, route.params]
+   );
+
+   useEffect(
+      function () {
+         console.log("Fetching user");
+         let userId = route.params.userId;
+         console.log("USERID", userId);
+         let fetchData = async () => {
+            // console.log("Fetching user")
+            //  let activeUserId = 1
+            try {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/auth/users/${userId}`,
+                  { method: "GET" }
+               );
+               let data = await response.json();
+               if (data.status == "success") {
+                  // console.log("Users-----",data.data)
+                  Setproducter(data.data.personal);
+                  // Alert.alert("Success",data.message)
+                  setLoading(false);
+               } else {
+                  Alert.alert("Failed", data.message);
+               }
+               setLoading(false);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
+            }
+         };
+         fetchData();
+      },
+      [route.params]
+   );
 
    const handleProductRequest = async () => {
       if (affiliateId) {
@@ -260,17 +264,16 @@ const ProductScreen = ({ navigation, route }: any) => {
    };
 
    const handleBuy = async () => {
-      
       try {
          setLoading2(true);
 
-      let buyObj: MakePurchaseParams = {
-         affiliateId: JSON.parse(String(product?.affiliateId))[0],
-         productId: product?.id,
-         userId: product?.userId,
-         buyerId: currentUser?.id,
-      };
-      console.log(buyObj);
+         let buyObj: MakePurchaseParams = {
+            affiliateId: JSON.parse(String(product?.affiliateId))[0],
+            productId: product?.id,
+            userId: product?.userId,
+            buyerId: currentUser?.id,
+         };
+         console.log(buyObj);
          let { data } = await axios.post(
             `http://192.168.175.183:5000/api/marketing/buy`,
             buyObj
@@ -384,7 +387,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                      borderRadius: 3,
                   }}>
                   {currentUser?.id == product?.userId && (
-                      <View>
+                     <View>
                         <Button
                            style={{ backgroundColor: "#f9f9f9" }}
                            onPress={() => setOpenModal(true)}>
@@ -485,7 +488,12 @@ const ProductScreen = ({ navigation, route }: any) => {
                      </Text>
                   </View>
                </View>
-               <View style={{ flexDirection: "row", gap: 8,paddingHorizontal:10 }}>
+               <View
+                  style={{
+                     flexDirection: "row",
+                     gap: 8,
+                     paddingHorizontal: 10,
+                  }}>
                   <Button
                      style={{ flex: 1 }}
                      loading={loading1}
@@ -589,40 +597,46 @@ const ProductScreen = ({ navigation, route }: any) => {
                </View>
                <Divider />
             </View>
-      <View
-         style={{
-            paddingHorizontal: 15,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-         }}>
-         <TextInput
-            value={productCommentState.text}
-            placeholder="Comment here..."
-            onChangeText={(v) =>  dispatchproductComment({ type: "TEXT", payload: v })}
-            style={{
-               flex: 1,
-               backgroundColor:"#f6f6f6",
-               borderTopLeftRadius: 20,
-               borderBottomLeftRadius: 20,
-               height: 50,
-               paddingHorizontal: 25,
-            }}
-         />
-         <Pressable
-            onPress={handleComment}
-            style={{
-               paddingHorizontal: 20,
-               height: 50,
-               alignItems: "center",
-               justifyContent: "center",
-               borderTopRightRadius: 20,
-               borderBottomRightRadius: 20,
-               backgroundColor:"#f6f6f6",
-            }}>
-            <FontAwesome color={theme.colors.primary} name="comment-o" size={23} />
-         </Pressable>
-      </View>
+            <View
+               style={{
+                  paddingHorizontal: 15,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+               }}>
+               <TextInput
+                  value={productCommentState.text}
+                  placeholder="Comment here..."
+                  onChangeText={(v) =>
+                     dispatchproductComment({ type: "TEXT", payload: v })
+                  }
+                  style={{
+                     flex: 1,
+                     backgroundColor: "#f6f6f6",
+                     borderTopLeftRadius: 20,
+                     borderBottomLeftRadius: 20,
+                     height: 50,
+                     paddingHorizontal: 25,
+                  }}
+               />
+               <Pressable
+                  onPress={handleComment}
+                  style={{
+                     paddingHorizontal: 20,
+                     height: 50,
+                     alignItems: "center",
+                     justifyContent: "center",
+                     borderTopRightRadius: 20,
+                     borderBottomRightRadius: 20,
+                     backgroundColor: "#f6f6f6",
+                  }}>
+                  <FontAwesome
+                     color={theme.colors.primary}
+                     name="comment-o"
+                     size={23}
+                  />
+               </Pressable>
+            </View>
             {/* <View style={styles.commentBox}>
                <TextInput
           
@@ -679,10 +693,9 @@ const styles = StyleSheet.create({
       alignItems: "center",
       gap: 5,
       paddingHorizontal: 15,
-      borderWidth:0,
+      borderWidth: 0,
 
-      borderRadius:20,
-      
+      borderRadius: 20,
    },
    title: {
       fontFamily: "Poppins_700Bold",
@@ -691,7 +704,7 @@ const styles = StyleSheet.create({
       marginTop: 6,
    },
    commentInputField: {
-       flex: 1,
+      flex: 1,
       backgroundColor: "#f4f4f4",
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
@@ -699,8 +712,8 @@ const styles = StyleSheet.create({
       borderBottomLeftRadius: 20,
       height: 50,
       paddingHorizontal: 25,
-      borderColor: '#ffffff',
-},
+      borderColor: "#ffffff",
+   },
    likeCommentAmountCon: {
       flexDirection: "row",
       // justifyContent: "space-between",

@@ -10,42 +10,44 @@ import { useCurrentUser } from "../utils/CustomHooks";
 const FindFriendsComponent = ({ navigation }: any) => {
    const [users, setUsers] = useState<User[]>();
    const [loading, setLoading] = useState<boolean>(false);
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
 
-   useEffect(function () {
-      console.log("Fetching ff user");
-      setLoading(true);
-      let fetchData = async () => {
-         // console.log("Fetching user")
-       
-         try {
-            if(currentUser){
-               let activeUserId = currentUser?.id;
-               let response = await fetch(
-               `http://192.168.175.183:5000/api/media/unfollowing/${activeUserId}`,
-               { method: "GET" }
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               // console.log("Users-----", data.data);
-               setUsers(data.data?.sort(() => 0.5 - Math.random()));
-               // Alert.alert("Success",data.message)
+   useEffect(
+      function () {
+         console.log("Fetching ff user");
+         setLoading(true);
+         let fetchData = async () => {
+            // console.log("Fetching user")
+
+            try {
+               if (currentUser) {
+                  let activeUserId = currentUser?.id;
+                  let response = await fetch(
+                     `http://192.168.175.183:5000/api/media/unfollowing/${activeUserId}`,
+                     { method: "GET" }
+                  );
+                  let data = await response.json();
+                  if (data.status == "success") {
+                     // console.log("Users-----", data.data);
+                     setUsers(data.data?.sort(() => 0.5 - Math.random()));
+                     // Alert.alert("Success",data.message)
+                     setLoading(false);
+                  } else {
+                     Alert.alert("Failed", data.message);
+                  }
+               }
+
                setLoading(false);
-            } else {
-               Alert.alert("Failed", data.message);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-
-            }
-           
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [currentUser]);
+         };
+         fetchData();
+      },
+      [currentUser]
+   );
 
    if (loading)
       return (

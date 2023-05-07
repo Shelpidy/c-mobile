@@ -18,43 +18,44 @@ const CustomHeader = () => {
    const currentUser = useCurrentUser();
    const [activeTab, setActiveTab] = useState<number>(0);
    const theme = useTheme();
-   const navigation = useNavigation<any>()
+   const navigation = useNavigation<any>();
 
-   useEffect(function () {
-      console.log("Fetching user");
-      setLoading(true);
-      let fetchData = async () => {
-         // console.log("Fetching user")
+   useEffect(
+      function () {
+         console.log("Fetching user");
+         setLoading(true);
+         let fetchData = async () => {
+            // console.log("Fetching user")
             try {
-               if(currentUser){
-                   let response = await fetch(
-                  `http://192.168.175.183:5000/api/auth/users/${currentUser?.id}`,
-                  { method: "GET" }
-               );
-            
-               if (response.ok) {
-                  let data = await response.json();
-                  // console.log("Users-----", data.data);
-                  setUser(data.data.personal);
-                  // Alert.alert("Success",data.message)
-                  setLoading(false);
-               } else {
-                  let data = await response.json();
-                  Alert.alert("Failed", data.message);
+               if (currentUser) {
+                  let response = await fetch(
+                     `http://192.168.175.183:5000/api/auth/users/${currentUser?.id}`,
+                     { method: "GET" }
+                  );
+
+                  if (response.ok) {
+                     let data = await response.json();
+                     // console.log("Users-----", data.data);
+                     setUser(data.data.personal);
+                     // Alert.alert("Success",data.message)
+                     setLoading(false);
+                  } else {
+                     let data = await response.json();
+                     Alert.alert("Failed", data.message);
+                  }
                }
 
-               }
-              
                setLoading(false);
             } catch (err) {
                console.log(err);
                Alert.alert("Failed", String(err));
                setLoading(false);
             }
-         
-      };
-      fetchData();
-   }, [currentUser]);
+         };
+         fetchData();
+      },
+      [currentUser]
+   );
 
    const gotoNextScreen = (screenName: string, params?: any) => {
       if (screenName === "HomeScreen") {

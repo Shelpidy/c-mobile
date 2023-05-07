@@ -9,36 +9,39 @@ const ProductNotificationScreen = ({ navigation, route }: any) => {
    const [product, setProduct] = useState<ProductComponentProps | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
 
-   useEffect(function () {
-      console.log("Fetching user");
-      setLoading(true);
-      let fetchData = async () => {
-         // console.log("Fetching user")
-         //  let activeUserId = 1
-         try {
-            let response = await fetch(
-               `http://192.168.175.183:5000/api/notifications/product/${route.params.productId}`,
-               { method: "GET" }
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               console.log("Data-----", data.data);
-               setOwner(data.data.owner);
-               setProduct(data.data.product);
-               // Alert.alert("Success",data.message)
+   useEffect(
+      function () {
+         console.log("Fetching user");
+         setLoading(true);
+         let fetchData = async () => {
+            // console.log("Fetching user")
+            //  let activeUserId = 1
+            try {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/notifications/product/${route.params.productId}`,
+                  { method: "GET" }
+               );
+               let data = await response.json();
+               if (data.status == "success") {
+                  console.log("Data-----", data.data);
+                  setOwner(data.data.owner);
+                  setProduct(data.data.product);
+                  // Alert.alert("Success",data.message)
+                  setLoading(false);
+               } else {
+                  Alert.alert("Failed", data.message);
+               }
                setLoading(false);
-            } else {
-               Alert.alert("Failed", data.message);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [route.params]);
+         };
+         fetchData();
+      },
+      [route.params]
+   );
 
    return (
       <ScrollView style={{ backgroundColor: "#f5f5f5" }}>

@@ -11,41 +11,42 @@ const Comment = (props: ProductCommentProps) => {
    const [commentor, setCommentor] = useState<any>(null);
    const [loading, setLoading] = useState<any>(false);
 
-   useEffect(function () {
-      console.log("Fetching user");
-      setLoading(true);
-      let fetchData = async () => {
-         // console.log("Fetching user")
-         //  let activeUserId = 1
-         try {
-            if(props){
-                let response = await fetch(
-               `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
-               { method: "GET" }
-            );
-          
-            if (response.ok) {
-                 let data = await response.json();
-               // console.log("Users-----",data.data)
-               setCommentor(data.data.personal);
-               // Alert.alert("Success",data.message)
-         
-            } else {
-                 let data = await response.json();
-               Alert.alert("Failed", data.message);
+   useEffect(
+      function () {
+         console.log("Fetching user");
+         setLoading(true);
+         let fetchData = async () => {
+            // console.log("Fetching user")
+            //  let activeUserId = 1
+            try {
+               if (props) {
+                  let response = await fetch(
+                     `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
+                     { method: "GET" }
+                  );
+
+                  if (response.ok) {
+                     let data = await response.json();
+                     // console.log("Users-----",data.data)
+                     setCommentor(data.data.personal);
+                     // Alert.alert("Success",data.message)
+                  } else {
+                     let data = await response.json();
+                     Alert.alert("Failed", data.message);
+                  }
+               }
+
+               setLoading(false);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-               
-            }
-           
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [props]);
+         };
+         fetchData();
+      },
+      [props]
+   );
 
    const handleEditComment = () => {};
 
@@ -92,15 +93,23 @@ const Comment = (props: ProductCommentProps) => {
                         paddingHorizontal: 15,
                         paddingVertical: 8,
                      }}>
-                      <View style={{flex:1,flexDirection:'row',alignItems:"center",justifyContent:"space-between"}}>
-                         <Text style={styles.userFullName}>
+                     <View
+                        style={{
+                           flex: 1,
+                           flexDirection: "row",
+                           alignItems: "center",
+                           justifyContent: "space-between",
+                        }}>
+                        <Text style={styles.userFullName}>
                            {commentor.firstName} {commentor.middleName}{" "}
                            {commentor.lastName}
                         </Text>
-                           {(currentUser?.id == props?.userId ||
+                        {(currentUser?.id == props?.userId ||
                            currentUser?.id == props?.posterId) && (
                            <View style={{ flexDirection: "row" }}>
-                              <Button style={{backgroundColor:"#fff"}} onPress={() => setOpenModal(true)}>
+                              <Button
+                                 style={{ backgroundColor: "#fff" }}
+                                 onPress={() => setOpenModal(true)}>
                                  <SimpleLineIcons name="options-vertical" />
                               </Button>
                            </View>
@@ -121,9 +130,7 @@ const Comment = (props: ProductCommentProps) => {
                            marginTop: 2,
                            paddingHorizontal: 5,
                            borderRadius: 3,
-                        }}>
-                       
-                     </View>
+                        }}></View>
                   </View>
                </View>
             </View>

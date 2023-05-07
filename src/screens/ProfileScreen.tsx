@@ -69,40 +69,43 @@ const ProfileScreen = ({ navigation, route }: any) => {
       fetchData();
    }, []);
 
-   useEffect(function () {
-      setLoading(true);
-      let fetchData = async () => {
-         let userId = route.params.userId;
-         try {
-            let response = await fetch(
-               `http://192.168.175.183:5000/api/media/posts/user/${userId}`
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               // console.log(data.data)
-               // setPosts(data.data);
-               let fetchedPost: PostComponentProps[] = data.data;
-               let numOfPageLinks = Math.ceil(
-                  fetchedPost.length / numberOfPostsPerPage
+   useEffect(
+      function () {
+         setLoading(true);
+         let fetchData = async () => {
+            let userId = route.params.userId;
+            try {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/media/posts/user/${userId}`
                );
-               // console.log(fetchedPost);
-               setAllPosts(fetchedPost);
-               setNumberOfPageLinks(numOfPageLinks);
-               const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
-               const lastIndex = currentIndex + numberOfPostsPerPage;
-               setPosts(data.data.slice(currentIndex, lastIndex));
-               // Alert.alert("Success",data.message)
-            } else {
-               Alert.alert("Failed", data.message);
+               let data = await response.json();
+               if (data.status == "success") {
+                  // console.log(data.data)
+                  // setPosts(data.data);
+                  let fetchedPost: PostComponentProps[] = data.data;
+                  let numOfPageLinks = Math.ceil(
+                     fetchedPost.length / numberOfPostsPerPage
+                  );
+                  // console.log(fetchedPost);
+                  setAllPosts(fetchedPost);
+                  setNumberOfPageLinks(numOfPageLinks);
+                  const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
+                  const lastIndex = currentIndex + numberOfPostsPerPage;
+                  setPosts(data.data.slice(currentIndex, lastIndex));
+                  // Alert.alert("Success",data.message)
+               } else {
+                  Alert.alert("Failed", data.message);
+               }
+               setLoading(false);
+            } catch (err) {
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [route]);
+         };
+         fetchData();
+      },
+      [route]
+   );
 
    useEffect(() => {
       const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
@@ -155,8 +158,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                            navigation.navigate("FollowersScreen", {
                               user: user?.personal,
                            })
-                        }
-                       >
+                        }>
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -186,8 +188,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                            navigation.navigate("FollowingsScreen", {
                               user: user?.personal,
                            })
-                        }
-                       >
+                        }>
                         <Text
                            style={{
                               textAlign: "center",
@@ -230,9 +231,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         }}>
                         {user?.sales?.count}
                      </Text>
-                     <Button
-                        style={{ backgroundColor: "#fff" }}
-                       >
+                     <Button style={{ backgroundColor: "#fff" }}>
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -255,9 +254,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         }}>
                         {user?.affiliates?.count}
                      </Text>
-                     <Button
-                        style={{ backgroundColor: "#fff" }}
-                       >
+                     <Button style={{ backgroundColor: "#fff" }}>
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -279,13 +276,15 @@ const ProfileScreen = ({ navigation, route }: any) => {
                user={user?.personal}
             />
          </View>
-        
+
          {!posts && (
             <View>
                <ActivityIndicator />
             </View>
          )}
-         {posts && posts.length > 1 && <SearchForm setSearchValue={(v) => searchPosts(v)} />}
+         {posts && posts.length > 1 && (
+            <SearchForm setSearchValue={(v) => searchPosts(v)} />
+         )}
          {posts &&
             posts.map((post) => {
                return (

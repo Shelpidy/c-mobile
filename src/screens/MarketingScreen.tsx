@@ -54,7 +54,6 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       fetchData();
    }, []);
 
-
    useEffect(() => {
       const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
       const lastIndex = currentIndex + numberOfProductsPerPage;

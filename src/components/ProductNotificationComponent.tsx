@@ -29,36 +29,39 @@ const ProductNotificationComponent = ({
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
-   useEffect(function () {
-      console.log("Fetching notification products");
-      setLoading(true);
-      let fetchData = async () => {
-         // console.log("Fetching user")
-         //  let activeUserId = 1
-         try {
-            let response = await fetch(
-               `http://192.168.175.183:5000/api/marketing/products/${notification?.notificationFrom}`,
-               { method: "GET" }
-            );
-            if (response.ok) {
-               let data = await response.json();
-               console.log("Products-----", data.data);
-               setNotFrom(data.data);
-               // Alert.alert("Success",data.message)
+   useEffect(
+      function () {
+         console.log("Fetching notification products");
+         setLoading(true);
+         let fetchData = async () => {
+            // console.log("Fetching user")
+            //  let activeUserId = 1
+            try {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/marketing/products/${notification?.notificationFrom}`,
+                  { method: "GET" }
+               );
+               if (response.ok) {
+                  let data = await response.json();
+                  console.log("Products-----", data.data);
+                  setNotFrom(data.data);
+                  // Alert.alert("Success",data.message)
+                  setLoading(false);
+               } else {
+                  let data = await response.json();
+                  Alert.alert("Failed", data.message);
+               }
                setLoading(false);
-            } else {
-               let data = await response.json();
-               Alert.alert("Failed", data.message);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [notification]);
+         };
+         fetchData();
+      },
+      [notification]
+   );
 
    const handleNotification = async () => {
       let notId = notification.id;

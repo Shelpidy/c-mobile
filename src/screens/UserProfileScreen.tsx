@@ -29,76 +29,83 @@ const UserProfileScreen = ({ navigation, route }: any) => {
    const currentUser = useCurrentUser();
    const [followed, setFollowed] = useState<boolean>(false);
 
-   useEffect(function () {
-      console.log("Fetching user");
-      console.log(route.params.userId);
-      let fetchData = async () => {
-         // console.log("Fetching user")
-         //  let activeUserId = 1
-         try {
-           
-            let response = await fetch(
-               `http://192.168.175.183:5000/api/auth/users/${route.params?.userId}`,
-               { method: "GET" }
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               console.log("Users-----", data.data);
-               setUser(data.data);
+   useEffect(
+      function () {
+         console.log("Fetching user");
+         console.log(route.params.userId);
+         let fetchData = async () => {
+            // console.log("Fetching user")
+            //  let activeUserId = 1
+            try {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/auth/users/${route.params?.userId}`,
+                  { method: "GET" }
+               );
+               let data = await response.json();
+               if (data.status == "success") {
+                  console.log("Users-----", data.data);
+                  setUser(data.data);
 
-               if (currentUser?.followingIds?.includes(data.data?.personal)) {
-                  setFollowed(true);
+                  if (
+                     currentUser?.followingIds?.includes(data.data?.personal)
+                  ) {
+                     setFollowed(true);
+                  }
+               } else {
+                  Alert.alert("Failed", data.message);
                }
-            } else {
-               Alert.alert("Failed", data.message);
+               setLoading(false);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [currentUser,route.params,followed]);
+         };
+         fetchData();
+      },
+      [currentUser, route.params, followed]
+   );
 
-   useEffect(function () {
-      let fetchData = async () => {
-         let userId = route.params?.userId;
-         try {
-            let response = await fetch(
-               `http://192.168.175.183:5000/api/media/posts/user/${userId}`
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               // console.log(data.data);
-               // setPosts(data.data);
-               let numOfPageLinks = 1;
-               let fetchedPost: PostComponentProps[] = data.data;
-               if (fetchedPost.length > numberOfPostsPerPage) {
-                  numOfPageLinks = Math.ceil(
-                     fetchedPost.length / numberOfPostsPerPage
-                  );
+   useEffect(
+      function () {
+         let fetchData = async () => {
+            let userId = route.params?.userId;
+            try {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/media/posts/user/${userId}`
+               );
+               let data = await response.json();
+               if (data.status == "success") {
+                  // console.log(data.data);
+                  // setPosts(data.data);
+                  let numOfPageLinks = 1;
+                  let fetchedPost: PostComponentProps[] = data.data;
+                  if (fetchedPost.length > numberOfPostsPerPage) {
+                     numOfPageLinks = Math.ceil(
+                        fetchedPost.length / numberOfPostsPerPage
+                     );
+                  }
+
+                  // console.log(fetchedPost);
+                  setAllPosts(fetchedPost);
+                  setNumberOfPageLinks(numOfPageLinks);
+                  const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
+                  const lastIndex = currentIndex + numberOfPostsPerPage;
+                  setPosts(data.data.slice(currentIndex, lastIndex));
+                  // Alert.alert("Success",data.message)
+               } else {
+                  Alert.alert("Failed", data.message);
                }
-
-               // console.log(fetchedPost);
-               setAllPosts(fetchedPost);
-               setNumberOfPageLinks(numOfPageLinks);
-               const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
-               const lastIndex = currentIndex + numberOfPostsPerPage;
-               setPosts(data.data.slice(currentIndex, lastIndex));
-               // Alert.alert("Success",data.message)
-            } else {
-               Alert.alert("Failed", data.message);
+               setLoading(false);
+            } catch (err) {
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [route]);
+         };
+         fetchData();
+      },
+      [route]
+   );
 
    useEffect(() => {
       const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
@@ -107,7 +114,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
    }, [pageNumber]);
 
    const handleFollow = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
          let { data } = await axios.put(
             `http://192.168.175.183:5000/api/media/follows/`,
@@ -129,7 +136,8 @@ const UserProfileScreen = ({ navigation, route }: any) => {
    };
 
    return (
-      <ScrollView style={{ flex: 1, backgroundColor: "#f6f6f6",paddingTop:5 }}>
+      <ScrollView
+         style={{ flex: 1, backgroundColor: "#f6f6f6", paddingTop: 5 }}>
          {!user && (
             <View>
                <ActivityIndicator />
@@ -167,13 +175,12 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                         {user?.followers?.count}
                      </Text>
                      <Button
-                         style={{ backgroundColor: "#fff" }}
+                        style={{ backgroundColor: "#fff" }}
                         onPress={() =>
                            navigation.navigate("FollowersScreen", {
                               user: user?.personal,
                            })
-                        }
-                        >
+                        }>
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -203,8 +210,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                            navigation.navigate("FollowingsScreen", {
                               user: user?.personal,
                            })
-                        }
-                    >
+                        }>
                         <Text
                            style={{
                               textAlign: "center",
@@ -247,9 +253,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                         }}>
                         {user?.sales?.count}
                      </Text>
-                     <Button
-                        style={{ backgroundColor: "#fff" }}
-                    >
+                     <Button style={{ backgroundColor: "#fff" }}>
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -272,9 +276,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                         }}>
                         {user?.affiliates?.count}
                      </Text>
-                     <Button
-                        style={{ backgroundColor: "#fff" }}
-                    >
+                     <Button style={{ backgroundColor: "#fff" }}>
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -297,7 +299,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      marginBottom: 10,
                   }}>
                   <Button
-                     loading = {loading}
+                     loading={loading}
                      disabled={loading}
                      labelStyle={{ color: theme.colors.primary }}
                      onPress={handleFollow}

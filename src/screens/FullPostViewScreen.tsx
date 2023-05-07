@@ -9,7 +9,7 @@ import {
    ScrollView,
    Pressable,
    KeyboardAvoidingView,
-   TextInput
+   TextInput,
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../components/ImagesViewer";
@@ -17,7 +17,7 @@ import VideoPlayer from "../components/VideoPlayer";
 import TextViewer from "../components/TextViewer";
 import Comments from "../components/MediaPosts/Comments";
 import { postComments, postLikes, users } from "../data";
-import {useTheme, Button, IconButton } from "react-native-paper";
+import { useTheme, Button, IconButton } from "react-native-paper";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import {
    AntDesign,
@@ -87,65 +87,71 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       console.log("Post", route.params);
    }, []);
 
-   useEffect(function () {
-      let fetchData = async () => {
-         let activeUserId = currentUser?.id;
-         let postId = route.params.id;
-         try {
-            let { data } = await axios.get(
-               `http://192.168.175.183:5000/api/media/posts/cl/${postId}`
-            );
-            if (data.status == "success") {
-               console.log(data.data);
-               let ls: any[] = data.data.likes;
-               setComments(data.data.comments);
-               setLikes(data.data.likes);
-               if (ls.map((like) => like.userId).includes(activeUserId)) {
-                  setLiked(true);
+   useEffect(
+      function () {
+         let fetchData = async () => {
+            let activeUserId = currentUser?.id;
+            let postId = route.params.id;
+            try {
+               let { data } = await axios.get(
+                  `http://192.168.175.183:5000/api/media/posts/cl/${postId}`
+               );
+               if (data.status == "success") {
+                  console.log(data.data);
+                  let ls: any[] = data.data.likes;
+                  setComments(data.data.comments);
+                  setLikes(data.data.likes);
+                  if (ls.map((like) => like.userId).includes(activeUserId)) {
+                     setLiked(true);
+                  }
+                  // Alert.alert("Success",data.message)
+               } else {
+                  Alert.alert("Failed", data.message);
                }
-               // Alert.alert("Success",data.message)
-            } else {
-               Alert.alert("Failed", data.message);
-            }
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [currentUser]);
-
-   useEffect(function () {
-      console.log("Fetching user");
-      setLoading(true);
-      let userId = route.params.userId;
-      let fetchData = async () => {
-         // console.log("Fetching user")
-         //  let activeUserId = 1
-         try {
-            let response = await fetch(
-               `http://192.168.175.183:5000/api/auth/users/${userId}`,
-               { method: "GET" }
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               // console.log("Users-----",data.data)
-               SetPoster(data.data.personal);
-               // Alert.alert("Success",data.message)
                setLoading(false);
-            } else {
-               Alert.alert("Failed", data.message);
+            } catch (err) {
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [route]);
+         };
+         fetchData();
+      },
+      [currentUser]
+   );
+
+   useEffect(
+      function () {
+         console.log("Fetching user");
+         setLoading(true);
+         let userId = route.params.userId;
+         let fetchData = async () => {
+            // console.log("Fetching user")
+            //  let activeUserId = 1
+            try {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/auth/users/${userId}`,
+                  { method: "GET" }
+               );
+               let data = await response.json();
+               if (data.status == "success") {
+                  // console.log("Users-----",data.data)
+                  SetPoster(data.data.personal);
+                  // Alert.alert("Success",data.message)
+                  setLoading(false);
+               } else {
+                  Alert.alert("Failed", data.message);
+               }
+               setLoading(false);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
+            }
+         };
+         fetchData();
+      },
+      [route]
+   );
 
    const toggleEmojiPicker = () => {
       setShowEmojiPicker(!showEmojiPicker);
@@ -372,40 +378,44 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                   
                   </View>
             </Modal> */}
-                <View
-         style={{
-            paddingHorizontal: 15,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-         }}>
-         <TextInput
-            value={textValue}
-            placeholder="Comment here..."
-            onChangeText={(v) =>setTextValue(v)}
-            style={{
-               flex: 1,
-               backgroundColor:"#f6f6f6",
-               borderTopLeftRadius: 20,
-               borderBottomLeftRadius: 20,
-               height: 50,
-               paddingHorizontal: 25,
-            }}
-         />
-         <Pressable
-            onPress={handleComment}
-            style={{
-               paddingHorizontal: 20,
-               height: 50,
-               alignItems: "center",
-               justifyContent: "center",
-               borderTopRightRadius: 20,
-               borderBottomRightRadius: 20,
-               backgroundColor:"#f6f6f6",
-            }}>
-            <FontAwesome color={theme.colors.primary} name="comment-o" size={23} />
-         </Pressable>
-      </View>
+               <View
+                  style={{
+                     paddingHorizontal: 15,
+                     flexDirection: "row",
+                     alignItems: "center",
+                     justifyContent: "center",
+                  }}>
+                  <TextInput
+                     value={textValue}
+                     placeholder="Comment here..."
+                     onChangeText={(v) => setTextValue(v)}
+                     style={{
+                        flex: 1,
+                        backgroundColor: "#f6f6f6",
+                        borderTopLeftRadius: 20,
+                        borderBottomLeftRadius: 20,
+                        height: 50,
+                        paddingHorizontal: 25,
+                     }}
+                  />
+                  <Pressable
+                     onPress={handleComment}
+                     style={{
+                        paddingHorizontal: 20,
+                        height: 50,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderTopRightRadius: 20,
+                        borderBottomRightRadius: 20,
+                        backgroundColor: "#f6f6f6",
+                     }}>
+                     <FontAwesome
+                        color={theme.colors.primary}
+                        name="comment-o"
+                        size={23}
+                     />
+                  </Pressable>
+               </View>
                {/* <KeyboardAvoidingView style={styles.commentBox}>
                   <TextInput
                      value={textValue}

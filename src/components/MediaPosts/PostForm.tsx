@@ -11,6 +11,14 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { ImagePicker } from "expo-image-multiple-picker";
 import { useCurrentUser } from "../../utils/CustomHooks";
+import config from "../.././aws-config";
+import AWS from "aws-sdk";
+
+const s3 = new AWS.S3({
+   accessKeyId: config.accessKeyId,
+   secretAccessKey: config.secretAccessKey,
+   region: config.region,
+});
 
 type Post = Partial<Omit<PostComponentProps, "id" | "updatedAt" | "createdAt">>;
 
@@ -41,14 +49,37 @@ const PostForm = () => {
    const [postState, postDispatch] = useReducer(postReducer, initialState);
    const [imageOpen, setImageOpen] = useState(false);
    const [videoOpen, setVideoOpen] = useState(false);
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
    const theme = useTheme();
-
 
    const handlePost = async () => {
       setLoading(true);
       let activeUserId = currentUser?.id;
       let postObj = { ...postState, userId: activeUserId };
+      // Upload images to S3
+      const uploadedImageURLs = [];
+      for (const imageUri of postObj.images) {
+         const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
+         const imageKey = `${Date.now()}-${imageName}`;
+         const imageParams = {
+            Bucket: config.bucketName,
+            Key: imageKey,
+            Body: { uri: imageUri },
+         };
+
+         try {
+            const uploadResponse = await s3.upload(imageParams).promise();
+            uploadedImageURLs.push(uploadResponse.Location);
+         } catch (error) {
+            console.log("Image upload error:", error);
+            setLoading(false);
+            Alert.alert("Failed", "Image upload failed");
+            return;
+         }
+      }
+
+      // Update product with uploaded image URLs
+      postObj.images = uploadedImageURLs;
       try {
          let response = await axios.post(
             "http://192.168.175.183:5000/api/media/posts/",

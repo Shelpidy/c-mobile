@@ -70,7 +70,7 @@ const NotificationProductReviewComponent = ({
    const currentUser = useCurrentUser();
    const [poster, SetPoster] = useState<any>();
    const [loading, setLoading] = useState<boolean>(false);
-   const [buyer,setBuyer] =  useState<User>()
+   const [buyer, setBuyer] = useState<User>();
    const theme = useTheme();
    const navigation = useNavigation<any>();
 
@@ -81,25 +81,24 @@ const NotificationProductReviewComponent = ({
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
-            if(props){
-                let response = await fetch(
-               `http://192.168.175.183:5000/api/auth/users/${props.userId}`,
-               { method: "GET" }
-            );
+            if (props) {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/auth/users/${props.userId}`,
+                  { method: "GET" }
+               );
 
-            if (response.ok) {
-               let data = await response.json();
-               // console.log("Users-----", data.data);
-               SetPoster(data.data.personal);
-               // Alert.alert("Success",data.message)
-               setLoading(false);
-            } else {
-               let data = await response.json();
-               Alert.alert("Failed", data.message);
+               if (response.ok) {
+                  let data = await response.json();
+                  // console.log("Users-----", data.data);
+                  SetPoster(data.data.personal);
+                  // Alert.alert("Success",data.message)
+                  setLoading(false);
+               } else {
+                  let data = await response.json();
+                  Alert.alert("Failed", data.message);
+               }
             }
 
-            }
-           
             setLoading(false);
          } catch (err) {
             console.log(err);
@@ -110,32 +109,31 @@ const NotificationProductReviewComponent = ({
       fetchData();
    }, []);
 
-      useEffect(function () {
+   useEffect(function () {
       console.log("Fetching user");
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
-            if(props){
-                let response = await fetch(
-               `http://192.168.175.183:5000/api/auth/users/${buyerId}`,
-               { method: "GET" }
-            );
+            if (props) {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/auth/users/${buyerId}`,
+                  { method: "GET" }
+               );
 
-            if (response.ok) {
-               let data = await response.json();
-               // console.log("Users-----", data.data);
-               setBuyer(data.data.personal);
-               // Alert.alert("Success",data.message)
-               setLoading(false);
-            } else {
-               let data = await response.json();
-               Alert.alert("Failed", data.message);
+               if (response.ok) {
+                  let data = await response.json();
+                  // console.log("Users-----", data.data);
+                  setBuyer(data.data.personal);
+                  // Alert.alert("Success",data.message)
+                  setLoading(false);
+               } else {
+                  let data = await response.json();
+                  Alert.alert("Failed", data.message);
+               }
             }
 
-            }
-           
             setLoading(false);
          } catch (err) {
             console.log(err);

@@ -76,72 +76,76 @@ const PostComponent = (props: NPostComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
-   useEffect(function () {
-      let fetchData = async () => {
-         let activeUserId = currentUser?.id;
-         try {
-            if(props){
+   useEffect(
+      function () {
+         let fetchData = async () => {
+            let activeUserId = currentUser?.id;
+            try {
+               if (props) {
                   let { data } = await axios.get(
-               `http://192.168.175.183:5000/api/media/posts/cl/${props?.id}`
-            );
-            if (data.status == "success") {
-               // console.log(data.data);
-               let ls: any[] = data.data.likes;
-               let cs = data.data.comments;
-               setComments(cs);
-               setLikes(ls);
-               if (ls.map((like) => like.userId).includes(activeUserId)) {
-                  setLiked(true);
+                     `http://192.168.175.183:5000/api/media/posts/cl/${props?.id}`
+                  );
+                  if (data.status == "success") {
+                     // console.log(data.data);
+                     let ls: any[] = data.data.likes;
+                     let cs = data.data.comments;
+                     setComments(cs);
+                     setLikes(ls);
+                     if (ls.map((like) => like.userId).includes(activeUserId)) {
+                        setLiked(true);
+                     }
+                     // Alert.alert("Success",data.message)
+                  } else {
+                     Alert.alert("Failed", data.message);
+                  }
                }
-               // Alert.alert("Success",data.message)
-            } else {
-               Alert.alert("Failed", data.message);
-            }
 
-            }
-         
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [currentUser,props]);
-
-   useEffect(function () {
-      console.log("Fetching user");
-      setLoading(true);
-      let fetchData = async () => {
-         // console.log("Fetching user")
-         //  let activeUserId = 1
-         try {
-            if(props){
-                 let response = await fetch(
-               `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
-               { method: "GET" }
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               // console.log("Users-----", data.data);
-               SetPoster(data.data.personal);
-               // Alert.alert("Success",data.message)
                setLoading(false);
-            } else {
-               Alert.alert("Failed", data.message);
+            } catch (err) {
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
+         };
+         fetchData();
+      },
+      [currentUser, props]
+   );
 
+   useEffect(
+      function () {
+         console.log("Fetching user");
+         setLoading(true);
+         let fetchData = async () => {
+            // console.log("Fetching user")
+            //  let activeUserId = 1
+            try {
+               if (props) {
+                  let response = await fetch(
+                     `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
+                     { method: "GET" }
+                  );
+                  let data = await response.json();
+                  if (data.status == "success") {
+                     // console.log("Users-----", data.data);
+                     SetPoster(data.data.personal);
+                     // Alert.alert("Success",data.message)
+                     setLoading(false);
+                  } else {
+                     Alert.alert("Failed", data.message);
+                  }
+               }
+
+               setLoading(false);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-          
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [props]);
+         };
+         fetchData();
+      },
+      [props]
+   );
 
    const gotoUserProfile = () => {
       if (currentUser?.id === poster.id) {
@@ -356,7 +360,7 @@ const styles = StyleSheet.create({
       // justifyContent: "space-between",
       gap: 20,
       paddingHorizontal: 10,
-      paddingVertical:4,
+      paddingVertical: 4,
       // borderWidth:1,
       marginLeft: 10,
       borderRadius: 20,

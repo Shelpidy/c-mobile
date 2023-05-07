@@ -27,34 +27,37 @@ const NotificationScreen = ({ navigation }: any) => {
    const currentUser = useCurrentUser();
    const theme = useTheme();
 
-   useEffect(function () {
-      console.log("Fetching user");
-      setLoading(true);
-      let fetchData = async () => {
-         let activeUserId = currentUser?.id;
-         try {
-            let response = await fetch(
-               `http://192.168.175.183:5000/api/notifications/${activeUserId}`,
-               { method: "GET" }
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               // console.log("User Notifications-----", data.data);
-               setNotifications(data.data);
-               // Alert.alert("Success",data.message)
+   useEffect(
+      function () {
+         console.log("Fetching user");
+         setLoading(true);
+         let fetchData = async () => {
+            let activeUserId = currentUser?.id;
+            try {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/notifications/${activeUserId}`,
+                  { method: "GET" }
+               );
+               let data = await response.json();
+               if (data.status == "success") {
+                  // console.log("User Notifications-----", data.data);
+                  setNotifications(data.data);
+                  // Alert.alert("Success",data.message)
+                  setLoading(false);
+               } else {
+                  Alert.alert("Failed", data.message);
+               }
                setLoading(false);
-            } else {
-               Alert.alert("Failed", data.message);
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [currentUser]);
+         };
+         fetchData();
+      },
+      [currentUser]
+   );
 
    if (!notifications) {
       return (

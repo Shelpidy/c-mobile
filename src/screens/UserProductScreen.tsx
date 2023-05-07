@@ -15,45 +15,48 @@ const UserProductScreen = ({ navigation, route }: any) => {
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
    const [owner, setOwner] = useState<User>();
-   const currentUser =  useCurrentUser()
+   const currentUser = useCurrentUser();
 
-   useEffect(function () {
-      setLoading(true);
-      let fetchData = async () => {
-         let activeUserId = currentUser?.id;
-         setOwner(route.params.user);
-         console.log("Product userId", route.params.user.id);
-         try {
-            let response = await fetch(
-               `http://192.168.175.183:5000/api/marketing/products/user/${route.params.user.id}`
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               console.log(data.data);
-               console.log("Products", data.data);
-               let fetchedPost: ProductComponentProps[] = data.data;
-               let numOfPageLinks = Math.ceil(
-                  fetchedPost.length / numberOfProductsPerPage
+   useEffect(
+      function () {
+         setLoading(true);
+         let fetchData = async () => {
+            let activeUserId = currentUser?.id;
+            setOwner(route.params.user);
+            console.log("Product userId", route.params.user.id);
+            try {
+               let response = await fetch(
+                  `http://192.168.175.183:5000/api/marketing/products/user/${route.params.user.id}`
                );
-               // console.log(fetchedPost);
-               setAllProducts(fetchedPost);
-               setNumberOfPageLinks(numOfPageLinks);
-               const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
-               const lastIndex = currentIndex + numberOfProductsPerPage;
-               setProducts(data.data.slice(currentIndex, lastIndex));
-               // Alert.alert("Success",data.message)
-            } else {
-               Alert.alert("Failed", data.message);
+               let data = await response.json();
+               if (data.status == "success") {
+                  console.log(data.data);
+                  console.log("Products", data.data);
+                  let fetchedPost: ProductComponentProps[] = data.data;
+                  let numOfPageLinks = Math.ceil(
+                     fetchedPost.length / numberOfProductsPerPage
+                  );
+                  // console.log(fetchedPost);
+                  setAllProducts(fetchedPost);
+                  setNumberOfPageLinks(numOfPageLinks);
+                  const currentIndex =
+                     numberOfProductsPerPage * (pageNumber - 1);
+                  const lastIndex = currentIndex + numberOfProductsPerPage;
+                  setProducts(data.data.slice(currentIndex, lastIndex));
+                  // Alert.alert("Success",data.message)
+               } else {
+                  Alert.alert("Failed", data.message);
+               }
+               setLoading(false);
+            } catch (err) {
+               Alert.alert("Failed", String(err));
+               setLoading(false);
             }
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, [currentUser]);
-
+         };
+         fetchData();
+      },
+      [currentUser]
+   );
 
    useEffect(() => {
       const currentIndex = numberOfProductsPerPage * (pageNumber - 1);

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Dimensions, StyleSheet, Text, View, Alert } from "react-native";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import * as Device from "expo-device";
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePushNotificationToken } from "../utils/CustomHooks";
 
 type LoginFormProps = {
@@ -54,9 +54,9 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                let data = await response.json();
                console.log("Login Token", data.token);
                try {
-                  await AsyncStorage.setItem('loginToken',data.token);
-                  console.log("Token set")
-                  navigation.navigate("HomeStack",{screen:"HomeScreen"})
+                  await AsyncStorage.setItem("loginToken", data.token);
+                  console.log("Token set");
+                  navigation.navigate("HomeStack", { screen: "HomeScreen" });
                } catch (err) {
                   console.log(err);
                }
