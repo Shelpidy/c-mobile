@@ -343,7 +343,7 @@ const ProductScreen = ({ navigation, route }: any) => {
 
    return (
       <ScrollView style={styles.productContainer}>
-         <Modal visible={openModal}>
+         {/* <Modal visible={openModal}>
             <View
                style={{
                   flex: 1,
@@ -361,7 +361,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                   <Text>Comment Editor</Text>
                </View>
             </View>
-         </Modal>
+         </Modal> */}
          {producter && (
             <View
                style={{

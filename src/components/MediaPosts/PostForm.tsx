@@ -91,7 +91,7 @@ const PostForm = () => {
             Alert.alert("Successful", "Post successfully");
          } else {
             setLoading(false);
-            Alert.alert("Failed", "Post Faile");
+            Alert.alert("Failed", "Post Failed");
          }
       } catch (err) {
          setLoading(false);

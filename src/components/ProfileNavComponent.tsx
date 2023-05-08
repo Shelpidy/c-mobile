@@ -32,7 +32,9 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                   }}>
                   Settings
                </Text>
-               <Button>
+               <Button  onPress={() =>
+                  navigation.navigate("SettingsScreen")
+               }>
                   <Entypo name="chevron-thin-right" />
                </Button>
             </View>
