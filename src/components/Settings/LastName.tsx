@@ -13,7 +13,7 @@ const LastNameForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.put('http://192.168.175.183:5000/api/auth/users/personal/', {
+      const response = await axios.put('http://192.168.0.107:5000/api/auth/users/personal/', {
         key: 'lastName',
         value: lastName,
         userId: currentUser?.id, // Replace with the actual user ID
@@ -36,6 +36,7 @@ const LastNameForm = () => {
     <View>
       <TextInput
         label="Last Name"
+             outlineStyle={{borderColor:"#f6f6f6"}}
         value={lastName}
         onChangeText={setLastName}
         mode="outlined"
@@ -55,6 +56,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
+    backgroundColor:"#f6f6f6"
   },
 });
 

@@ -39,16 +39,19 @@ const Form4 = ({ navigation, setActiveTab }: Form4Props) => {
             source={require("../../../assets/Illustrators/signin.png")}></Image>
          <View style={styles.form}>
             <TextInput
+              outlineStyle={{borderColor:"#f6f6f6"}}
                mode="outlined"
                style={styles.input}
                label="city"
                inputMode="text"></TextInput>
             <TextInput
+              outlineStyle={{borderColor:"#f6f6f6"}}
                mode="outlined"
                style={styles.input}
                label="Permanent Adress"
                inputMode="text"></TextInput>
             <TextInput
+              outlineStyle={{borderColor:"#f6f6f6"}}
                mode="outlined"
                style={styles.input}
                label="Current Address"
@@ -58,9 +61,9 @@ const Form4 = ({ navigation, setActiveTab }: Form4Props) => {
                onPress={submitForm4}
                style={{ marginTop: 15 }}>
                Continue{" "}
-               <MaterialCommunityIcons
+               {/* <MaterialCommunityIcons
                   name="chevron-double-right"
-                  color="white"></MaterialCommunityIcons>
+                  color="white"></MaterialCommunityIcons> */}
             </Button>
          </View>
       </View>
@@ -73,9 +76,10 @@ const styles = StyleSheet.create({
    form: {
       paddingTop: 70,
    },
-   input: {
+     input: {
       width: width - 60,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
+      backgroundColor:"#f6f6f6"
    },
 });

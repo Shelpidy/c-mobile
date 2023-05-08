@@ -31,15 +31,18 @@ const Form1 = ({ navigation, setActiveTab }: Form1Props) => {
             }}
             source={require("../../../assets/Illustrators/ani-signup.gif")}></Image>
          <View style={styles.form}>
-            <TextInput
+           <TextInput
+              outlineStyle={{borderColor:"#f6f6f6"}}
                mode="outlined"
                style={styles.input}
                label="FirstName"></TextInput>
-            <TextInput
+           <TextInput
+              outlineStyle={{borderColor:"#f6f6f6"}}
                mode="outlined"
                style={styles.input}
                label="MiddleName"></TextInput>
-            <TextInput
+           <TextInput
+              outlineStyle={{borderColor:"#f6f6f6"}}
                mode="outlined"
                style={styles.input}
                label="LastName"></TextInput>
@@ -49,9 +52,9 @@ const Form1 = ({ navigation, setActiveTab }: Form1Props) => {
                   onPress={() => submitForm1(1)}
                   style={styles.button}>
                   NEXT{" "}
-                  <MaterialCommunityIcons
+                  {/* <MaterialCommunityIcons
                      name="chevron-double-right"
-                     color="white"></MaterialCommunityIcons>
+                     color="white"></MaterialCommunityIcons> */}
                </Button>
             </View>
             <View style={styles.signInCon}>
@@ -76,10 +79,11 @@ const styles = StyleSheet.create({
       paddingTop: 40,
       alignItems: "center",
    },
-   input: {
+     input: {
       width: width - 60,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
+      backgroundColor:"#f6f6f6"
    },
    button: {
       width: width - 60,

@@ -126,6 +126,7 @@ const SettingScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:"#ffffff"
   },
   headerTitle: {
     fontFamily:"Poppins_300Light"

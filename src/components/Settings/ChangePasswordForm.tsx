@@ -15,7 +15,7 @@ const ChangePasswordForm = () => {
 
   const handleCheckPassword = async () => {
     try {
-      const response = await axios.post('http://192.168.175.183:5000/api/auth/users/checkpassword/', {
+      const response = await axios.post('http://192.168.0.107:5000/api/auth/users/checkpassword/', {
         password: oldPassword,
         userId: currentUser?.id, // Replace with the actual user ID
       });
@@ -56,7 +56,7 @@ const ChangePasswordForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.put('http://192.168.175.183:5000/api/auth/users/personal/', {
+      const response = await axios.put('http://192.168.0.107:5000/api/auth/users/personal/', {
         key: 'password',
         value: password,
         userId: currentUser?.id, // Replace with the actual user ID
@@ -78,6 +78,7 @@ const ChangePasswordForm = () => {
   return (
     <View style={styles.container}>
       <TextInput
+         outlineStyle={{borderColor:"#f6f6f6"}}
         label="Old Password"
         value={oldPassword}
         onChangeText={setOldPassword}
@@ -93,6 +94,7 @@ const ChangePasswordForm = () => {
       />
 
       <TextInput
+           outlineStyle={{borderColor:"#f6f6f6"}}
         label="New Password"
         value={password}
         onChangeText={setPassword}
@@ -108,6 +110,7 @@ const ChangePasswordForm = () => {
       />
 
       <TextInput
+           outlineStyle={{borderColor:"#f6f6f6"}}
         label="Confirm Password"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
@@ -135,6 +138,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
+    backgroundColor:"#f6f6f6"
   },
 });
 

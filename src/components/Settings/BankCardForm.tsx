@@ -49,6 +49,7 @@ const BankCardForm = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [loading, setLoading] = useState(false);
   const { colors } = useTheme();
+  const theme = useTheme()
 
   const handleInputChange = (type: string, value: string) => {
     dispatch({ type, payload: value });
@@ -58,7 +59,7 @@ const BankCardForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://192.168.175.183:5000/api/auth/bcards/', { ...state });
+      const response = await axios.post('http://192.168.0.107:5000/api/auth/bcards/', { ...state });
       // Handle success
       setLoading(false);
       dispatch({ type: 'RESET_FORM', payload: '' });
@@ -71,6 +72,8 @@ const BankCardForm = () => {
   return (
     <View style={styles.container}>
       <TextInput
+         outlineStyle={{borderColor:"#f6f6f6"}}
+        activeOutlineColor={theme.colors.primary}
         style={styles.input}
         label="Card Number"
         value={state.cardNumber}
@@ -85,6 +88,8 @@ const BankCardForm = () => {
         }
       />
       <TextInput
+         outlineStyle={{borderColor:"#f6f6f6"}}
+        activeOutlineColor={theme.colors.primary}
         style={styles.input}
         label="Expiry Date"
         value={state.expiryDate}
@@ -99,6 +104,8 @@ const BankCardForm = () => {
         }
       />
       <TextInput
+         outlineStyle={{borderColor:"#f6f6f6"}}
+        activeOutlineColor={theme.colors.primary}
         style={styles.input}
         label="CVV"
         value={state.cvv}
@@ -113,7 +120,9 @@ const BankCardForm = () => {
         }
       />
       <TextInput
-              style={styles.input}
+         outlineStyle={{borderColor:"#f6f6f6"}}
+        activeOutlineColor={theme.colors.primary}
+        style={styles.input}
         label="Card Type"
         value={state.cardType}
         onChangeText={(value) => handleInputChange('SET_CARD_TYPE', value)}
@@ -127,6 +136,8 @@ const BankCardForm = () => {
         }
       />
       <TextInput
+         outlineStyle={{borderColor:"#f6f6f6"}}
+        activeOutlineColor={theme.colors.primary}
         style={styles.input}
         label="Billing Address"
         value={state.billingAddress}
@@ -141,6 +152,8 @@ const BankCardForm = () => {
         }
       />
       <TextInput
+         outlineStyle={{borderColor:"#f6f6f6"}}
+        activeOutlineColor={theme.colors.primary}
         style={styles.input}
         label="Cash Holder Name"
         value={state.cashHolderName}
@@ -174,6 +187,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
+    backgroundColor:"#f6f6f6"
   },
   button: {
     marginTop: 16,

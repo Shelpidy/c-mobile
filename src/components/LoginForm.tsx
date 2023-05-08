@@ -40,7 +40,7 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
             };
 
             let response = await fetch(
-               `http://192.168.175.183:5000/api/auth/users/login/`,
+               `http://192.168.0.107:5000/api/auth/users/login/`,
                {
                   method: "POST",
                   body: JSON.stringify(loginObj),
@@ -93,21 +93,28 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                mode="outlined"
                style={styles.input}
                label="Email"
+               // outlineColor="#f6f6f6"
+               outlineStyle={{borderColor:"#f6f6f6"}}
+              
                // inputMode="email"
                right={
                   <TextInput.Icon
+                 
                      color={theme.colors.primary}
                      icon="email"></TextInput.Icon>
                }></TextInput>
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
                onChangeText={(v) => setPassword(v)}
                mode="outlined"
+               
                style={styles.input}
                label="Password"
                // inputMode="text"
                secureTextEntry={!showPassword}
                right={
                   <TextInput.Icon
+                  color={theme.colors.secondary}
                      icon={showPassword ? "eye" : "eye-off"}
                      onPress={() =>
                         setShowPassword(!showPassword)
@@ -157,6 +164,7 @@ const styles = StyleSheet.create({
       width: width - 60,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
+      backgroundColor:"#f6f6f6"
    },
    signinCon: {
       flexDirection: "row",

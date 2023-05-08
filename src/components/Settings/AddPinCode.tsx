@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
-import { TextInput, Button, Divider } from 'react-native-paper';
+import { TextInput, Button, Divider,useTheme } from 'react-native-paper';
 import axios from 'axios';
 import { useCurrentUser } from '../../utils/CustomHooks';
 
@@ -12,9 +12,11 @@ const PinCodeForm = () => {
   const [loading, setLoading] = useState(false);
   const currentUser = useCurrentUser()
 
+  const theme = useTheme()
+
   const handleCheckPassword = async () => {
     try {
-      const response = await axios.post('http://192.168.175.183:5000/api/auth/users/checkpassword/', {
+      const response = await axios.post('http://192.168.0.107:5000/api/auth/users/checkpassword/', {
         password,
         userId: currentUser?.id, // Replace with the actual user ID
       });
@@ -34,7 +36,7 @@ const PinCodeForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.put('http://192.168.175.183:5000/api/auth/users/personal/', {
+      const response = await axios.put('http://192.168.0.107:5000/api/auth/users/personal/', {
         key: 'pinCode',
         value: newPinCode,
         userId: currentUser?.id, // Replace with the actual user ID
@@ -56,6 +58,8 @@ const PinCodeForm = () => {
   return (
     <View style={styles.container}>
       <TextInput
+        outlineStyle={{borderColor:"#f6f6f6"}}
+        activeOutlineColor={theme.colors.primary}
         label="Password"
         value={password}
         onChangeText={setPassword}
@@ -65,6 +69,8 @@ const PinCodeForm = () => {
       />
 
       <TextInput
+         outlineStyle={{borderColor:"#f6f6f6"}}
+        activeOutlineColor={theme.colors.primary}
         label="New Pin Code"
         value={newPinCode}
         onChangeText={setNewPinCode}
@@ -74,6 +80,8 @@ const PinCodeForm = () => {
       />
 
       <TextInput
+         outlineStyle={{borderColor:"#f6f6f6"}}
+        activeOutlineColor={theme.colors.primary}
         label="Confirm Pin Code"
         value={confirmPinCode}
         onChangeText={setConfirmPinCode}
@@ -95,6 +103,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
+    backgroundColor:"#f6f6f6"
   },
 });
 

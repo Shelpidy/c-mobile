@@ -68,33 +68,33 @@ const ProductForm = () => {
       let productObj = { ...productState, userId: activeUserId };
 
       // Upload images to S3
-      const uploadedImageURLs = [];
-      for (const imageUri of productObj.images) {
-         const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
-         const imageKey = `${Date.now()}-${imageName}`;
-         const imageParams = {
-            Bucket: config.bucketName,
-            Key: imageKey,
-            Body: { uri: imageUri },
-         };
+      // const uploadedImageURLs = [];
+      // for (const imageUri of productObj.images) {
+      //    const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
+      //    const imageKey = `${Date.now()}-${imageName}`;
+      //    const imageParams = {
+      //       Bucket: config.bucketName,
+      //       Key: imageKey,
+      //       Body: { uri: imageUri },
+      //    };
 
-         try {
-            const uploadResponse = await s3.upload(imageParams).promise();
-            uploadedImageURLs.push(uploadResponse.Location);
-         } catch (error) {
-            console.log("Image upload error:", error);
-            setLoading(false);
-            Alert.alert("Failed", "Image upload failed");
-            return;
-         }
-      }
+      //    try {
+      //       const uploadResponse = await s3.upload(imageParams).promise();
+      //       uploadedImageURLs.push(uploadResponse.Location);
+      //    } catch (error) {
+      //       console.log("Image upload error:", error);
+      //       setLoading(false);
+      //       Alert.alert("Failed", "Image upload failed");
+      //       return;
+      //    }
+      // }
 
       // Update product with uploaded image URLs
-      productObj.images = uploadedImageURLs;
+      // productObj.images = uploadedImageURLs;
 
       try {
          let response = await axios.post(
-            "http://192.168.175.183:5000/api/marketing/poroducts/",
+            "http://192.168.0.107:5000/api/marketing/poroducts/",
             productObj
          );
          if (response.status === 201) {
@@ -117,7 +117,7 @@ const ProductForm = () => {
    //    let productObj = { ...productState, userId: activeUserId };
    //    try {
    //       let response = await axios.post(
-   //          "http://192.168.175.183:5000/api/marketing/poroducts/",
+   //          "http://192.168.0.107:5000/api/marketing/poroducts/",
    //          productObj
    //       );
    //       if (response.status === 201) {

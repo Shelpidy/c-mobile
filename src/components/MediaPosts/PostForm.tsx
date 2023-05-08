@@ -57,32 +57,32 @@ const PostForm = () => {
       let activeUserId = currentUser?.id;
       let postObj = { ...postState, userId: activeUserId };
       // Upload images to S3
-      const uploadedImageURLs = [];
-      for (const imageUri of postObj.images) {
-         const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
-         const imageKey = `${Date.now()}-${imageName}`;
-         const imageParams = {
-            Bucket: config.bucketName,
-            Key: imageKey,
-            Body: { uri: imageUri },
-         };
+      // const uploadedImageURLs = [];
+      // for (const imageUri of postObj.images) {
+      //    const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
+      //    const imageKey = `${Date.now()}-${imageName}`;
+      //    const imageParams = {
+      //       Bucket: config.bucketName,
+      //       Key: imageKey,
+      //       Body: { uri: imageUri },
+      //    };
 
-         try {
-            const uploadResponse = await s3.upload(imageParams).promise();
-            uploadedImageURLs.push(uploadResponse.Location);
-         } catch (error) {
-            console.log("Image upload error:", error);
-            setLoading(false);
-            Alert.alert("Failed", "Image upload failed");
-            return;
-         }
-      }
+      //    try {
+      //       const uploadResponse = await s3.upload(imageParams).promise();
+      //       uploadedImageURLs.push(uploadResponse.Location);
+      //    } catch (error) {
+      //       console.log("Image upload error:", error);
+      //       setLoading(false);
+      //       Alert.alert("Failed", "Image upload failed");
+      //       return;
+      //    }
+      // }
 
       // Update product with uploaded image URLs
-      postObj.images = uploadedImageURLs;
+      // postObj.images = uploadedImageURLs;
       try {
          let response = await axios.post(
-            "http://192.168.175.183:5000/api/media/posts/",
+            "http://192.168.0.107:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {
@@ -138,10 +138,8 @@ const PostForm = () => {
    return (
       <View
          style={{
-            borderWidth: 2,
-            borderRadius: 5,
             margin: 8,
-            borderColor: "#f5f5f5",
+         
          }}>
          <Modal visible={imageOpen}>
             <ImagePicker
@@ -162,12 +160,14 @@ const PostForm = () => {
          </Modal>
          <View style={styles.formContainer}>
             <TextInput
+               outlineStyle={{borderColor:"#f0f0f0"}}
                onChangeText={onValueChangeTitle}
                mode="outlined"
                label="Title"
             />
 
             <TextInput
+               outlineStyle={{borderColor:"#f0f0f0"}}
                onChangeText={onValueChangeContent}
                mode="outlined"
                label="Content"

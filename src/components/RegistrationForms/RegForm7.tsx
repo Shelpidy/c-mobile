@@ -40,16 +40,19 @@ const Form7 = ({ navigation, setActiveTab }: Form7Props) => {
             source={require("../../../assets/Illustrators/ani-signup.gif")}></Image>
          <View style={styles.form}>
             <TextInput
+              outlineStyle={{borderColor:"#f6f6f6"}}
                mode="outlined"
                style={styles.input}
                label="FirstName"
                inputMode="text"></TextInput>
-            <TextInput
+          <TextInput
+              outlineStyle={{borderColor:"#f6f6f6"}}
                mode="outlined"
                style={styles.input}
                label="MiddleName"
                inputMode="text"></TextInput>
             <TextInput
+              outlineStyle={{borderColor:"#f6f6f6"}}
                mode="outlined"
                style={styles.input}
                label="LastName"
@@ -103,6 +106,7 @@ const styles = StyleSheet.create({
       width: width / 2.5,
       marginTop: 10,
       fontFamily: "Poppins_300Light",
+      backgroundColor:"#f6f6f6"
    },
    buttonGroup: {
       flexDirection: "row",
