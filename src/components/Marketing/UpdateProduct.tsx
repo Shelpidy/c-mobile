@@ -111,7 +111,7 @@ const UpdateProductForm = (product: NProductComponentProps) => {
 
       try {
          let response = await axios.put(
-            "http://192.168.0.107:5000/api/marketing/products/",
+            "http://192.168.175.183:5000/api/marketing/products/",
             productObj
          );
          if (response.status === 202) {
@@ -144,10 +144,8 @@ const UpdateProductForm = (product: NProductComponentProps) => {
    return (
       <View
          style={{
-            borderWidth: 2,
-            borderRadius: 5,
             margin: 8,
-            borderColor: "#f5f5f5",
+          
          }}>
          <Modal visible={imageOpen}>
             <ImagePicker
@@ -159,6 +157,8 @@ const UpdateProductForm = (product: NProductComponentProps) => {
          </Modal>
          <View style={styles.formContainer}>
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "NAME", payload: v })
                }
@@ -167,6 +167,8 @@ const UpdateProductForm = (product: NProductComponentProps) => {
                value={productState.productName}
             />
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "DESCRIPTION", payload: v })
                }
@@ -177,6 +179,8 @@ const UpdateProductForm = (product: NProductComponentProps) => {
                value={productState.description}
             />
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "CATEGORY", payload: v })
                }
@@ -185,6 +189,8 @@ const UpdateProductForm = (product: NProductComponentProps) => {
                value={productState.category}
             />
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "SIZES", payload: v })
                }
@@ -193,6 +199,8 @@ const UpdateProductForm = (product: NProductComponentProps) => {
                value={productState.sizes}
             />
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "PRICE", payload: v })
                }
@@ -201,6 +209,8 @@ const UpdateProductForm = (product: NProductComponentProps) => {
                value={productState.price}
             />
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "NUMBERAVAILABLE", payload: v })
                }
@@ -230,7 +240,7 @@ const UpdateProductForm = (product: NProductComponentProps) => {
                onPress={handleUpdate}
                disabled={loading}
                loading={loading}>
-               Upload <AntDesign size={20} name="upload" />
+               Update <AntDesign size={20} name="upload" />
             </Button>
          </View>
       </View>

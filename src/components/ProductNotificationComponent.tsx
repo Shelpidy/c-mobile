@@ -38,7 +38,7 @@ const ProductNotificationComponent = ({
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.0.107:5000/api/marketing/products/${notification?.notificationFrom}`,
+                  `http://192.168.175.183:5000/api/marketing/products/${notification?.notificationFrom}`,
                   { method: "GET" }
                );
                if (response.ok) {
@@ -67,7 +67,7 @@ const ProductNotificationComponent = ({
       let notId = notification.id;
       try {
          let { data } = await axios.put(
-            `http://192.168.0.107:5000/api/notifications/read/${notId}`
+            `http://192.168.175.183:5000/api/notifications/read/${notId}`
          );
          if (data.status == "success") {
             navigation.navigate("ProductNotificationScreen", {

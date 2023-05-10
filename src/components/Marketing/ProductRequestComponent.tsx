@@ -96,7 +96,7 @@ const ProductRequestComponent = ({
       let fetchData = async () => {
          try {
             let response = await fetch(
-               `http://192.168.0.107:5000/api/auth/users/${props.userId}`,
+               `http://192.168.175.183:5000/api/auth/users/${props.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -124,7 +124,7 @@ const ProductRequestComponent = ({
       let userId = currentUser?.id;
       try {
          let { data } = await axios.delete(
-            `http://192.168.0.107:5000/api/marketing/products/request/${productId}/${userId}`
+            `http://192.168.175.183:5000/api/marketing/products/request/${productId}/${userId}`
          );
          if (data.status == "success") {
             console.log(data.data);
@@ -154,7 +154,7 @@ const ProductRequestComponent = ({
       console.log(buyObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.107:5000/api/marketing/buy`,
+            `http://192.168.175.183:5000/api/marketing/buy`,
             buyObj
          );
          if (data.status == "success") {

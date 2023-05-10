@@ -24,10 +24,13 @@ import {
    Ionicons,
    MaterialIcons,
    FontAwesome,
+   Feather
 } from "@expo/vector-icons";
 import axios from "axios";
 import ProductComments from "../components/Marketing/ProductComments";
 import { useCurrentUser } from "../utils/CustomHooks";
+import UpdateProductForm from "../components/Marketing/UpdateProduct";
+
 
 const initialState: ProductComment = {};
 
@@ -87,7 +90,7 @@ const ProductScreen = ({ navigation, route }: any) => {
             let productId = route.params.productId;
             try {
                let { data } = await axios.get(
-                  `http://192.168.0.107:5000/api/marketing/products/${productId}`
+                  `http://192.168.175.183:5000/api/marketing/products/${productId}`
                );
                if (data.status == "success") {
                   // console.log("Product", data.data);
@@ -113,7 +116,7 @@ const ProductScreen = ({ navigation, route }: any) => {
             let productId = route.params.productId;
             try {
                let { data } = await axios.get(
-                  `http://192.168.0.107:5000/api/marketing/products/cl/${productId}`
+                  `http://192.168.175.183:5000/api/marketing/products/cl/${productId}`
                );
                if (data.status == "success") {
                   // console.log(data.data);
@@ -148,7 +151,7 @@ const ProductScreen = ({ navigation, route }: any) => {
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.0.107:5000/api/auth/users/${userId}`,
+                  `http://192.168.175.183:5000/api/auth/users/${userId}`,
                   { method: "GET" }
                );
                let data = await response.json();
@@ -180,14 +183,14 @@ const ProductScreen = ({ navigation, route }: any) => {
          );
          return;
       }
-      setLoading1(true);
+      setLoading(true);
       let requestObj = {
          userId: route.params.userId,
          productId: route.params.productId,
       };
       try {
          let { data } = await axios.post(
-            `http://192.168.0.107:5000/api/marketing/products/request/`,
+            `http://192.168.175.183:5000/api/marketing/products/request/`,
             requestObj
          );
          if (data.status == "success") {
@@ -195,14 +198,14 @@ const ProductScreen = ({ navigation, route }: any) => {
                "Success",
                "You have successfully added a product to Shopping-Cart"
             );
-            setLoading1(false);
+            setLoading(false);
          } else {
             Alert.alert("Failed", data.message);
-            setLoading1(false);
+            setLoading(false);
          }
       } catch (err) {
          Alert.alert("Failed", String(err));
-         setLoading1(false);
+         setLoading(false);
       }
    };
 
@@ -211,18 +214,24 @@ const ProductScreen = ({ navigation, route }: any) => {
       let requestObj = {
          userId: route.params.userId,
          productId: route.params.productId,
-         affiliateId: affiliateId,
+         affiliateId: currentUser?.id,
       };
+      console.log(requestObj)
       try {
          let { data } = await axios.post(
-            `http://192.168.0.107:5000/api/marketing/affiliates/`,
+            `http://192.168.175.183:5000/api/marketing/affiliates/`,
             requestObj
          );
          if (data.status == "success") {
+            if(currentUser){
+                product?.affiliateId?.push(currentUser.id)
+                
             Alert.alert(
                "Success",
-               "You have successfully affiliated a product"
+                data.message
             );
+            }
+        
             setLoading1(false);
          } else {
             Alert.alert("Failed", data.message);
@@ -245,7 +254,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.107:5000/api/marketing/products/comments/`,
+            `http://192.168.175.183:5000/api/marketing/products/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -275,7 +284,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          };
          console.log(buyObj);
          let { data } = await axios.post(
-            `http://192.168.0.107:5000/api/marketing/buy`,
+            `http://192.168.175.183:5000/api/marketing/buy`,
             buyObj
          );
          if (data.status == "success") {
@@ -298,7 +307,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       try {
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.0.107:5000/api/marketing/products/likes/`,
+            `http://192.168.175.183:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
@@ -343,25 +352,24 @@ const ProductScreen = ({ navigation, route }: any) => {
 
    return (
       <ScrollView style={styles.productContainer}>
-         {/* <Modal visible={openModal}>
+          <Modal visible={openModal}>
             <View
                style={{
                   flex: 1,
-                  backgroundColor: "#ffffff88",
+                  backgroundColor: "#00000068",
                   justifyContent: "center",
                   alignItems: "center",
+                  paddingVertical: 4,
                }}>
-               <View
-                  style={{
-                     backgroundColor: "#ffffff",
-                     padding: 5,
-                     borderRadius: 4,
-                  }}>
-                  <Button onPress={() => setOpenModal(false)}>Back</Button>
-                  <Text>Comment Editor</Text>
+               <View style={{ backgroundColor: "#ffffff", paddingTop: 10 }}>
+                  {/* <IconButton name='plus'/> */}
+                  <Button mode="text" onPress={() => setOpenModal(false)}>
+                     <Feather size={26} name="x" />
+                  </Button>
+                  <UpdateProductForm {...product}/>
                </View>
             </View>
-         </Modal> */}
+         </Modal>
          {producter && (
             <View
                style={{
@@ -496,8 +504,8 @@ const ProductScreen = ({ navigation, route }: any) => {
                   }}>
                   <Button
                      style={{ flex: 1 }}
-                     loading={loading1}
-                     disabled={loading1}
+                     loading={loading}
+                     disabled={loading}
                      onPress={handleProductRequest}
                      mode="contained">
                      <MaterialIcons size={23} name="add-shopping-cart" />

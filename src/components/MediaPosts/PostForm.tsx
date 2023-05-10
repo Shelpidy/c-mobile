@@ -82,7 +82,7 @@ const PostForm = () => {
       // postObj.images = uploadedImageURLs;
       try {
          let response = await axios.post(
-            "http://192.168.0.107:5000/api/media/posts/",
+            "http://192.168.175.183:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {

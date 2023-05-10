@@ -101,7 +101,7 @@ const ChatScreen = ({ navigation, route }: any) => {
       let secUser = route.params?.user.id;
       let activeUser = currentUser?.id;
       let roomId = generateRoomId(secUser, activeUser);
-      let newSocket = io(`http://192.168.0.107:8080/?roomId=${roomId}`);
+      let newSocket = io(`http://192.168.175.183:8080/?roomId=${roomId}`);
       setSocket(newSocket);
 
       // cleanup function to close the socket connection when the component unmounts
@@ -144,7 +144,7 @@ const ChatScreen = ({ navigation, route }: any) => {
       let fetchData = async () => {
          try {
             let resp = await fetch(
-               `http://192.168.0.107:8080/chats/${roomId}`,
+               `http://192.168.175.183:8080/chats/${roomId}`,
                { method: "GET" }
             );
             let chatMessages = await resp.json();

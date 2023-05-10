@@ -36,7 +36,7 @@ const FollowerComponent = ({
    const handleFollow = async (userId: number) => {
       try {
          let { data } = await axios.put(
-            `http://192.168.0.107:5000/api/media/follows/`,
+            `http://192.168.175.183:5000/api/media/follows/`,
             { followerId: 1, followingId: userId },
             { headers: { Accept: "application/json" } }
          );

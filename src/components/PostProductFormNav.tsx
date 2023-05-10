@@ -35,7 +35,7 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
             try {
                if (currentUser) {
                   let response = await fetch(
-                     `http://192.168.0.107:5000/api/auth/users/${user?.id}`,
+                     `http://192.168.175.183:5000/api/auth/users/${user?.id}`,
                      { method: "GET" }
                   );
 
@@ -62,6 +62,19 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
       },
       [currentUser]
    );
+
+
+   const gotoUploadScreen =()=>{
+      if(page === 'product'){
+          navigation.navigate("ProductPostScreen", {
+                           openImagePicker: true })
+
+      }else{
+         navigation.navigate("PostScreen", {
+                           openImagePicker: true })
+
+      }
+   }
 
    const gotoUserProfile = () => {
       if (currentUser?.id === poster.id) {
@@ -130,11 +143,7 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
                      }}
                   />
                   <Pressable
-                     onPress={() =>
-                        navigation.navigate("PostScreen", {
-                           openImagePicker: true,
-                        })
-                     }
+                     onPress={gotoUploadScreen}
                      style={{
                         paddingHorizontal: 15,
                         height: 50,

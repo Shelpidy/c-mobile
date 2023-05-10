@@ -15,7 +15,7 @@ const PhoneNumberForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.put('http://192.168.0.107:5000/api/auth/users/contact/', {
+      const response = await axios.put('http://192.168.175.183:5000/api/auth/users/contact/', {
         key: 'phoneNumbers',
         value: phoneNumber,
         userId: currentUser?.id, // Replace with the actual user ID

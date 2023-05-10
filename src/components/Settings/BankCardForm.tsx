@@ -55,11 +55,12 @@ const BankCardForm = () => {
     dispatch({ type, payload: value });
   };
 
+
   const handleAddBankCard = async () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://192.168.0.107:5000/api/auth/bcards/', { ...state });
+      const response = await axios.post('http://192.168.175.183:5000/api/auth/bcards/', { ...state });
       // Handle success
       setLoading(false);
       dispatch({ type: 'RESET_FORM', payload: '' });

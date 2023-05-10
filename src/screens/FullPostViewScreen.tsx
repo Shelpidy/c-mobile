@@ -94,7 +94,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
             let postId = route.params.id;
             try {
                let { data } = await axios.get(
-                  `http://192.168.0.107:5000/api/media/posts/cl/${postId}`
+                  `http://192.168.175.183:5000/api/media/posts/cl/${postId}`
                );
                if (data.status == "success") {
                   console.log(data.data);
@@ -129,7 +129,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.0.107:5000/api/auth/users/${userId}`,
+                  `http://192.168.175.183:5000/api/auth/users/${userId}`,
                   { method: "GET" }
                );
                let data = await response.json();
@@ -173,7 +173,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.107:5000/api/media/posts/comments/`,
+            `http://192.168.175.183:5000/api/media/posts/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -196,7 +196,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       try {
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.0.107:5000/api/media/posts/likes/`,
+            `http://192.168.175.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {

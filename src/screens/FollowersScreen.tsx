@@ -7,7 +7,7 @@ import { ActivityIndicator } from "react-native-paper";
 import UserComponent from "../components/UserComponent";
 
 const FollowersScreen = ({ navigation, route }: any) => {
-   const [users, setUsers] = useState<User[]>();
+   const [users, setUsers] = useState<User[]>([]);
    const [loading, setLoading] = useState<boolean>(false);
 
    useEffect(function () {
@@ -18,7 +18,7 @@ const FollowersScreen = ({ navigation, route }: any) => {
          let userId = route.params.user.id;
          try {
             let response = await fetch(
-               `http://192.168.0.107:5000/api/media/follower/${userId}`,
+               `http://192.168.175.183:5000/api/media/followers/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -55,13 +55,10 @@ const FollowersScreen = ({ navigation, route }: any) => {
          </View>
       );
    return (
-      <View>
-         <Text>Followers</Text>
-         {/* <Text
-            style={{ fontFamily: "Poppins_600SemiBold", marginHorizontal: 15 }}>
-            <Feather size={20} name="users" /> Users
-         </Text> */}
+      <View style={{backgroundColor:"#f6f6f6"}}>
+     
          <ScrollView horizontal style={styles.container}>
+            {users.length < 1 && <View><Text>No Follower</Text></View>}
             {users?.map((user) => {
                return (
                   <UserComponent
@@ -80,7 +77,8 @@ export default FollowersScreen;
 
 const styles = StyleSheet.create({
    container: {
-      backgroundColor: "#f5f5f5",
+      backgroundColor: "#f6f6f6",
       padding: 5,
+ 
    },
 });

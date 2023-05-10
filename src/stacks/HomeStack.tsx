@@ -22,6 +22,7 @@ import UserRequestScreen from "../screens/_";
 import ChatScreen from "../screens/ChatScreen";
 import SearchScreen from "../screens/SearchScreen";
 import ProductNotificationScreen from "../screens/ProductNotificationScreen";
+import ProductPostScreen from "../screens/ProductPostScreen";
 // import { createDrawerNavigator } from '@react-navigation/drawer';
 
 const Stack = createNativeStackNavigator();
@@ -41,7 +42,7 @@ const HomeStack = (props: HomeStackProps) => {
    const [open, setOpen] = React.useState(false);
    return (
       <Stack.Navigator
-         screenOptions={{ header: () => <CustomHeader {...props} /> }}>
+         screenOptions={{ header: () => <CustomHeader/> }}>
          <Stack.Screen name="HomeScreen" component={HomeScreen}></Stack.Screen>
          <Stack.Screen
             name="ProfileScreen"
@@ -93,6 +94,7 @@ const HomeStack = (props: HomeStackProps) => {
             name="UserRequestScreen"
             component={UserRequestScreen}></Stack.Screen>
          <Stack.Screen name="ChatScreen" component={ChatScreen}></Stack.Screen>
+         <Stack.Screen name="ProductPostScreen" component={ProductPostScreen}></Stack.Screen>
          <Stack.Screen
             name="SearchScreen"
             component={SearchScreen}></Stack.Screen>

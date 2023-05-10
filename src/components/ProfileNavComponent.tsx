@@ -147,10 +147,12 @@ const styles = StyleSheet.create({
       backgroundColor: "#fff",
       // flex:1,
       width: width - 40,
-      borderRadius: 45,
+      borderRadius: 30,
       // marginBottom:120,
       paddingVertical: 15,
       paddingHorizontal: 10,
+      borderWidth:1,
+      borderColor:"#f6f6f6"
       // alignItems:'center'
    },
    navLink: {

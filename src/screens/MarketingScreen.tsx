@@ -26,7 +26,7 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       let fetchData = async () => {
          try {
             let response = await fetch(
-               "http://192.168.0.107:5000/api/marketing/products"
+               "http://192.168.175.183:5000/api/marketing/products"
             );
             let data = await response.json();
             if (data.status == "success") {

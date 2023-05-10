@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Alert, Modal } from "react-native";
+import { StyleSheet, Text, View, Alert, Modal, Dimensions } from "react-native";
 import React, { useState, useEffect, useReducer, useMemo } from "react";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
@@ -19,7 +19,7 @@ const s3 = new AWS.S3({
    secretAccessKey: config.secretAccessKey,
    region: config.region,
 });
-
+const {width} = Dimensions.get("window")
 type NewProduct = Partial<Product>;
 
 const initialState = {};
@@ -94,7 +94,7 @@ const ProductForm = () => {
 
       try {
          let response = await axios.post(
-            "http://192.168.0.107:5000/api/marketing/poroducts/",
+            "http://192.168.175.183:5000/api/marketing/poroducts/",
             productObj
          );
          if (response.status === 201) {
@@ -117,7 +117,7 @@ const ProductForm = () => {
    //    let productObj = { ...productState, userId: activeUserId };
    //    try {
    //       let response = await axios.post(
-   //          "http://192.168.0.107:5000/api/marketing/poroducts/",
+   //          "http://192.168.175.183:5000/api/marketing/poroducts/",
    //          productObj
    //       );
    //       if (response.status === 201) {
@@ -152,10 +152,9 @@ const ProductForm = () => {
    return (
       <View
          style={{
-            borderWidth: 2,
-            borderRadius: 5,
             margin: 8,
-            borderColor: "#f5f5f5",
+            
+          
          }}>
          <Modal visible={imageOpen}>
             <ImagePicker
@@ -167,14 +166,18 @@ const ProductForm = () => {
          </Modal>
          <View style={styles.formContainer}>
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "NAME", payload: v })
                }
                mode="outlined"
                label="Product Name"
+               value={productState.productName}
             />
-
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "DESCRIPTION", payload: v })
                }
@@ -182,34 +185,47 @@ const ProductForm = () => {
                label="Description"
                multiline
                numberOfLines={5}
+               value={productState.description}
             />
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "CATEGORY", payload: v })
                }
                mode="outlined"
                label="Category"
+               value={productState.category}
             />
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "SIZES", payload: v })
                }
                mode="outlined"
                label="Sizes"
+               value={productState.sizes}
             />
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "PRICE", payload: v })
                }
                mode="outlined"
                label="Price"
+               value={productState.price}
             />
             <TextInput
+               outlineStyle={{borderColor:"#f6f6f6"}}
+               style={{backgroundColor:"#f6f6f6"}}
                onChangeText={(v) =>
                   productDispatch({ type: "NUMBERAVAILABLE", payload: v })
                }
                mode="outlined"
                label="Number Available"
+               value={productState.numberAvailable}
             />
             <Text
                style={{

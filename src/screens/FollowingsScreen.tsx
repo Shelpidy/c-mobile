@@ -8,7 +8,7 @@ import UserComponent from "../components/UserComponent";
 import SearchForm from "../components/SearchForm";
 
 const FollowingsScreen = ({ navigation, route }: any) => {
-   const [users, setUsers] = useState<User[]>();
+   const [users, setUsers] = useState<User[]>([]);
    const [loading, setLoading] = useState<boolean>(false);
 
    useEffect(function () {
@@ -19,7 +19,7 @@ const FollowingsScreen = ({ navigation, route }: any) => {
          let userId = route.params.user.id;
          try {
             let response = await fetch(
-               `http://192.168.0.107:5000/api/media/following/${userId}`,
+               `http://192.168.175.183:5000/api/media/followings/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -59,6 +59,8 @@ const FollowingsScreen = ({ navigation, route }: any) => {
       <View>
          <Text>Followings</Text>
          <SearchForm setSearchValue={(v) => console.log(v)} />
+         {users.length < 1 && <View><Text>No Follower</Text></View>}
+       
          {/* <Text
             style={{ fontFamily: "Poppins_600SemiBold", marginHorizontal: 15 }}>
             <Feather size={20} name="users" /> Users
