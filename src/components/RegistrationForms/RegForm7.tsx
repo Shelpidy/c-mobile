@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
       width: width / 2.5,
       marginTop: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor:"#f6f6f6"
+      backgroundColor:"#f9f9f9"
    },
    buttonGroup: {
       flexDirection: "row",

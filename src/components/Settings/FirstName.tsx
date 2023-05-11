@@ -13,7 +13,7 @@ const FirstNameForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.put('http://192.168.175.183:5000/api/auth/users/personal/', {
+      const response = await axios.put('http://192.168.52.183:5000/api/auth/users/personal/', {
         key: 'firstName',
         value: firstName,
         userId: currentUser?.id, // Replace with the actual user ID

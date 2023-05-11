@@ -24,7 +24,7 @@ const Comment = (props: ProductCommentProps) => {
             try {
                if (props) {
                   let response = await fetch(
-                     `http://192.168.175.183:5000/api/auth/users/${props?.userId}`,
+                     `http://192.168.52.183:5000/api/auth/users/${props?.userId}`,
                      { method: "GET" }
                   );
 
@@ -58,7 +58,7 @@ const Comment = (props: ProductCommentProps) => {
        async function UpdateComment(){
          try{
             let putObj = {text:comment,id:props.id}
-            let response = await axios.put("`http://192.168.175.183:5000/marketing/products/comments",putObj)
+            let response = await axios.put("`http://192.168.52.183:5000/marketing/products/comments",putObj)
             if(response.status == 202){
                props.text = comment
                Alert.alert("Success","Comment Updated")

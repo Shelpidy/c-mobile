@@ -111,7 +111,7 @@ const UpdateProductForm = (product: NProductComponentProps) => {
 
       try {
          let response = await axios.put(
-            "http://192.168.175.183:5000/api/marketing/products/",
+            "http://192.168.52.183:5000/api/marketing/products/",
             productObj
          );
          if (response.status === 202) {

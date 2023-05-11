@@ -60,7 +60,7 @@ const BankCardForm = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://192.168.175.183:5000/api/auth/bcards/', { ...state });
+      const response = await axios.post('http://192.168.52.183:5000/api/auth/bcards/', { ...state });
       // Handle success
       setLoading(false);
       dispatch({ type: 'RESET_FORM', payload: '' });

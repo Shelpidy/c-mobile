@@ -24,17 +24,38 @@ import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import { io, Socket } from "socket.io-client";
 import { StyleSheet } from "react-native";
 import TextShortener from "../components/TextShortener";
-import { useCurrentUser } from "../utils/CustomHooks";
+import { useCurrentUser, useNetworkStatus } from "../utils/CustomHooks";
+import moment from "moment"
 
 type ChatBoxProps = {
    onSend: () => void;
    onTextInput: (v: string) => void;
+   getFocused: (v: boolean) => void;
+   sent:boolean
 };
 
-const ChatBox = ({ onSend, onTextInput }: ChatBoxProps) => {
+const ChatBox = ({ onSend, onTextInput,getFocused,sent}: ChatBoxProps) => {
+
+   const [text,setText] = useState<any>()
+
+   useEffect(()=>{
+      if(sent){
+         setText("")
+      }
+   },[sent])
+   
+   const handleSend =(v:any)=>{
+       setText(v)
+       onTextInput(v)
+   }
+
+   const handleFocus =(v:any)=>{
+          console.log({focus:v})
+          getFocused(v)
+   }
    const theme = useTheme();
    return (
-      <View
+      <KeyboardAvoidingView
          style={{
             paddingHorizontal: 15,
             flexDirection: "row",
@@ -42,8 +63,11 @@ const ChatBox = ({ onSend, onTextInput }: ChatBoxProps) => {
             justifyContent: "center",
          }}>
          <TextInput
+           onFocus={()=>handleFocus(true)}
+           onBlur={()=>handleFocus(false)}
+            value={text}
             placeholder="Type here..."
-            onChangeText={(v) => onTextInput(v)}
+            onChangeText={handleSend}
             style={{
                flex: 1,
                backgroundColor: "#f6f6f6",
@@ -66,7 +90,7 @@ const ChatBox = ({ onSend, onTextInput }: ChatBoxProps) => {
             }}>
             <FontAwesome color={theme.colors.primary} name="send-o" size={23} />
          </Pressable>
-      </View>
+      </KeyboardAvoidingView>
    );
 };
 
@@ -76,10 +100,15 @@ const ChatScreen = ({ navigation, route }: any) => {
    const theme = useTheme();
    const [fileUri, setFileUri] = useState<any>(null);
    const [textValue, setTextValue] = useState<string>("");
+   const [inputFocus,setInputFocus] = useState<boolean>(false)
    const [loading, setLoading] = useState<boolean>(true);
    const currentUser = useCurrentUser();
    const [secondUser, setSecondUser] = useState<User>();
    const [socket, setSocket] = useState<Socket | null>(null);
+   const isOnline = useNetworkStatus()
+   const [lastSeen,setLastSeen] = useState<any>()
+   const [typing,setTyping] = useState<boolean | null>(false)
+   const [sent,setSent] = useState<boolean>(false)
 
    const toggleEmojiPicker = () => {
       setShowEmojiPicker(!showEmojiPicker);
@@ -101,20 +130,39 @@ const ChatScreen = ({ navigation, route }: any) => {
       let secUser = route.params?.user.id;
       let activeUser = currentUser?.id;
       let roomId = generateRoomId(secUser, activeUser);
-      let newSocket = io(`http://192.168.175.183:8080/?roomId=${roomId}`);
+      let newSocket = io(`http://192.168.52.183:8080/?roomId=${roomId}&userId=${activeUser}`);
       setSocket(newSocket);
-
       // cleanup function to close the socket connection when the component unmounts
       return () => {
          newSocket.close();
       };
    }, [currentUser]);
 
-   useEffect(() => {
-      let secUser = route.params.user.id;
+  
+ useEffect(()=>{
+       //// Updating Online Status//////////
+      if(socket){
+         if(isOnline && currentUser){
+            socket.emit("online",{userId:currentUser.id,online:isOnline})
+         }
+      }
+   },[socket,isOnline,currentUser])
 
+
+    useEffect(()=>{
+       //// Updating Typing Status //////////
+      if(socket){
+         if(currentUser){
+            socket.emit("typing",{userId:currentUser.id,online:inputFocus})
+         }
+      }
+   },[socket,inputFocus])
+  
+
+   useEffect(() => {
+      let secUserId = route.params.user.id;
       let activeUser = currentUser?.id;
-      let roomId = generateRoomId(secUser, activeUser);
+      let roomId = generateRoomId(secUserId, activeUser);
       console.log(roomId);
       console.log("Socket connecting");
 
@@ -122,6 +170,8 @@ const ChatScreen = ({ navigation, route }: any) => {
          socket.on("message", (msg: any) => {
             console.log("Message from the server", msg);
          });
+
+         //////////  Chat message listener ///////
 
          socket.on(String(roomId), (message: any) => {
             console.log("From Server", message);
@@ -132,8 +182,34 @@ const ChatScreen = ({ navigation, route }: any) => {
                return GiftedChat.append([], message);
             });
          });
+
+
+
+         /////// Online Status listener ///////////
+
+         socket.on("online",(data)=>{
+            console.log("From Online",{online:data.online})
+            if(data.userId == secondUser?.id){
+                  if(data.online){
+                    setLastSeen("online")
+                  }else{
+                     let lastSeenDate = moment(data.createdAt, "YYYYMMDD").fromNow()
+                     setLastSeen(lastSeenDate)
+                  }
+            } })
+
+
+         //////// Check or listen for typing status //////////
+
+           socket.on("typing",(data)=>{
+            console.log("From Typing",{typing:data.typing})
+            if(data.userId == secUserId){
+                    setTyping(data.typing)
+                 
+            } })
       }
    }, [socket, currentUser]);
+
 
    useEffect(() => {
       console.log("Fetching chats");
@@ -144,11 +220,11 @@ const ChatScreen = ({ navigation, route }: any) => {
       let fetchData = async () => {
          try {
             let resp = await fetch(
-               `http://192.168.175.183:8080/chats/${roomId}`,
+               `http://192.168.52.183:8080/chats/${roomId}`,
                { method: "GET" }
             );
             let chatMessages = await resp.json();
-            console.log("Chats Messages", chatMessages);
+            // console.log("Chats Messages", chatMessages);
             setMessages(chatMessages.reverse());
          } catch (err) {
             console.log(err);
@@ -159,28 +235,32 @@ const ChatScreen = ({ navigation, route }: any) => {
       fetchData();
    }, [currentUser]);
 
-   const onSend = () => {
+   const onSend = useCallback(() => {
+      console.log("Onsend loading")
       let secUser = route.params.user.id;
       let activeUser = currentUser?.id;
       let roomId = generateRoomId(secUser, activeUser);
       let sendData = {
-         senderId: route.params.user.id,
-         receipientId: currentUser?.id,
+         senderId:currentUser?.id,
+         receipientId: route.params.user.id,
          text: textValue,
          roomId: roomId,
       };
       console.log(sendData, roomId);
-      setTextValue("");
-
       socket?.emit(String(roomId), sendData);
-   };
+      setTextValue("");
+      setSent(true);
+   },[textValue]);
 
    const handleEmojiSelect = (emoji: any) => {
       setTextValue(textValue + emoji);
    };
 
-   const handleChatInput = (val: string) => {
-      setTextValue(val);
+   const handleFocus = (val:boolean) => {
+      console.log({Focused:val})
+       if(socket && currentUser){
+         socket.emit("typing",{userId:currentUser.id,typing:val})
+       }
    };
 
    const gotoUserProfile = () => {
@@ -207,8 +287,9 @@ const ChatScreen = ({ navigation, route }: any) => {
                   style={{
                      flexDirection: "row",
                      alignItems: "center",
-                     paddingVertical: 10,
+                     paddingBottom: 10,
                      paddingLeft: 15,
+                     backgroundColor:"#ffffff"
                   }}>
                   <Pressable onPress={gotoUserProfile}>
                      <Image
@@ -223,8 +304,12 @@ const ChatScreen = ({ navigation, route }: any) => {
                            marginHorizontal: 5,
                         }}
                         text={secondUser.fullName}
-                        textLength={18}
+                        textLength={15}
                      />
+                  </View>
+                  <View style={{flex:1,flexDirection:"row",justifyContent:'space-between',alignItems:"center",marginRight:5}}>
+                      <Text style={{fontFamily:"Poppins_300Light",color:theme.colors.secondary,marginLeft:10}}>{typing?"typing...":""}</Text>
+                      <Text style={{fontFamily:"Poppins_300Light",color:"darkgreen",marginRight:5}}>{lastSeen}</Text>
                   </View>
                </View>
             )}
@@ -234,6 +319,8 @@ const ChatScreen = ({ navigation, route }: any) => {
             <GiftedChat
                renderInputToolbar={() => (
                   <ChatBox
+                     sent = {sent}
+                     getFocused={handleFocus}
                      onSend={onSend}
                      onTextInput={(v) => setTextValue(v)}
                   />
@@ -260,7 +347,7 @@ const ChatScreen = ({ navigation, route }: any) => {
                inverted
                messages={messages}
                user={{
-                  _id: currentUser?.id,
+                  _id: route.params.user.id,
                }}
             />
          </KeyboardAvoidingView>

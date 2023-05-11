@@ -29,7 +29,7 @@ const CustomHeader = () => {
             try {
                if (currentUser) {
                   let response = await fetch(
-                     `http://192.168.175.183:5000/api/auth/users/${currentUser?.id}`,
+                     `http://192.168.52.183:5000/api/auth/users/${currentUser?.id}`,
                      { method: "GET" }
                   );
 
