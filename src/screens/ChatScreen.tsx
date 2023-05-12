@@ -109,6 +109,9 @@ const ChatScreen = ({ navigation, route }: any) => {
    const [lastSeen,setLastSeen] = useState<any>()
    const [typing,setTyping] = useState<boolean | null>(false)
    const [sent,setSent] = useState<boolean>(false)
+   const [currentPage,setCurrentPage] = useState<number>(1)
+   const [totalChats,setTotalChats] = useState<number>(0)
+   const [numberOfChatsRecord,setNumberOfChatsRecord] = useState<number>(30)
 
    const toggleEmojiPicker = () => {
       setShowEmojiPicker(!showEmojiPicker);
@@ -212,28 +215,38 @@ const ChatScreen = ({ navigation, route }: any) => {
 
 
    useEffect(() => {
-      console.log("Fetching chats");
-      let secUser = route.params.user.id;
-      let activeUser = currentUser?.id;
-      let roomId = generateRoomId(secUser, activeUser);
+      if(currentUser && currentPage){
+          console.log("Fetching chats");
+         let secUser = route.params.user.id;
+         let activeUser = currentUser?.id;
+         let roomId = generateRoomId(secUser, activeUser);
 
-      let fetchData = async () => {
-         try {
-            let resp = await fetch(
-               `http://192.168.52.183:8080/chats/${roomId}`,
-               { method: "GET" }
-            );
-            let chatMessages = await resp.json();
-            // console.log("Chats Messages", chatMessages);
-            setMessages(chatMessages.reverse());
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
+         let fetchData = async () => {
+            try {
+               let resp = await fetch(
+                  `http://192.168.52.183:8080/chats/${roomId}/${currentPage}/${numberOfChatsRecord}`,
+                  { method: "GET" }
+               );
+               let {chats:chatMessages,count}= await resp.json();
+               // console.log("Chats Messages", chatMessages);
+               setTotalChats(count)
+               if(messages && currentPage > 1){
+                 setMessages([...messages,...chatMessages])
+               }else{
+                    setMessages(chatMessages);
+               }
+             
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
+            }
+         };
       fetchData();
-   }, [currentUser]);
+
+      }
+     
+   }, [currentUser,currentPage]);
 
    const onSend = useCallback(() => {
       console.log("Onsend loading")
