@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect,useRef } from "react";
 import {
    Bubble,
    GiftedChat,
@@ -12,12 +12,12 @@ import { Button, Divider, IconButton, useTheme } from "react-native-paper";
 import {
    View,
    Text,
-   KeyboardAvoidingView,
    Platform,
    Alert,
    Image,
    Pressable,
    TextInput,
+   TextInputState,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
@@ -26,6 +26,10 @@ import { StyleSheet } from "react-native";
 import TextShortener from "../components/TextShortener";
 import { useCurrentUser, useNetworkStatus } from "../utils/CustomHooks";
 import moment from "moment"
+import { useNavigation, useNavigationState } from '@react-navigation/native';
+import axios from "axios";
+
+
 
 type ChatBoxProps = {
    onSend: () => void;
@@ -37,16 +41,29 @@ type ChatBoxProps = {
 const ChatBox = ({ onSend, onTextInput,getFocused,sent}: ChatBoxProps) => {
 
    const [text,setText] = useState<any>()
+   const textInputRef = useRef<TextInput>(null);
 
    useEffect(()=>{
+      console.log("Running")
       if(sent){
          setText("")
+         textInputRef?.current?.clear()
+         textInputRef?.current?.blur()
       }
    },[sent])
    
-   const handleSend =(v:any)=>{
+   const handleTextChange =(v:any)=>{
        setText(v)
        onTextInput(v)
+   }
+
+
+   const handleSend=()=>{
+         textInputRef?.current?.clear()
+         textInputRef?.current?.blur()
+         onSend()
+
+
    }
 
    const handleFocus =(v:any)=>{
@@ -55,7 +72,7 @@ const ChatBox = ({ onSend, onTextInput,getFocused,sent}: ChatBoxProps) => {
    }
    const theme = useTheme();
    return (
-      <KeyboardAvoidingView
+      <View
          style={{
             paddingHorizontal: 15,
             flexDirection: "row",
@@ -63,22 +80,26 @@ const ChatBox = ({ onSend, onTextInput,getFocused,sent}: ChatBoxProps) => {
             justifyContent: "center",
          }}>
          <TextInput
+           multiline
+           ref={textInputRef}
            onFocus={()=>handleFocus(true)}
            onBlur={()=>handleFocus(false)}
-            value={text}
+           value={text}
             placeholder="Type here..."
-            onChangeText={handleSend}
+            onChangeText={handleTextChange}
             style={{
                flex: 1,
+               fontFamily:"Poppins_300Light",
                backgroundColor: "#f6f6f6",
                borderTopLeftRadius: 20,
                borderBottomLeftRadius: 20,
                height: 50,
                paddingHorizontal: 25,
+               fontSize:16
             }}
          />
          <Pressable
-            onPress={onSend}
+            onPress={handleSend}
             style={{
                paddingHorizontal: 20,
                height: 50,
@@ -90,11 +111,11 @@ const ChatBox = ({ onSend, onTextInput,getFocused,sent}: ChatBoxProps) => {
             }}>
             <FontAwesome color={theme.colors.primary} name="send-o" size={23} />
          </Pressable>
-      </KeyboardAvoidingView>
+      </View>
    );
 };
 
-const ChatScreen = ({ navigation, route }: any) => {
+const ChatScreen = ({route }: any) => {
    const [messages, setMessages] = useState<IMessage[] | null>(null);
    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
    const theme = useTheme();
@@ -112,6 +133,9 @@ const ChatScreen = ({ navigation, route }: any) => {
    const [currentPage,setCurrentPage] = useState<number>(1)
    const [totalChats,setTotalChats] = useState<number>(0)
    const [numberOfChatsRecord,setNumberOfChatsRecord] = useState<number>(30)
+   const navigationState = useNavigationState((state) => state);
+   const navigation = useNavigation<any>()
+   const isOnChatScreen = navigationState.routes[navigationState.index].name === 'ChatScreen';
 
    const toggleEmojiPicker = () => {
       setShowEmojiPicker(!showEmojiPicker);
@@ -123,13 +147,8 @@ const ChatScreen = ({ navigation, route }: any) => {
       return Number(`${maxId}${minId}`);
    };
 
-   useEffect(() => {
-      let secUser = route.params.user;
-      console.log(secUser);
-      setSecondUser(secUser);
-   }, []);
-
-   useEffect(() => {
+///////////////////////////////// CONNECT TO SOCKETIO //////////////////////////////
+  useEffect(() => {
       let secUser = route.params?.user.id;
       let activeUser = currentUser?.id;
       let roomId = generateRoomId(secUser, activeUser);
@@ -140,6 +159,103 @@ const ChatScreen = ({ navigation, route }: any) => {
          newSocket.close();
       };
    }, [currentUser]);
+
+
+//////////////////////////////// GET SECOND USER STATUS ///////////////////////////
+
+  useEffect(() => {
+      if(route.params){
+          console.log("Fetching status");
+         let secUserId = route.params.user.id;
+       
+         let fetchData = async () => {
+            try {
+               let resp = await fetch(
+                  `http://192.168.52.183:8080/userstatus/${secUserId}`,
+                  { method: "GET" }
+               );
+               if(resp.ok){
+                  let data = await resp.json()
+                  console.log("Status",data)
+                   if(data.data.online){
+                    setLastSeen("online")
+                  }else{
+                     let lastSeenDate = moment(data.data.updatedAt, "YYYYMMDD").fromNow()
+                     setLastSeen(lastSeenDate)
+                  }
+                  
+               }else{
+                  let data = await resp.json()
+                  Alert.alert("Failed",data.message)
+               }
+
+            } catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+               setLoading(false);
+            }
+         };
+      fetchData();
+
+      }
+     
+   }, []);
+
+
+
+ ///// LISTEN FOR WHEN A USER LEAVES THE SCREEN //////////
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      console.log('User left the screen');
+      // Perform actions when user leaves the screen
+   if(socket && currentUser){
+      let activeUser = currentUser.id;
+      socket.emit("chatScreen",{userId:activeUser,onChatScreen:false})
+      }
+    
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+
+
+//////// UPDATE READ STATUS OF LAST MESSAGE(S) RECEIVED //////////
+
+   // useEffect(()=>{
+      //   async function updateReadMessageStatus(){
+      //    if(currentUser){
+      //        try{
+      //       let secUser = route.params?.user.id;
+      //       let activeUser = currentUser?.id;
+      //       let roomId = generateRoomId(secUser, activeUser);
+      //       let response =  await fetch(
+      //             `http://192.168.52.183:8080/conversations/read/${roomId}/${activeUser}`,{ method: "PUT" }
+      //          );
+      //       if(response.status != 202){
+      //          let responseBody = await response.json()
+      //          Alert.alert("Update Failed","Failed to update read status")
+      //          console.log(responseBody)
+      //       }
+      //     }catch(err){
+      //        console.log(err);
+      //        Alert.alert("Failed", String(err));
+      //     }
+      //    } 
+      //   }
+      //   updateReadMessageStatus()
+   // },[])
+
+
+   useEffect(() => {
+      let secUser = route.params.user;
+      console.log(secUser);
+      setSecondUser(secUser);
+   }, []);
+
+
+ 
 
   
  useEffect(()=>{
@@ -196,7 +312,7 @@ const ChatScreen = ({ navigation, route }: any) => {
                   if(data.online){
                     setLastSeen("online")
                   }else{
-                     let lastSeenDate = moment(data.createdAt, "YYYYMMDD").fromNow()
+                     let lastSeenDate = moment(data.updatedAt, "YYYYMMDD").fromNow()
                      setLastSeen(lastSeenDate)
                   }
             } })
@@ -328,7 +444,7 @@ const ChatScreen = ({ navigation, route }: any) => {
             )}
          </View>
          <Divider />
-         <KeyboardAvoidingView style={{ flex: 1, marginBottom: 20 }}>
+         <View style={{ flex: 1, marginBottom: 20 }}>
             <GiftedChat
                renderInputToolbar={() => (
                   <ChatBox
@@ -343,8 +459,8 @@ const ChatScreen = ({ navigation, route }: any) => {
                      <Bubble
                         {...props}
                         textStyle={{
-                           right: { color: "#f9f9f9" },
-                           left: { color: "#000" },
+                           right: { color: "#f9f9f9",fontFamily:"Poppins_300Light" },
+                           left: { color: "#000",fontFamily:"Poppins_300Light" },
                         }}
                         wrapperStyle={{
                            left: {
@@ -363,7 +479,7 @@ const ChatScreen = ({ navigation, route }: any) => {
                   _id: route.params.user.id,
                }}
             />
-         </KeyboardAvoidingView>
+         </View>
       </View>
    );
 };

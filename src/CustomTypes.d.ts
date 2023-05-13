@@ -168,3 +168,16 @@ declare type CustomNotification = {
    notificationType: string;
    updatedAt: Date | null;
 };
+
+declare type Conversation = {
+  id: number;
+  senderId: number;
+  receipientId: number;
+  lastText:string | null;
+  receipientReadStatus: boolean | null;
+  roomId: number;
+  numberOfUnreadText:number | null;
+  createdAt: Date;
+  updatedAt:  | null;
+};
+

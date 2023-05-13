@@ -1,10 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Button, Alert } from "react-native";
+import { StyleSheet, Text, View, Button, Alert, ScrollView, Pressable } from "react-native";
 import { Appbar, FAB, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Drawer } from "react-native-drawer-layout";
-import { AntDesign, Feather } from "@expo/vector-icons";
+import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import { Image } from "react-native";
 import { useCurrentUser } from "../utils/CustomHooks";
 
@@ -101,10 +101,19 @@ const CustomHeader = () => {
             navigation.navigate(screenName);
          }
       }
+      else if (screenName === "ConversationsScreen") {
+         setActiveTab(6);
+         if (params) {
+            navigation.navigate(screenName, params);
+         } else {
+            navigation.navigate(screenName);
+         }
+      }
    };
 
    return (
-      <Appbar.Header style={{ alignItems: "center",backgroundColor:"#fff" }}>
+      <Appbar.Header style={{ alignItems: "center",backgroundColor:"#fff"}}>
+         <ScrollView horizontal>
          {/* <Appbar.Content title="C" /> */}
          {navigation.canGoBack() && (
             <Appbar.BackAction onPress={() => navigation.goBack()} />
@@ -122,7 +131,21 @@ const CustomHeader = () => {
                   name="home"
                />
             )}
-            onPress={() => navigation.navigate("HomeScreen")}
+            onPress={() => gotoNextScreen("HomeScreen")}
+         />
+         <Appbar.Action
+            style={{ alignItems: "center", flexDirection: "row" }}
+            icon={() => (
+               <Ionicons 
+               color={
+                     activeTab === 6
+                        ? theme.colors.primary
+                        : theme.colors.secondary
+                  }
+                   size={20}
+                name='md-chatbubbles-outline' />
+            )}
+            onPress={() => gotoNextScreen("ConversationsScreen")}
          />
          <Appbar.Action
             style={{ alignItems: "center", flexDirection: "row" }}
@@ -187,18 +210,20 @@ const CustomHeader = () => {
             onPress={() => gotoNextScreen("SearchScreen")}
          />
          {/* <Appbar.Action icon={()=><Feather size={20} name='users'/>} onPress={() =>setOpen(!open)} /> */}
-         <Appbar.Action
+         <Pressable
+            style={styles.profileImage}
             onPress={() =>
                gotoNextScreen("ProfileScreen", { userId: currentUser?.id })
             }
-            icon={() => (
-               <Image
+         ><Text  style={styles.profileImage}>
+            <Image
                   resizeMode="cover"
                   style={styles.profileImage}
                   source={{ uri: user?.profileImage }}
                />
-            )}
-         />
+         </Text>
+         </Pressable>
+         </ScrollView>
       </Appbar.Header>
    );
 };
