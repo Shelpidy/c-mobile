@@ -254,17 +254,18 @@ const ConversationComponent = ({
                   style={{
                      width: 300,
                      flexDirection: "row",
-                     justifyContent: "space-between",
+                     justifyContent: "flex-end",
                      paddingRight: 5,
                      alignItems: "center",
                      paddingTop: 5,
+                     height:'auto'
                   }}>
                   {currentUser?.id == newConversation.receipientId &&
                      newConversation.numberOfUnreadText && (
                         <Badge
                            style={{
                               backgroundColor: theme.colors.primary,
-                              marginVertical: 0,
+                              marginBottom:5,
                            }}
                            size={18}>
                            {newConversation.numberOfUnreadText}
@@ -280,7 +281,7 @@ const ConversationComponent = ({
                               : "Poppins_300Light",
                         marginHorizontal: 3,
                      }}
-                     textLength={100}
+                     textLength={38}
                   />
                </View>
             )}
@@ -297,6 +298,7 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       padding: 5,
       height: "auto",
+      marginVertical:2
    },
 
    notTitle: {
