@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect,useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
    Bubble,
    GiftedChat,
@@ -25,51 +25,45 @@ import { io, Socket } from "socket.io-client";
 import { StyleSheet } from "react-native";
 import TextShortener from "../components/TextShortener";
 import { useCurrentUser, useNetworkStatus } from "../utils/CustomHooks";
-import moment from "moment"
-import { useNavigation, useNavigationState } from '@react-navigation/native';
+import moment from "moment";
+import { useNavigation, useNavigationState } from "@react-navigation/native";
 import axios from "axios";
-
-
 
 type ChatBoxProps = {
    onSend: () => void;
    onTextInput: (v: string) => void;
    getFocused: (v: boolean) => void;
-   sent:boolean
+   sent: boolean;
 };
 
-const ChatBox = ({ onSend, onTextInput,getFocused,sent}: ChatBoxProps) => {
-
-   const [text,setText] = useState<any>()
+const ChatBox = ({ onSend, onTextInput, getFocused, sent }: ChatBoxProps) => {
+   const [text, setText] = useState<any>();
    const textInputRef = useRef<TextInput>(null);
 
-   useEffect(()=>{
-      console.log("Running")
-      if(sent){
-         setText("")
-         textInputRef?.current?.clear()
-         textInputRef?.current?.blur()
+   useEffect(() => {
+      console.log("Running");
+      if (sent) {
+         setText("");
+         textInputRef?.current?.clear();
+         textInputRef?.current?.blur();
       }
-   },[sent])
-   
-   const handleTextChange =(v:any)=>{
-       setText(v)
-       onTextInput(v)
-   }
+   }, [sent]);
 
+   const handleTextChange = (v: any) => {
+      setText(v);
+      onTextInput(v);
+   };
 
-   const handleSend=()=>{
-         textInputRef?.current?.clear()
-         textInputRef?.current?.blur()
-         onSend()
+   const handleSend = () => {
+      textInputRef?.current?.clear();
+      textInputRef?.current?.blur();
+      onSend();
+   };
 
-
-   }
-
-   const handleFocus =(v:any)=>{
-          console.log({focus:v})
-          getFocused(v)
-   }
+   const handleFocus = (v: any) => {
+      console.log({ focus: v });
+      getFocused(v);
+   };
    const theme = useTheme();
    return (
       <View
@@ -80,22 +74,22 @@ const ChatBox = ({ onSend, onTextInput,getFocused,sent}: ChatBoxProps) => {
             justifyContent: "center",
          }}>
          <TextInput
-           multiline
-           ref={textInputRef}
-           onFocus={()=>handleFocus(true)}
-           onBlur={()=>handleFocus(false)}
-           value={text}
+            multiline
+            ref={textInputRef}
+            onFocus={() => handleFocus(true)}
+            onBlur={() => handleFocus(false)}
+            value={text}
             placeholder="Type here..."
             onChangeText={handleTextChange}
             style={{
                flex: 1,
-               fontFamily:"Poppins_300Light",
+               fontFamily: "Poppins_300Light",
                backgroundColor: "#f6f6f6",
                borderTopLeftRadius: 20,
                borderBottomLeftRadius: 20,
                height: 50,
                paddingHorizontal: 25,
-               fontSize:16
+               fontSize: 16,
             }}
          />
          <Pressable
@@ -115,27 +109,29 @@ const ChatBox = ({ onSend, onTextInput,getFocused,sent}: ChatBoxProps) => {
    );
 };
 
-const ChatScreen = ({route }: any) => {
+const ChatScreen = ({ route }: any) => {
    const [messages, setMessages] = useState<IMessage[] | null>(null);
    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
    const theme = useTheme();
    const [fileUri, setFileUri] = useState<any>(null);
    const [textValue, setTextValue] = useState<string>("");
-   const [inputFocus,setInputFocus] = useState<boolean>(false)
+   const [inputFocus, setInputFocus] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(true);
    const currentUser = useCurrentUser();
    const [secondUser, setSecondUser] = useState<User>();
    const [socket, setSocket] = useState<Socket | null>(null);
-   const isOnline = useNetworkStatus()
-   const [lastSeen,setLastSeen] = useState<any>()
-   const [typing,setTyping] = useState<boolean | null>(false)
-   const [sent,setSent] = useState<boolean>(false)
-   const [currentPage,setCurrentPage] = useState<number>(1)
-   const [totalChats,setTotalChats] = useState<number>(0)
-   const [numberOfChatsRecord,setNumberOfChatsRecord] = useState<number>(30)
+   const isOnline = useNetworkStatus();
+   const [lastSeen, setLastSeen] = useState<any>();
+   const [typing, setTyping] = useState<boolean | null>(false);
+   const [sent, setSent] = useState<boolean>(false);
+   const [currentPage, setCurrentPage] = useState<number>(1);
+   const [totalChats, setTotalChats] = useState<number>(0);
+   const [numberOfChatsRecord, setNumberOfChatsRecord] = useState<number>(30);
    const navigationState = useNavigationState((state) => state);
-   const navigation = useNavigation<any>()
-   const isOnChatScreen = navigationState.routes[navigationState.index].name === 'ChatScreen';
+   const navigation = useNavigation<any>();
+   const isOnChatScreen =
+      navigationState.routes[navigationState.index].name === "ChatScreen";
+   const [resetLastSeen, setResetLastSeen] = useState<number>(0);
 
    const toggleEmojiPicker = () => {
       setShowEmojiPicker(!showEmojiPicker);
@@ -147,12 +143,14 @@ const ChatScreen = ({route }: any) => {
       return Number(`${maxId}${minId}`);
    };
 
-///////////////////////////////// CONNECT TO SOCKETIO //////////////////////////////
-  useEffect(() => {
+   ///////////////////////////////// CONNECT TO SOCKETIO //////////////////////////////
+   useEffect(() => {
       let secUser = route.params?.user.id;
       let activeUser = currentUser?.id;
       let roomId = generateRoomId(secUser, activeUser);
-      let newSocket = io(`http://192.168.52.183:8080/?roomId=${roomId}&userId=${activeUser}`);
+      let newSocket = io(
+         `http://192.168.52.183:8080/?roomId=${roomId}&userId=${activeUser}`
+      );
       setSocket(newSocket);
       // cleanup function to close the socket connection when the component unmounts
       return () => {
@@ -160,93 +158,88 @@ const ChatScreen = ({route }: any) => {
       };
    }, [currentUser]);
 
+   //////////////////////////////// GET SECOND USER STATUS ///////////////////////////
 
-//////////////////////////////// GET SECOND USER STATUS ///////////////////////////
-
-  useEffect(() => {
-      if(route.params){
-          console.log("Fetching status");
+   useEffect(() => {
+      if (route.params) {
+         console.log("Fetching status");
          let secUserId = route.params.user.id;
-       
+
          let fetchData = async () => {
             try {
                let resp = await fetch(
                   `http://192.168.52.183:8080/userstatus/${secUserId}`,
                   { method: "GET" }
                );
-               if(resp.ok){
-                  let data = await resp.json()
-                  console.log("Status",data)
-                   if(data.data.online){
-                    setLastSeen("online")
-                  }else{
-                     let lastSeenDate = moment(data.data.updatedAt, "YYYYMMDD").fromNow()
-                     setLastSeen(lastSeenDate)
+               if (resp.ok) {
+                  let data = await resp.json();
+                  console.log("Status", data);
+                  if (data.data.online) {
+                     setLastSeen("online");
+                  } else {
+                     let lastSeenDate = moment(
+                        data.data.updatedAt,
+                        "YYYYMMDD"
+                     ).fromNow();
+                     setLastSeen(lastSeenDate);
                   }
-                  
-               }else{
-                  let data = await resp.json()
-                  Alert.alert("Failed",data.message)
+               } else {
+                  let data = await resp.json();
+                  Alert.alert("Failed", data.message);
                }
-
             } catch (err) {
                console.log(err);
                Alert.alert("Failed", String(err));
                setLoading(false);
             }
          };
-      fetchData();
-
+         fetchData();
       }
-     
-   }, []);
+   }, [resetLastSeen]);
 
+   ///// LISTEN FOR WHEN A USER LEAVES THE SCREEN //////////
 
+   useEffect(() => {
+      const unsubscribe = navigation.addListener("blur", () => {
+         console.log("User left the screen");
+         // Perform actions when user leaves the screen
+         if (socket && currentUser) {
+            let activeUser = currentUser.id;
+            socket.emit("chatScreen", {
+               userId: activeUser,
+               onChatScreen: false,
+            });
+         }
+      });
 
- ///// LISTEN FOR WHEN A USER LEAVES THE SCREEN //////////
+      return unsubscribe;
+   }, [navigation]);
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
-      console.log('User left the screen');
-      // Perform actions when user leaves the screen
-   if(socket && currentUser){
-      let activeUser = currentUser.id;
-      socket.emit("chatScreen",{userId:activeUser,onChatScreen:false})
-      }
-    
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-
-
-//////// UPDATE READ STATUS OF LAST MESSAGE(S) RECEIVED //////////
+   //////// UPDATE READ STATUS OF LAST MESSAGE(S) RECEIVED //////////
 
    // useEffect(()=>{
-      //   async function updateReadMessageStatus(){
-      //    if(currentUser){
-      //        try{
-      //       let secUser = route.params?.user.id;
-      //       let activeUser = currentUser?.id;
-      //       let roomId = generateRoomId(secUser, activeUser);
-      //       let response =  await fetch(
-      //             `http://192.168.52.183:8080/conversations/read/${roomId}/${activeUser}`,{ method: "PUT" }
-      //          );
-      //       if(response.status != 202){
-      //          let responseBody = await response.json()
-      //          Alert.alert("Update Failed","Failed to update read status")
-      //          console.log(responseBody)
-      //       }
-      //     }catch(err){
-      //        console.log(err);
-      //        Alert.alert("Failed", String(err));
-      //     }
-      //    } 
-      //   }
-      //   updateReadMessageStatus()
+   //   async function updateReadMessageStatus(){
+   //    if(currentUser){
+   //        try{
+   //       let secUser = route.params?.user.id;
+   //       let activeUser = currentUser?.id;
+   //       let roomId = generateRoomId(secUser, activeUser);
+   //       let response =  await fetch(
+   //             `http://192.168.52.183:8080/conversations/read/${roomId}/${activeUser}`,{ method: "PUT" }
+   //          );
+   //       if(response.status != 202){
+   //          let responseBody = await response.json()
+   //          Alert.alert("Update Failed","Failed to update read status")
+   //          console.log(responseBody)
+   //       }
+   //     }catch(err){
+   //        console.log(err);
+   //        Alert.alert("Failed", String(err));
+   //     }
+   //    }
+   //   }
+   //   updateReadMessageStatus()
    // },[])
-
 
    useEffect(() => {
       let secUser = route.params.user;
@@ -254,29 +247,26 @@ const ChatScreen = ({route }: any) => {
       setSecondUser(secUser);
    }, []);
 
-
- 
-
-  
- useEffect(()=>{
-       //// Updating Online Status//////////
-      if(socket){
-         if(isOnline && currentUser){
-            socket.emit("online",{userId:currentUser.id,online:isOnline})
+   useEffect(() => {
+      //// Updating Online Status//////////
+      if (socket) {
+         if (isOnline && currentUser) {
+            socket.emit("online", { userId: currentUser.id, online: isOnline });
          }
       }
-   },[socket,isOnline,currentUser])
+   }, [socket, isOnline, currentUser]);
 
-
-    useEffect(()=>{
-       //// Updating Typing Status //////////
-      if(socket){
-         if(currentUser){
-            socket.emit("typing",{userId:currentUser.id,online:inputFocus})
+   useEffect(() => {
+      //// Updating Typing Status //////////
+      if (socket) {
+         if (currentUser) {
+            socket.emit("typing", {
+               userId: currentUser.id,
+               online: inputFocus,
+            });
          }
       }
-   },[socket,inputFocus])
-  
+   }, [socket, inputFocus]);
 
    useEffect(() => {
       let secUserId = route.params.user.id;
@@ -302,37 +292,29 @@ const ChatScreen = ({route }: any) => {
             });
          });
 
-
-
          /////// Online Status listener ///////////
 
-         socket.on("online",(data)=>{
-            console.log("From Online",{online:data.online})
-            if(data.userId == secondUser?.id){
-                  if(data.online){
-                    setLastSeen("online")
-                  }else{
-                     let lastSeenDate = moment(data.updatedAt, "YYYYMMDD").fromNow()
-                     setLastSeen(lastSeenDate)
-                  }
-            } })
-
+         socket.on("online", (data) => {
+            console.log("From Online", { online: data.online });
+            if (data.userId == secondUser?.id) {
+               setResetLastSeen(resetLastSeen + 1);
+            }
+         });
 
          //////// Check or listen for typing status //////////
 
-           socket.on("typing",(data)=>{
-            console.log("From Typing",{typing:data.typing})
-            if(data.userId == secUserId){
-                    setTyping(data.typing)
-                 
-            } })
+         socket.on("typing", (data) => {
+            console.log("From Typing", { typing: data.typing });
+            if (data.userId == secUserId) {
+               setTyping(data.typing);
+            }
+         });
       }
    }, [socket, currentUser]);
 
-
    useEffect(() => {
-      if(currentUser && currentPage){
-          console.log("Fetching chats");
+      if (currentUser && currentPage) {
+         console.log("Fetching chats");
          let secUser = route.params.user.id;
          let activeUser = currentUser?.id;
          let roomId = generateRoomId(secUser, activeUser);
@@ -343,34 +325,31 @@ const ChatScreen = ({route }: any) => {
                   `http://192.168.52.183:8080/chats/${roomId}/${currentPage}/${numberOfChatsRecord}`,
                   { method: "GET" }
                );
-               let {chats:chatMessages,count}= await resp.json();
+               let { chats: chatMessages, count } = await resp.json();
                // console.log("Chats Messages", chatMessages);
-               setTotalChats(count)
-               if(messages && currentPage > 1){
-                 setMessages([...messages,...chatMessages])
-               }else{
-                    setMessages(chatMessages);
+               setTotalChats(count);
+               if (messages && currentPage > 1) {
+                  setMessages([...messages, ...chatMessages]);
+               } else {
+                  setMessages(chatMessages);
                }
-             
             } catch (err) {
                console.log(err);
                Alert.alert("Failed", String(err));
                setLoading(false);
             }
          };
-      fetchData();
-
+         fetchData();
       }
-     
-   }, [currentUser,currentPage]);
+   }, [currentUser, currentPage]);
 
    const onSend = useCallback(() => {
-      console.log("Onsend loading")
+      console.log("Onsend loading");
       let secUser = route.params.user.id;
       let activeUser = currentUser?.id;
       let roomId = generateRoomId(secUser, activeUser);
       let sendData = {
-         senderId:currentUser?.id,
+         senderId: currentUser?.id,
          receipientId: route.params.user.id,
          text: textValue,
          roomId: roomId,
@@ -379,17 +358,17 @@ const ChatScreen = ({route }: any) => {
       socket?.emit(String(roomId), sendData);
       setTextValue("");
       setSent(true);
-   },[textValue]);
+   }, [textValue]);
 
    const handleEmojiSelect = (emoji: any) => {
       setTextValue(textValue + emoji);
    };
 
-   const handleFocus = (val:boolean) => {
-      console.log({Focused:val})
-       if(socket && currentUser){
-         socket.emit("typing",{userId:currentUser.id,typing:val})
-       }
+   const handleFocus = (val: boolean) => {
+      console.log({ Focused: val });
+      if (socket && currentUser) {
+         socket.emit("typing", { userId: currentUser.id, typing: val });
+      }
    };
 
    const gotoUserProfile = () => {
@@ -418,7 +397,7 @@ const ChatScreen = ({route }: any) => {
                      alignItems: "center",
                      paddingBottom: 10,
                      paddingLeft: 15,
-                     backgroundColor:"#ffffff"
+                     backgroundColor: "#ffffff",
                   }}>
                   <Pressable onPress={gotoUserProfile}>
                      <Image
@@ -436,9 +415,30 @@ const ChatScreen = ({route }: any) => {
                         textLength={15}
                      />
                   </View>
-                  <View style={{flex:1,flexDirection:"row",justifyContent:'space-between',alignItems:"center",marginRight:5}}>
-                      <Text style={{fontFamily:"Poppins_300Light",color:theme.colors.secondary,marginLeft:10}}>{typing?"typing...":""}</Text>
-                      <Text style={{fontFamily:"Poppins_300Light",color:"darkgreen",marginRight:5}}>{lastSeen}</Text>
+                  <View
+                     style={{
+                        flex: 1,
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginRight: 5,
+                     }}>
+                     <Text
+                        style={{
+                           fontFamily: "Poppins_300Light",
+                           color: theme.colors.secondary,
+                           marginLeft: 10,
+                        }}>
+                        {typing ? "typing..." : ""}
+                     </Text>
+                     <Text
+                        style={{
+                           fontFamily: "Poppins_300Light",
+                           color: "darkgreen",
+                           marginRight: 5,
+                        }}>
+                        {lastSeen}
+                     </Text>
                   </View>
                </View>
             )}
@@ -448,7 +448,7 @@ const ChatScreen = ({route }: any) => {
             <GiftedChat
                renderInputToolbar={() => (
                   <ChatBox
-                     sent = {sent}
+                     sent={sent}
                      getFocused={handleFocus}
                      onSend={onSend}
                      onTextInput={(v) => setTextValue(v)}
@@ -459,8 +459,14 @@ const ChatScreen = ({route }: any) => {
                      <Bubble
                         {...props}
                         textStyle={{
-                           right: { color: "#f9f9f9",fontFamily:"Poppins_300Light" },
-                           left: { color: "#000",fontFamily:"Poppins_300Light" },
+                           right: {
+                              color: "#f9f9f9",
+                              fontFamily: "Poppins_300Light",
+                           },
+                           left: {
+                              color: "#000",
+                              fontFamily: "Poppins_300Light",
+                           },
                         }}
                         wrapperStyle={{
                            left: {

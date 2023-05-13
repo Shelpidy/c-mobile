@@ -94,27 +94,24 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                style={styles.input}
                label="Email"
                // outlineColor="#f6f6f6"
-               outlineStyle={{borderColor:"#f6f6f6"}}
-              
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                // inputMode="email"
                right={
                   <TextInput.Icon
-                 
                      color={theme.colors.primary}
                      icon="email"></TextInput.Icon>
                }></TextInput>
             <TextInput
-               outlineStyle={{borderColor:"#f6f6f6"}}
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                onChangeText={(v) => setPassword(v)}
                mode="outlined"
-               
                style={styles.input}
                label="Password"
                // inputMode="text"
                secureTextEntry={!showPassword}
                right={
                   <TextInput.Icon
-                  color={theme.colors.secondary}
+                     color={theme.colors.secondary}
                      icon={showPassword ? "eye" : "eye-off"}
                      onPress={() =>
                         setShowPassword(!showPassword)
@@ -164,7 +161,7 @@ const styles = StyleSheet.create({
       width: width - 60,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor:"#f6f6f6"
+      backgroundColor: "#f6f6f6",
    },
    signinCon: {
       flexDirection: "row",

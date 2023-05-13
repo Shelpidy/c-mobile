@@ -102,8 +102,8 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
                />
             </View>
 
-           <TextInput
-              outlineStyle={{borderColor:"#f6f6f6"}}
+            <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Email"
@@ -145,11 +145,11 @@ const styles = StyleSheet.create({
       paddingTop: 0,
       alignItems: "center",
    },
-     input: {
+   input: {
       width: width - 60,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor:"#f6f6f6"
+      backgroundColor: "#f6f6f6",
    },
    button: {
       width: width / 3,
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
       marginTop: 10,
       fontFamily: "Poppins_300Light",
       marginVertical: 10,
-      backgroundColor:"#f6f6f6"
+      backgroundColor: "#f6f6f6",
    },
 
    buttonGroup: {

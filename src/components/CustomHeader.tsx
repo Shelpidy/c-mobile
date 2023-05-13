@@ -1,6 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Button, Alert, ScrollView, Pressable } from "react-native";
+import {
+   StyleSheet,
+   Text,
+   View,
+   Button,
+   Alert,
+   ScrollView,
+   Pressable,
+} from "react-native";
 import { Appbar, FAB, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Drawer } from "react-native-drawer-layout";
@@ -100,8 +108,7 @@ const CustomHeader = () => {
          } else {
             navigation.navigate(screenName);
          }
-      }
-      else if (screenName === "ConversationsScreen") {
+      } else if (screenName === "ConversationsScreen") {
          setActiveTab(6);
          if (params) {
             navigation.navigate(screenName, params);
@@ -112,117 +119,118 @@ const CustomHeader = () => {
    };
 
    return (
-      <Appbar.Header style={{ alignItems: "center",backgroundColor:"#fff"}}>
+      <Appbar.Header style={{ alignItems: "center", backgroundColor: "#fff" }}>
          <ScrollView horizontal>
-         {/* <Appbar.Content title="C" /> */}
-         {navigation.canGoBack() && (
-            <Appbar.BackAction onPress={() => navigation.goBack()} />
-         )}
-         <Appbar.Action
-            style={{ alignItems: "center", flexDirection: "row" }}
-            icon={() => (
-               <Feather
-                  color={
-                     activeTab === 0
-                        ? theme.colors.primary
-                        : theme.colors.secondary
-                  }
-                  size={20}
-                  name="home"
-               />
+            {/* <Appbar.Content title="C" /> */}
+            {navigation.canGoBack() && (
+               <Appbar.BackAction onPress={() => navigation.goBack()} />
             )}
-            onPress={() => gotoNextScreen("HomeScreen")}
-         />
-         <Appbar.Action
-            style={{ alignItems: "center", flexDirection: "row" }}
-            icon={() => (
-               <Ionicons 
-               color={
-                     activeTab === 6
-                        ? theme.colors.primary
-                        : theme.colors.secondary
-                  }
-                   size={20}
-                name='md-chatbubbles-outline' />
-            )}
-            onPress={() => gotoNextScreen("ConversationsScreen")}
-         />
-         <Appbar.Action
-            style={{ alignItems: "center", flexDirection: "row" }}
-            icon={() => (
-               <Feather
-                  color={
-                     activeTab === 1
-                        ? theme.colors.primary
-                        : theme.colors.secondary
-                  }
-                  size={20}
-                  name="bell"
-               />
-            )}
-            onPress={() => gotoNextScreen("NotificationScreen")}
-         />
-         <Appbar.Action
-            style={{
-               alignItems: "center",
-               flexDirection: "row",
-               justifyContent: "center",
-            }}
-            icon={() => (
-               <Feather
-                  color={
-                     activeTab === 2
-                        ? theme.colors.primary
-                        : theme.colors.secondary
-                  }
-                  size={20}
-                  name="shopping-bag"
-               />
-            )}
-            onPress={() => gotoNextScreen("MarketingScreen")}
-         />
-         <Appbar.Action
-            icon={() => (
-               <Feather
-                  color={
-                     activeTab === 3
-                        ? theme.colors.primary
-                        : theme.colors.secondary
-                  }
-                  size={20}
-                  name="shopping-cart"
-               />
-            )}
-            onPress={() => gotoNextScreen("ProductsRequestScreen")}
-         />
-         <Appbar.Action
-            icon={() => (
-               <Feather
-                  color={
-                     activeTab === 4
-                        ? theme.colors.primary
-                        : theme.colors.secondary
-                  }
-                  size={20}
-                  name="search"
-               />
-            )}
-            onPress={() => gotoNextScreen("SearchScreen")}
-         />
-         {/* <Appbar.Action icon={()=><Feather size={20} name='users'/>} onPress={() =>setOpen(!open)} /> */}
-         <Pressable
-            style={styles.profileImage}
-            onPress={() =>
-               gotoNextScreen("ProfileScreen", { userId: currentUser?.id })
-            }
-         ><Text  style={styles.profileImage}>
-            <Image
-                  resizeMode="cover"
-                  style={styles.profileImage}
-                  source={{ uri: user?.profileImage }}
-               />
-         </Text>
-         </Pressable>
+            <Appbar.Action
+               style={{ alignItems: "center", flexDirection: "row" }}
+               icon={() => (
+                  <Feather
+                     color={
+                        activeTab === 0
+                           ? theme.colors.primary
+                           : theme.colors.secondary
+                     }
+                     size={20}
+                     name="home"
+                  />
+               )}
+               onPress={() => gotoNextScreen("HomeScreen")}
+            />
+            <Appbar.Action
+               style={{ alignItems: "center", flexDirection: "row" }}
+               icon={() => (
+                  <Ionicons
+                     color={
+                        activeTab === 6
+                           ? theme.colors.primary
+                           : theme.colors.secondary
+                     }
+                     size={20}
+                     name="md-chatbubbles-outline"
+                  />
+               )}
+               onPress={() => gotoNextScreen("ConversationsScreen")}
+            />
+            <Appbar.Action
+               style={{ alignItems: "center", flexDirection: "row" }}
+               icon={() => (
+                  <Feather
+                     color={
+                        activeTab === 1
+                           ? theme.colors.primary
+                           : theme.colors.secondary
+                     }
+                     size={20}
+                     name="bell"
+                  />
+               )}
+               onPress={() => gotoNextScreen("NotificationScreen")}
+            />
+            <Appbar.Action
+               style={{
+                  alignItems: "center",
+                  flexDirection: "row",
+                  justifyContent: "center",
+               }}
+               icon={() => (
+                  <Feather
+                     color={
+                        activeTab === 2
+                           ? theme.colors.primary
+                           : theme.colors.secondary
+                     }
+                     size={20}
+                     name="shopping-bag"
+                  />
+               )}
+               onPress={() => gotoNextScreen("MarketingScreen")}
+            />
+            <Appbar.Action
+               icon={() => (
+                  <Feather
+                     color={
+                        activeTab === 3
+                           ? theme.colors.primary
+                           : theme.colors.secondary
+                     }
+                     size={20}
+                     name="shopping-cart"
+                  />
+               )}
+               onPress={() => gotoNextScreen("ProductsRequestScreen")}
+            />
+            <Appbar.Action
+               icon={() => (
+                  <Feather
+                     color={
+                        activeTab === 4
+                           ? theme.colors.primary
+                           : theme.colors.secondary
+                     }
+                     size={20}
+                     name="search"
+                  />
+               )}
+               onPress={() => gotoNextScreen("SearchScreen")}
+            />
+            {/* <Appbar.Action icon={()=><Feather size={20} name='users'/>} onPress={() =>setOpen(!open)} /> */}
+            <Pressable
+               style={styles.profileImage}
+               onPress={() =>
+                  gotoNextScreen("ProfileScreen", { userId: currentUser?.id })
+               }>
+               <Text style={styles.profileImage}>
+                  <Image
+                     resizeMode="cover"
+                     style={styles.profileImage}
+                     source={{ uri: user?.profileImage }}
+                  />
+               </Text>
+            </Pressable>
          </ScrollView>
       </Appbar.Header>
    );

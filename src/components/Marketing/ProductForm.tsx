@@ -19,7 +19,7 @@ const s3 = new AWS.S3({
    secretAccessKey: config.secretAccessKey,
    region: config.region,
 });
-const {width} = Dimensions.get("window")
+const { width } = Dimensions.get("window");
 type NewProduct = Partial<Product>;
 
 const initialState = {};
@@ -153,8 +153,6 @@ const ProductForm = () => {
       <View
          style={{
             margin: 8,
-            
-          
          }}>
          <Modal visible={imageOpen}>
             <ImagePicker
@@ -166,8 +164,8 @@ const ProductForm = () => {
          </Modal>
          <View style={styles.formContainer}>
             <TextInput
-               outlineStyle={{borderColor:"#f6f6f6"}}
-               style={{backgroundColor:"#f6f6f6"}}
+               outlineStyle={{ borderColor: "#f6f6f6" }}
+               style={{ backgroundColor: "#f6f6f6" }}
                onChangeText={(v) =>
                   productDispatch({ type: "NAME", payload: v })
                }
@@ -176,8 +174,8 @@ const ProductForm = () => {
                value={productState.productName}
             />
             <TextInput
-               outlineStyle={{borderColor:"#f6f6f6"}}
-               style={{backgroundColor:"#f6f6f6"}}
+               outlineStyle={{ borderColor: "#f6f6f6" }}
+               style={{ backgroundColor: "#f6f6f6" }}
                onChangeText={(v) =>
                   productDispatch({ type: "DESCRIPTION", payload: v })
                }
@@ -188,8 +186,8 @@ const ProductForm = () => {
                value={productState.description}
             />
             <TextInput
-               outlineStyle={{borderColor:"#f6f6f6"}}
-               style={{backgroundColor:"#f6f6f6"}}
+               outlineStyle={{ borderColor: "#f6f6f6" }}
+               style={{ backgroundColor: "#f6f6f6" }}
                onChangeText={(v) =>
                   productDispatch({ type: "CATEGORY", payload: v })
                }
@@ -198,8 +196,8 @@ const ProductForm = () => {
                value={productState.category}
             />
             <TextInput
-               outlineStyle={{borderColor:"#f6f6f6"}}
-               style={{backgroundColor:"#f6f6f6"}}
+               outlineStyle={{ borderColor: "#f6f6f6" }}
+               style={{ backgroundColor: "#f6f6f6" }}
                onChangeText={(v) =>
                   productDispatch({ type: "SIZES", payload: v })
                }
@@ -208,8 +206,8 @@ const ProductForm = () => {
                value={productState.sizes}
             />
             <TextInput
-               outlineStyle={{borderColor:"#f6f6f6"}}
-               style={{backgroundColor:"#f6f6f6"}}
+               outlineStyle={{ borderColor: "#f6f6f6" }}
+               style={{ backgroundColor: "#f6f6f6" }}
                onChangeText={(v) =>
                   productDispatch({ type: "PRICE", payload: v })
                }
@@ -218,8 +216,8 @@ const ProductForm = () => {
                value={productState.price}
             />
             <TextInput
-               outlineStyle={{borderColor:"#f6f6f6"}}
-               style={{backgroundColor:"#f6f6f6"}}
+               outlineStyle={{ borderColor: "#f6f6f6" }}
+               style={{ backgroundColor: "#f6f6f6" }}
                onChangeText={(v) =>
                   productDispatch({ type: "NUMBERAVAILABLE", payload: v })
                }

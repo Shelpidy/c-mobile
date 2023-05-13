@@ -6,11 +6,11 @@ import {
    Image,
    Alert,
    Pressable,
-   TextInput
+   TextInput,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { users } from "../../data";
-import { Feather, SimpleLineIcons,FontAwesome} from "@expo/vector-icons";
+import { Feather, SimpleLineIcons, FontAwesome } from "@expo/vector-icons";
 import { Button, useTheme } from "react-native-paper";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
@@ -21,9 +21,9 @@ const Comment = (props: CommentProps) => {
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [commentor, setCommentor] = useState<any>(null);
    const [loading, setLoading] = useState<any>(false);
-   const [comment,setComment] = useState<string>("")
+   const [comment, setComment] = useState<string>("");
 
-   const theme = useTheme()
+   const theme = useTheme();
 
    const navigation = useNavigation<any>();
 
@@ -44,7 +44,7 @@ const Comment = (props: CommentProps) => {
                   if (data.status == "success") {
                      // console.log("Users-----",data.data)
                      setCommentor(data.data.personal);
-                     setComment(props?.text||"")
+                     setComment(props?.text || "");
                      // Alert.alert("Success",data.message)
                      setLoading(false);
                   } else {
@@ -65,26 +65,28 @@ const Comment = (props: CommentProps) => {
    );
 
    const handleUpdateComment = () => {
-      setLoading(true)
-       async function UpdateComment(){
-         try{
-            let putObj = {text:comment,id:props.id}
-            let response = await axios.put("`http://192.168.52.183:5000/media/posts/comments",putObj)
-            if(response.status == 202){
-               props.text = comment
-               Alert.alert("Success","Comment Updated")
-            }else{
-               Alert.alert("Failed",response.data.message)
+      setLoading(true);
+      async function UpdateComment() {
+         try {
+            let putObj = { text: comment, id: props.id };
+            let response = await axios.put(
+               "`http://192.168.52.183:5000/media/posts/comments",
+               putObj
+            );
+            if (response.status == 202) {
+               props.text = comment;
+               Alert.alert("Success", "Comment Updated");
+            } else {
+               Alert.alert("Failed", response.data.message);
             }
-            setLoading(false)
-         }catch(err){
+            setLoading(false);
+         } catch (err) {
             console.log(err);
-               Alert.alert("Failed", String(err));
-               setLoading(false);
-
+            Alert.alert("Failed", String(err));
+            setLoading(false);
          }
-       }
-       UpdateComment()
+      }
+      UpdateComment();
    };
 
    const gotoUserProfile = () => {
@@ -112,49 +114,54 @@ const Comment = (props: CommentProps) => {
                      borderRadius: 4,
                   }}>
                   <Button onPress={() => setOpenModal(false)}>Back</Button>
-                  <View style={{margin:6}}>
-                     <Text style={{fontFamily:"Poppins_400Regular",color:theme.colors.primary,textAlign:'center'}}>Update Comment</Text>
+                  <View style={{ margin: 6 }}>
+                     <Text
+                        style={{
+                           fontFamily: "Poppins_400Regular",
+                           color: theme.colors.primary,
+                           textAlign: "center",
+                        }}>
+                        Update Comment
+                     </Text>
                   </View>
-                       <View
-               style={{
-                  paddingHorizontal: 15,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-               }}>
-               <TextInput
-                  value={comment}
-                  placeholder="Comment here..."
-                  onChangeText={(v) =>
-                    setComment(v)
-                  }
-                  style={{
-                     flex: 1,
-                     backgroundColor: "#f6f6f6",
-                     borderTopLeftRadius: 20,
-                     borderBottomLeftRadius: 20,
-                     height: 50,
-                     paddingHorizontal: 25,
-                  }}
-               />
-               <Pressable
-                  onPress={handleUpdateComment}
-                  style={{
-                     paddingHorizontal: 20,
-                     height: 50,
-                     alignItems: "center",
-                     justifyContent: "center",
-                     borderTopRightRadius: 20,
-                     borderBottomRightRadius: 20,
-                     backgroundColor: "#f6f6f6",
-                  }}>
-                  <FontAwesome
-                     color={theme.colors.primary}
-                     name="comment-o"
-                     size={23}
-                  />
-               </Pressable>
-            </View>
+                  <View
+                     style={{
+                        paddingHorizontal: 15,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                     }}>
+                     <TextInput
+                        value={comment}
+                        placeholder="Comment here..."
+                        onChangeText={(v) => setComment(v)}
+                        style={{
+                           flex: 1,
+                           backgroundColor: "#f6f6f6",
+                           borderTopLeftRadius: 20,
+                           borderBottomLeftRadius: 20,
+                           height: 50,
+                           paddingHorizontal: 25,
+                        }}
+                     />
+                     <Pressable
+                        onPress={handleUpdateComment}
+                        style={{
+                           paddingHorizontal: 20,
+                           height: 50,
+                           alignItems: "center",
+                           justifyContent: "center",
+                           borderTopRightRadius: 20,
+                           borderBottomRightRadius: 20,
+                           backgroundColor: "#f6f6f6",
+                        }}>
+                        <FontAwesome
+                           color={theme.colors.primary}
+                           name="comment-o"
+                           size={23}
+                        />
+                     </Pressable>
+                  </View>
                </View>
             </View>
          </Modal>

@@ -55,10 +55,13 @@ const FollowersScreen = ({ navigation, route }: any) => {
          </View>
       );
    return (
-      <View style={{backgroundColor:"#f6f6f6"}}>
-     
+      <View style={{ backgroundColor: "#f6f6f6" }}>
          <ScrollView horizontal style={styles.container}>
-            {users.length < 1 && <View><Text>No Follower</Text></View>}
+            {users.length < 1 && (
+               <View>
+                  <Text>No Follower</Text>
+               </View>
+            )}
             {users?.map((user) => {
                return (
                   <UserComponent
@@ -79,6 +82,5 @@ const styles = StyleSheet.create({
    container: {
       backgroundColor: "#f6f6f6",
       padding: 5,
- 
    },
 });

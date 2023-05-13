@@ -24,13 +24,12 @@ import {
    Ionicons,
    MaterialIcons,
    FontAwesome,
-   Feather
+   Feather,
 } from "@expo/vector-icons";
 import axios from "axios";
 import ProductComments from "../components/Marketing/ProductComments";
 import { useCurrentUser } from "../utils/CustomHooks";
 import UpdateProductForm from "../components/Marketing/UpdateProduct";
-
 
 const initialState: ProductComment = {};
 
@@ -216,22 +215,19 @@ const ProductScreen = ({ navigation, route }: any) => {
          productId: route.params.productId,
          affiliateId: currentUser?.id,
       };
-      console.log(requestObj)
+      console.log(requestObj);
       try {
          let { data } = await axios.post(
             `http://192.168.52.183:5000/api/marketing/affiliates/`,
             requestObj
          );
          if (data.status == "success") {
-            if(currentUser){
-                product?.affiliateId?.push(currentUser.id)
-                
-            Alert.alert(
-               "Success",
-                data.message
-            );
+            if (currentUser) {
+               product?.affiliateId?.push(currentUser.id);
+
+               Alert.alert("Success", data.message);
             }
-        
+
             setLoading1(false);
          } else {
             Alert.alert("Failed", data.message);
@@ -352,7 +348,7 @@ const ProductScreen = ({ navigation, route }: any) => {
 
    return (
       <ScrollView style={styles.productContainer}>
-          <Modal visible={openModal}>
+         <Modal visible={openModal}>
             <View
                style={{
                   flex: 1,
@@ -366,7 +362,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                   <Button mode="text" onPress={() => setOpenModal(false)}>
                      <Feather size={26} name="x" />
                   </Button>
-                  <UpdateProductForm {...product}/>
+                  <UpdateProductForm {...product} />
                </View>
             </View>
          </Modal>

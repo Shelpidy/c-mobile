@@ -189,7 +189,6 @@ const ProductComponent = (props: ProductComponentProps) => {
 
    return (
       <View style={styles.postContainer}>
-         
          <Modal visible={openModal}>
             <View
                style={{
@@ -204,7 +203,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                   <Button mode="text" onPress={() => setOpenModal(false)}>
                      <Feather size={26} name="x" />
                   </Button>
-                  <UpdateProductForm {...props}/>
+                  <UpdateProductForm {...props} />
                </View>
             </View>
          </Modal>

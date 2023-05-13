@@ -20,7 +20,7 @@ type UserComponentProps = {
    navigation: any;
    _user: User;
 };
-const {width} = Dimensions.get("window")
+const { width } = Dimensions.get("window");
 const UserComponent = ({ navigation, _user }: UserComponentProps) => {
    const [user, SetUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
@@ -31,11 +31,11 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
    let theme = useTheme();
 
    useEffect(() => {
-      console.log("USER COMPONENT")
-      console.log(_user.id)
-      console.log(currentUser?.followingIds)
+      console.log("USER COMPONENT");
+      console.log(_user.id);
+      console.log(currentUser?.followingIds);
       if (currentUser?.followingIds?.includes(_user.id)) {
-         console.log(_user.id,currentUser?.followingIds)
+         console.log(_user.id, currentUser?.followingIds);
          setFollowed(true);
       }
       // dispatchPostComment({ type: "", payload: "" });
@@ -86,7 +86,13 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
       );
    }
    return (
-      <View style={{ backgroundColor: "#ffffff", margin: 2, borderRadius: 20,width:width - 5 }}>
+      <View
+         style={{
+            backgroundColor: "#ffffff",
+            margin: 2,
+            borderRadius: 20,
+            width: width - 5,
+         }}>
          {user && (
             <View
                style={{

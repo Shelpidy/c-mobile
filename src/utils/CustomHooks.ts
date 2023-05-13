@@ -4,55 +4,51 @@ import { Alert } from "react-native";
 import jwtDecode from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import NetInfo from '@react-native-community/netinfo';
+import NetInfo from "@react-native-community/netinfo";
 import { io, Socket } from "socket.io-client";
-import moment from "moment"
+import moment from "moment";
 
- const generateRoomId = (secondUserId: any, activeUserId: any) => {
-      let maxId = Math.max(secondUserId, activeUserId);
-      let minId = Math.min(secondUserId, activeUserId);
-      return Number(`${maxId}${minId}`);
-   };
-
-
-
-export const useNetworkStatus = () => {
-  const [isOnline, setIsOnline] = useState<boolean | null>(true);
-
-
-  useEffect(() => {
-    const checkOnlineStatus = async () => {
-      try {
-        const netInfoState = await NetInfo.fetch();
-        setIsOnline(netInfoState.isConnected && netInfoState.isInternetReachable);
-      } catch (error) {
-        console.error('Error checking online status:', error);
-      }
-    };
-
-    checkOnlineStatus();
-
-    const unsubscribe = NetInfo.addEventListener(checkOnlineStatus);
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  return isOnline;
+const generateRoomId = (secondUserId: any, activeUserId: any) => {
+   let maxId = Math.max(secondUserId, activeUserId);
+   let minId = Math.min(secondUserId, activeUserId);
+   return Number(`${maxId}${minId}`);
 };
 
+export const useNetworkStatus = () => {
+   const [isOnline, setIsOnline] = useState<boolean | null>(true);
 
-
-
-export const useLastSeenOrOnlineStatus = (secondUserId:any) => {
-  const [lastSeen, setLastSeen] = useState<string | null>(null);
-  const [isConnected, setIsConnected] = useState<boolean | null>(true);
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const currentUser = useCurrentUser()
-  
    useEffect(() => {
-      if(currentUser && secondUserId){
+      const checkOnlineStatus = async () => {
+         try {
+            const netInfoState = await NetInfo.fetch();
+            setIsOnline(
+               netInfoState.isConnected && netInfoState.isInternetReachable
+            );
+         } catch (error) {
+            console.error("Error checking online status:", error);
+         }
+      };
+
+      checkOnlineStatus();
+
+      const unsubscribe = NetInfo.addEventListener(checkOnlineStatus);
+
+      return () => {
+         unsubscribe();
+      };
+   }, []);
+
+   return isOnline;
+};
+
+export const useLastSeenOrOnlineStatus = (secondUserId: any) => {
+   const [lastSeen, setLastSeen] = useState<string | null>(null);
+   const [isConnected, setIsConnected] = useState<boolean | null>(true);
+   const [socket, setSocket] = useState<Socket | null>(null);
+   const currentUser = useCurrentUser();
+
+   useEffect(() => {
+      if (currentUser && secondUserId) {
          let secUser = secondUserId;
          let activeUser = currentUser?.id;
          let roomId = generateRoomId(secUser, activeUser);
@@ -61,31 +57,32 @@ export const useLastSeenOrOnlineStatus = (secondUserId:any) => {
          // cleanup function to close the socket connection when the component unmounts
          return () => {
             newSocket.close();
-      };
+         };
       }
-      
-   }, [currentUser,secondUserId]);
+   }, [currentUser, secondUserId]);
 
-
-    useEffect(()=>{
-       //// Updating Online Status//////////
-      if(socket && secondUserId){
-            socket.on("online",(data)=>{
-            console.log("From Online",data)
-            if(data.userId == secondUserId){
-                  if(data.online){
-                  setLastSeen("online")
-                  }else{
-                     let lastSeenDate = moment(data.createdAt, "YYYYMMDD").fromNow()
-                     setLastSeen(lastSeenDate)
-                  }
-            } })
+   useEffect(() => {
+      //// Updating Online Status//////////
+      if (socket && secondUserId) {
+         socket.on("online", (data) => {
+            console.log("From Online", data);
+            if (data.userId == secondUserId) {
+               if (data.online) {
+                  setLastSeen("online");
+               } else {
+                  let lastSeenDate = moment(
+                     data.createdAt,
+                     "YYYYMMDD"
+                  ).fromNow();
+                  setLastSeen(lastSeenDate);
+               }
+            }
+         });
       }
-   },[socket,secondUserId])
+   }, [socket, secondUserId]);
 
-  return lastSeen;
+   return lastSeen;
 };
-
 
 export const useCurrentUser = () => {
    const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);

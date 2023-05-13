@@ -7,7 +7,7 @@ import { Easing, useSharedValue, withTiming } from "react-native-reanimated";
 import { Svg } from "react-native-svg";
 
 const StartUpLoadingScreen = () => {
-   const theme = useTheme()
+   const theme = useTheme();
    const progress = useSharedValue(0);
    const paths = [
       "M1.27979 15.84C1.27979 13.0667 1.85312 10.6 2.99979 8.43999C4.17312 6.25332 5.82645 4.55999 7.95979 3.35999C10.0931 2.13332 12.5465 1.51999 15.3198 1.51999C18.8398 1.51999 21.7998 2.46665 24.1998 4.35999C26.5998 6.22665 28.1465 8.77332 28.8398 12H20.3998C19.8931 10.9333 19.1865 10.12 18.2798 9.55998C17.3998 8.99999 16.3731 8.71999 15.1998 8.71999C13.3865 8.71999 11.9331 9.37332 10.8398 10.68C9.77312 11.96 9.23978 13.68 9.23978 15.84C9.23978 18.0267 9.77312 19.7733 10.8398 21.08C11.9331 22.36 13.3865 23 15.1998 23C16.3731 23 17.3998 22.72 18.2798 22.16C19.1865 21.6 19.8931 20.7867 20.3998 19.72H28.8398C28.1465 22.9467 26.5998 25.5067 24.1998 27.4C21.7998 29.2667 18.8398 30.2 15.3198 30.2C12.5465 30.2 10.0931 29.6 7.95979 28.4C5.82645 27.1733 4.17312 25.48 2.99979 23.32C1.85312 21.1333 1.27979 18.64 1.27979 15.84Z",
@@ -19,7 +19,7 @@ const StartUpLoadingScreen = () => {
       "M207.541 1.79999V30H199.701V1.79999H207.541Z",
       "M233.245 1.79999V8.03999H225.725V30H217.885V8.03999H210.445V1.79999H233.245Z",
       "M233.245 1.79999V8.03999H225.725V30H217.885V8.03999H210.445V1.79999H233.245Z",
-      "M261.786 1.79999L251.866 21.04V30H243.986V21.04L234.066 1.79999H243.026L247.986 12.68L252.946 1.79999H261.786Z"
+      "M261.786 1.79999L251.866 21.04V30H243.986V21.04L234.066 1.79999H243.026L247.986 12.68L252.946 1.79999H261.786Z",
    ];
 
    useEffect(() => {
@@ -35,7 +35,9 @@ const StartUpLoadingScreen = () => {
             alignItems: "center",
             height: height,
          }}>
-         <ExpoStatusBar backgroundColor={theme.colors.primary} style="light"></ExpoStatusBar>
+         <ExpoStatusBar
+            backgroundColor={theme.colors.primary}
+            style="light"></ExpoStatusBar>
          <Svg width="264" height="32" viewBox="0 0 264 32" fill="none">
             {paths.map((path) => {
                return (
@@ -43,7 +45,14 @@ const StartUpLoadingScreen = () => {
                );
             })}
          </Svg>
-         <Text style={{ opacity: 0.8, marginTop: 8,color:theme.colors.secondary}}>LOADING...</Text>
+         <Text
+            style={{
+               opacity: 0.8,
+               marginTop: 8,
+               color: theme.colors.secondary,
+            }}>
+            LOADING...
+         </Text>
       </View>
    );
 };

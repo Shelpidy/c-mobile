@@ -139,7 +139,6 @@ const PostForm = () => {
       <View
          style={{
             margin: 8,
-         
          }}>
          <Modal visible={imageOpen}>
             <ImagePicker
@@ -160,14 +159,14 @@ const PostForm = () => {
          </Modal>
          <View style={styles.formContainer}>
             <TextInput
-               outlineStyle={{borderColor:"#f0f0f0"}}
+               outlineStyle={{ borderColor: "#f0f0f0" }}
                onChangeText={onValueChangeTitle}
                mode="outlined"
                label="Title"
             />
 
             <TextInput
-               outlineStyle={{borderColor:"#f0f0f0"}}
+               outlineStyle={{ borderColor: "#f0f0f0" }}
                onChangeText={onValueChangeContent}
                mode="outlined"
                label="Content"

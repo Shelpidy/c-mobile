@@ -63,18 +63,17 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
       [currentUser]
    );
 
-
-   const gotoUploadScreen =()=>{
-      if(page === 'product'){
-          navigation.navigate("ProductPostScreen", {
-                           openImagePicker: true })
-
-      }else{
+   const gotoUploadScreen = () => {
+      if (page === "product") {
+         navigation.navigate("ProductPostScreen", {
+            openImagePicker: true,
+         });
+      } else {
          navigation.navigate("PostScreen", {
-                           openImagePicker: true })
-
+            openImagePicker: true,
+         });
       }
-   }
+   };
 
    const gotoUserProfile = () => {
       if (currentUser?.id === poster.id) {

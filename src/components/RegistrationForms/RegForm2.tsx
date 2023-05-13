@@ -42,8 +42,8 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
             }}
             source={require("../../../assets/Illustrators/ani-signup.gif")}></Image>
          <View style={styles.form}>
-           <TextInput
-              outlineStyle={{borderColor:"#f6f6f6"}}
+            <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Password"
@@ -56,8 +56,8 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                         setShowPassword(!showPassword)
                      }></TextInput.Icon>
                }></TextInput>
-           <TextInput
-              outlineStyle={{borderColor:"#f6f6f6"}}
+            <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Confirm Password"
@@ -70,8 +70,8 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                         setShowConPassword(!showConPassword)
                      }></TextInput.Icon>
                }></TextInput>
-           <TextInput
-              outlineStyle={{borderColor:"#f6f6f6"}}
+            <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Pincode"
@@ -84,8 +84,8 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                         setShowPincode(!showPincode)
                      }></TextInput.Icon>
                }></TextInput>
-           <TextInput
-              outlineStyle={{borderColor:"#f6f6f6"}}
+            <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Confirm Pincode"
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
       width: width - 60,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor:"#f6f6f6"
+      backgroundColor: "#f6f6f6",
    },
    button: {
       width: width / 3,

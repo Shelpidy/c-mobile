@@ -59,8 +59,12 @@ const FollowingsScreen = ({ navigation, route }: any) => {
       <View>
          <Text>Followings</Text>
          <SearchForm setSearchValue={(v) => console.log(v)} />
-         {users.length < 1 && <View><Text>No Follower</Text></View>}
-       
+         {users.length < 1 && (
+            <View>
+               <Text>No Follower</Text>
+            </View>
+         )}
+
          {/* <Text
             style={{ fontFamily: "Poppins_600SemiBold", marginHorizontal: 15 }}>
             <Feather size={20} name="users" /> Users

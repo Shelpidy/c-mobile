@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
-import { View, Text } from "react-native";
+import { View, Text, LogBox } from "react-native";
 import {
    NavigationContainer,
    // adaptNavigationTheme,
@@ -86,6 +86,7 @@ function LayoutContainer() {
 
 export default function App() {
    const [loading, setLoading] = React.useState(true);
+   LogBox.ignoreAllLogs();
    let [fontsLoaded] = useFonts({
       Poppins_100Thin,
       Poppins_100Thin_Italic,

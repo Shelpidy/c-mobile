@@ -32,9 +32,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                   }}>
                   Settings
                </Text>
-               <Button  onPress={() =>
-                  navigation.navigate("SettingsScreen")
-               }>
+               <Button onPress={() => navigation.navigate("SettingsScreen")}>
                   <Entypo name="chevron-thin-right" />
                </Button>
             </View>
@@ -151,8 +149,8 @@ const styles = StyleSheet.create({
       // marginBottom:120,
       paddingVertical: 15,
       paddingHorizontal: 10,
-      borderWidth:1,
-      borderColor:"#f6f6f6"
+      borderWidth: 1,
+      borderColor: "#f6f6f6",
       // alignItems:'center'
    },
    navLink: {
