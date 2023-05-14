@@ -24,6 +24,7 @@ import SearchScreen from "../screens/SearchScreen";
 import ProductNotificationScreen from "../screens/ProductNotificationScreen";
 import ProductPostScreen from "../screens/ProductPostScreen";
 import ConversationsScreen from "../screens/ConversationsScreen";
+import { useNavigationState } from "@react-navigation/native";
 // import { createDrawerNavigator } from '@react-navigation/drawer';
 
 const Stack = createNativeStackNavigator();
@@ -39,10 +40,30 @@ type HomeStackProps = {
 //    </drawer.Navigator>)
 // }
 
+const RenderHeader = ()=>{   
+    const navigationState = useNavigationState(state => state)
+    let screenNames = navigationState.routes[navigationState.index].state?.routes.map(screen => screen?.name)
+    let chatScreenIndex = screenNames?.lastIndexOf('ChatScreen')
+     if(screenNames === undefined){
+        return <CustomHeader/>
+
+    }
+    if(chatScreenIndex === undefined){
+        return <CustomHeader/>
+
+    }
+    const isOnChatScreen = navigationState.routes[navigationState.index].state?.routes[chatScreenIndex]?.name === "ChatScreen" && chatScreenIndex === screenNames.length - 1;
+    console.log(isOnChatScreen)
+    if(isOnChatScreen) return null
+    return <CustomHeader/>
+
+}
+
 const HomeStack = (props: HomeStackProps) => {
    const [open, setOpen] = React.useState(false);
+  
    return (
-      <Stack.Navigator screenOptions={{ header: () => <CustomHeader /> }}>
+      <Stack.Navigator screenOptions={{ header: () => RenderHeader()}}>
          <Stack.Screen name="HomeScreen" component={HomeScreen}></Stack.Screen>
          <Stack.Screen
             name="ProfileScreen"

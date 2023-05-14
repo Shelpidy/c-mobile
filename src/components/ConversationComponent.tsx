@@ -35,10 +35,11 @@ const ConversationComponent = ({
    const [secondUser, setSecondUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
-   const navigation = useNavigation<Navigator>();
+   const navigation = useNavigation<any>();
    const [socket, setSocket] = useState<Socket | null>(null);
    const [lastSeen, setLastSeen] = useState<any>("");
    const [typing, setTyping] = useState<boolean | null>(false);
+   const [recording, setRecording] = useState<boolean | null>(false);
    const [resetLastSeen, setResetLastSeen] = useState<number>(0);
    const currentUser = useCurrentUser();
    const [newConversation, setNewConversation] =
@@ -162,6 +163,15 @@ const ConversationComponent = ({
             }
          });
 
+         ///////// check or listen for recording ///////////////
+
+          socket.on("recording", (data) => {
+            console.log("From Recording", { recording: data.recording });
+            if (data.userId == secUserId) {
+               setRecording(data.recording);
+            }
+         });
+
          ////////////// check for conversation /////////////////
 
          socket.on("conversation", (data) => {
@@ -171,7 +181,9 @@ const ConversationComponent = ({
       }
    }, [socket, currentUser, secondUser]);
 
-   const gotoChatScreen = () => {};
+   const gotoChatScreen = () => {
+      navigation.navigate("ChatScreen",{user:secondUser})
+   };
    if (!newConversation) {
       return (
          <View>
@@ -236,9 +248,10 @@ const ConversationComponent = ({
                            : "Poppins_300Light",
                      marginHorizontal: 3,
                   }}
-                  textLength={16}
+                  textLength={15}
                />
-               <Text
+               {
+                  !recording && <Text
                   style={{
                      fontFamily: "Poppins_300Light",
                      color: theme.colors.secondary,
@@ -246,6 +259,18 @@ const ConversationComponent = ({
                   }}>
                   {typing ? "typing..." : ""}
                </Text>
+               }
+               {
+                  !typing && <Text
+                  style={{
+                     fontFamily: "Poppins_300Light",
+                     color: theme.colors.secondary,
+                     marginLeft: 10,
+                  }}>
+                  {recording ? "recording..." : ""}
+               </Text>
+               }
+                
                <Text>{lastSeen}</Text>
             </View>
 
@@ -254,8 +279,8 @@ const ConversationComponent = ({
                   style={{
                      width: 300,
                      flexDirection: "row",
-                     justifyContent: "flex-end",
-                     paddingRight: 5,
+                     justifyContent: "flex-start",
+                     paddingLeft: 5,
                      alignItems: "center",
                      paddingTop: 5,
                      height:'auto'
@@ -290,7 +315,7 @@ const ConversationComponent = ({
    );
 };
 
-export default React.memo(ConversationComponent);
+export default ConversationComponent;
 
 const styles = StyleSheet.create({
    container: {

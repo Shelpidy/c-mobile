@@ -59,7 +59,7 @@ const NewConversationsScreen = () => {
    }
 
    return (
-      <View>
+      <View style={{backgroundColor:"#fff"}}>
          <Text>All Chats</Text>
          {conversations.map((conversation) => {
             return (
@@ -78,6 +78,6 @@ const ConversationsScreen = ()=>{
    return <MemoScreen/>
 }
 
-export default ConversationsScreen;
+export default NewConversationsScreen;
 
 const styles = StyleSheet.create({});
