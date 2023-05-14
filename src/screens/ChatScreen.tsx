@@ -127,7 +127,8 @@ const ChatBox = ({ onSend, onTextInput, getFocused, sent,openMediaPicker,handleI
          />
          {
             isFocused && <TouchableOpacity
-            onPress={()=>handleIsRecording(!recording)}
+               onPress={handleSend}
+           
             style={{
                paddingHorizontal: 20,
                height: 50,
@@ -143,7 +144,7 @@ const ChatBox = ({ onSend, onTextInput, getFocused, sent,openMediaPicker,handleI
          }
          {
             !isFocused && <TouchableOpacity
-            onPress={handleSend}
+          onPress={()=>handleIsRecording(!recording)}
              style={{
                paddingHorizontal: 20,
                height: 50,
