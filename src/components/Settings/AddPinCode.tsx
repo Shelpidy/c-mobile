@@ -16,7 +16,7 @@ const PinCodeForm = () => {
    const handleCheckPassword = async () => {
       try {
          const response = await axios.post(
-            "http://192.168.52.183:5000/api/auth/users/checkpassword/",
+            "http://192.168.99.44:5000/api/auth/users/checkpassword/",
             {
                password,
                userId: currentUser?.id, // Replace with the actual user ID
@@ -39,7 +39,7 @@ const PinCodeForm = () => {
 
       try {
          const response = await axios.put(
-            "http://192.168.52.183:5000/api/auth/users/personal/",
+            "http://192.168.99.44:5000/api/auth/users/personal/",
             {
                key: "pinCode",
                value: newPinCode,

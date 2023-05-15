@@ -40,30 +40,32 @@ type HomeStackProps = {
 //    </drawer.Navigator>)
 // }
 
-const RenderHeader = ()=>{   
-    const navigationState = useNavigationState(state => state)
-    let screenNames = navigationState.routes[navigationState.index].state?.routes.map(screen => screen?.name)
-    let chatScreenIndex = screenNames?.lastIndexOf('ChatScreen')
-     if(screenNames === undefined){
-        return <CustomHeader/>
-
-    }
-    if(chatScreenIndex === undefined){
-        return <CustomHeader/>
-
-    }
-    const isOnChatScreen = navigationState.routes[navigationState.index].state?.routes[chatScreenIndex]?.name === "ChatScreen" && chatScreenIndex === screenNames.length - 1;
-    console.log(isOnChatScreen)
-    if(isOnChatScreen) return null
-    return <CustomHeader/>
-
-}
+const RenderHeader = () => {
+   const navigationState = useNavigationState((state) => state);
+   let screenNames = navigationState.routes[
+      navigationState.index
+   ].state?.routes.map((screen) => screen?.name);
+   let chatScreenIndex = screenNames?.lastIndexOf("ChatScreen");
+   if (screenNames === undefined) {
+      return <CustomHeader />;
+   }
+   if (chatScreenIndex === undefined) {
+      return <CustomHeader />;
+   }
+   const isOnChatScreen =
+      navigationState.routes[navigationState.index].state?.routes[
+         chatScreenIndex
+      ]?.name === "ChatScreen" && chatScreenIndex === screenNames.length - 1;
+   console.log(isOnChatScreen);
+   if (isOnChatScreen) return null;
+   return <CustomHeader />;
+};
 
 const HomeStack = (props: HomeStackProps) => {
    const [open, setOpen] = React.useState(false);
-  
+
    return (
-      <Stack.Navigator screenOptions={{ header: () => RenderHeader()}}>
+      <Stack.Navigator screenOptions={{ header: () => RenderHeader() }}>
          <Stack.Screen name="HomeScreen" component={HomeScreen}></Stack.Screen>
          <Stack.Screen
             name="ProfileScreen"

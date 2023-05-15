@@ -1,10 +1,12 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
+import { Bubble, GiftedChat } from "react-native-gifted-chat";
 import {
-   Bubble,
-   GiftedChat,
-  
-} from "react-native-gifted-chat";
-import { Button, Divider, IconButton, useTheme } from "react-native-paper";
+   Button,
+   Divider,
+   IconButton,
+   ProgressBar,
+   useTheme,
+} from "react-native-paper";
 import {
    View,
    Text,
@@ -17,24 +19,34 @@ import {
    StatusBar,
    TouchableOpacity,
 } from "react-native";
-import { Feather, FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import {
+   Feather,
+   FontAwesome,
+   Ionicons,
+   MaterialIcons,
+} from "@expo/vector-icons";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import { io, Socket } from "socket.io-client";
-import { StyleSheet,Modal } from "react-native";
+import { StyleSheet, Modal } from "react-native";
 import TextShortener from "../components/TextShortener";
 import { useCurrentUser, useNetworkStatus } from "../utils/CustomHooks";
 import moment from "moment";
 import { useNavigation, useNavigationState } from "@react-navigation/native";
-import { ImagePicker } from "expo-image-multiple-picker";
+// import { ImagePicker } from "expo-image-multiple-picker";
+import * as ImagePicker from "expo-image-picker";
 import config from ".././aws-config";
 import AWS from "aws-sdk";
+import { Camera } from "expo-camera";
+import { Video, Audio, ResizeMode, AVPlaybackStatus } from "expo-av";
+import * as FileSystem from "expo-file-system";
 
 type ChatBoxProps = {
    onSend: () => void;
    onTextInput: (v: string) => void;
    getFocused: (v: boolean) => void;
    openMediaPicker: () => void;
-   handleIsRecording:(v:boolean)=>void
+   openVideoPicker: () => void;
+   handleIsRecording: (v: boolean) => void;
    sent: boolean;
 };
 
@@ -44,12 +56,19 @@ const s3 = new AWS.S3({
    region: config.region,
 });
 
-
-const ChatBox = ({ onSend, onTextInput, getFocused, sent,openMediaPicker,handleIsRecording }: ChatBoxProps) => {
+const ChatBox = ({
+   onSend,
+   onTextInput,
+   getFocused,
+   sent,
+   openMediaPicker,
+   handleIsRecording,
+   openVideoPicker,
+}: ChatBoxProps) => {
    const [text, setText] = useState<any>();
    const textInputRef = useRef<TextInput>(null);
-   const [isFocused,setIsFocused] = useState<boolean>(false)
-   const [recording,setRecording] = useState<boolean>(false)
+   const [isFocused, setIsFocused] = useState<boolean>(false);
+   const [recording, setRecording] = useState<boolean>(false);
 
    useEffect(() => {
       // console.log("Running");
@@ -73,95 +92,121 @@ const ChatBox = ({ onSend, onTextInput, getFocused, sent,openMediaPicker,handleI
 
    const handleFocus = (v: any) => {
       // console.log({ focus: v });
-      setIsFocused(v)
+      setIsFocused(v);
       getFocused(v);
+   };
+
+   const handleRecording = () => {
+      setRecording(!recording);
+      handleIsRecording(!recording);
    };
 
    const theme = useTheme();
    return (
       <View
          style={{
-            paddingHorizontal:10,
+            paddingHorizontal: 10,
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: 'center',
-            gap:10,
-            
+            justifyContent: "center",
+            gap: 10,
          }}>
-         
-         <View  style={{
-             flex:1,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: 'center',
-         }}>
-             <TouchableOpacity
-              style={{
-               paddingHorizontal: 20,
-               height: 50,
+         <View
+            style={{
+               flex: 1,
+               flexDirection: "row",
                alignItems: "center",
                justifyContent: "center",
-               borderTopLeftRadius: 20,
-               borderBottomLeftRadius: 20,
-               backgroundColor: "#f6f6f6",
-            }}
-              onPress={openMediaPicker} >
-                 <Ionicons color={theme.colors.secondary} name="camera" size={23} />
+            }}>
+            <TouchableOpacity
+               style={{
+                  paddingHorizontal: 20,
+                  height: 50,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderTopLeftRadius: 20,
+                  borderBottomLeftRadius: 20,
+                  backgroundColor: "#f6f6f6",
+               }}
+               onPress={openMediaPicker}>
+               <Ionicons
+                  color={theme.colors.secondary}
+                  name="camera"
+                  size={23}
+               />
             </TouchableOpacity>
-              <TextInput
-            multiline
-            ref={textInputRef}
-            onFocus={() => handleFocus(true)}
-            onBlur={() => handleFocus(false)}
-            value={text}
-            placeholder="Type here..."
-            onChangeText={handleTextChange}
-            style={{
-               flex:1,
-               fontFamily: "Poppins_300Light",
-               backgroundColor: "#f6f6f6",
-               height: 50,
-               paddingHorizontal: 25,
-               fontSize: 16,
-            }}
-         />
-         {
-            isFocused && <TouchableOpacity
-               onPress={handleSend}
-           
-            style={{
-               paddingHorizontal: 20,
-               height: 50,
-               alignItems: "center",
-               justifyContent: "center",
-               borderTopRightRadius: 20,
-               borderBottomRightRadius: 20,
-               backgroundColor: "#f6f6f6",
-            }}>
-             
-             <FontAwesome color={theme.colors.primary} name="send-o" size={23} />
-         </TouchableOpacity>
-         }
-         {
-            !isFocused && <TouchableOpacity
-          onPress={()=>handleIsRecording(!recording)}
-             style={{
-               paddingHorizontal: 20,
-               height: 50,
-               alignItems: "center",
-               justifyContent: "center",
-               borderTopRightRadius: 20,
-               borderBottomRightRadius: 20,
-               backgroundColor: "#f6f6f6",
-            }}>
-               <Feather name='mic' color={recording?"red":theme.colors.secondary} size={23} />
-          
-         </TouchableOpacity>
-         }
+            <TouchableOpacity
+               style={{
+                  paddingHorizontal: 4,
+                  height: 50,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#f6f6f6",
+               }}
+               onPress={openVideoPicker}>
+               <Ionicons
+                  color={theme.colors.secondary}
+                  name="videocam-outline"
+                  size={23}
+               />
+            </TouchableOpacity>
 
+            <TextInput
+               multiline
+               ref={textInputRef}
+               onFocus={() => handleFocus(true)}
+               onBlur={() => handleFocus(false)}
+               value={text}
+               placeholder="Type here..."
+               onChangeText={handleTextChange}
+               style={{
+                  flex: 1,
+                  fontFamily: "Poppins_300Light",
+                  backgroundColor: "#f6f6f6",
+                  height: 50,
+                  paddingHorizontal: 25,
+                  fontSize: 16,
+               }}
+            />
+            {isFocused && (
+               <TouchableOpacity
+                  onPress={handleSend}
+                  style={{
+                     paddingHorizontal: 20,
+                     height: 50,
+                     alignItems: "center",
+                     justifyContent: "center",
+                     borderTopRightRadius: 20,
+                     borderBottomRightRadius: 20,
+                     backgroundColor: "#f6f6f6",
+                  }}>
+                  <FontAwesome
+                     color={theme.colors.primary}
+                     name="send-o"
+                     size={23}
+                  />
+               </TouchableOpacity>
+            )}
+            {!isFocused && (
+               <TouchableOpacity
+                  onPress={handleRecording}
+                  style={{
+                     paddingHorizontal: 20,
+                     height: 50,
+                     alignItems: "center",
+                     justifyContent: "center",
+                     borderTopRightRadius: 20,
+                     borderBottomRightRadius: 20,
+                     backgroundColor: "#f6f6f6",
+                  }}>
+                  <Feather
+                     name="mic"
+                     color={recording ? "red" : theme.colors.secondary}
+                     size={23}
+                  />
+               </TouchableOpacity>
+            )}
          </View>
-       
-            
       </View>
    );
 };
@@ -174,6 +219,7 @@ const ChatScreen = ({ route }: any) => {
    const [textValue, setTextValue] = useState<string>("");
    const [inputFocus, setInputFocus] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(true);
+   const [recording, setRecording] = useState<Audio.Recording | null>(null);
    const currentUser = useCurrentUser();
    const [secondUser, setSecondUser] = useState<User>();
    const [socket, setSocket] = useState<Socket | null>(null);
@@ -187,38 +233,21 @@ const ChatScreen = ({ route }: any) => {
    const navigationState = useNavigationState((state) => state);
    const navigation = useNavigation<any>();
    const [imageOpen, setImageOpen] = useState<boolean>(false);
-   const [videoOpen, setVideoOpen] =  useState<boolean>(false);
+   const [videoOpen, setVideoOpen] = useState<boolean>(false);
+   const [image, setImage] = useState<string | null>(null);
    const [audioRecording, setAudioRecording] = useState<boolean>(false);
-
+   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+   const [audio, setAudio] = useState<string | null>(null);
+   const [downloadVideoProgress, setVideoDownloadProgress] = useState<
+      number | null
+   >(null);
+   const [downloadImageProgress, setImageDownloadProgress] = useState<
+      number | null
+   >(null);
+   const [downloadId, setDownloadId] = useState<number | string | null>(null);
    const [resetLastSeen, setResetLastSeen] = useState<number>(0);
-
-   const toggleEmojiPicker = () => {
-      setShowEmojiPicker(!showEmojiPicker);
-   };
-
-
-   
-   const chooseImage = (assets: any[]) => {
-      let imageSrcs = assets.map((asset) => asset.uri);
-      // console.log(imageSrcs);
-      setImageOpen(false);
-   };
-
-   const cancelImage = () => {
-      // console.log("No permission, canceling image picker");
-      setImageOpen(false);
-   };
-
-   const chooseVideo = (assets: any[]) => {
-      let videoSrc = assets[0]["uri"];
-      // console.log(videoSrc);
-      setVideoOpen(false);
-   };
-
-   const cancelVideo = () => {
-      // console.log("No permission, canceling image picker");
-      setImageOpen(false);
-   };
+   const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
+    const [audioDuration, setAudioDuration] = useState<number | null>(null);
 
    const generateRoomId = (secUserId: any, activeUserId: any) => {
       let maxId = Math.max(secUserId, activeUserId);
@@ -232,7 +261,7 @@ const ChatScreen = ({ route }: any) => {
       let activeUser = currentUser?.id;
       let roomId = generateRoomId(secUser, activeUser);
       let newSocket = io(
-         `http://192.168.52.183:8080/?roomId=${roomId}&userId=${activeUser}`
+         `http://192.168.99.44:8080/?roomId=${roomId}&userId=${activeUser}`
       );
       setSocket(newSocket);
       // cleanup function to close the socket connection when the component unmounts
@@ -251,7 +280,7 @@ const ChatScreen = ({ route }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.52.183:8080/userstatus/${secUserId}`,
+                  `http://192.168.99.44:8080/userstatus/${secUserId}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -298,32 +327,6 @@ const ChatScreen = ({ route }: any) => {
       return unsubscribe;
    }, [navigation]);
 
-   //////// UPDATE READ STATUS OF LAST MESSAGE(S) RECEIVED //////////
-
-   // useEffect(()=>{
-   //   async function updateReadMessageStatus(){
-   //    if(currentUser){
-   //        try{
-   //       let secUser = route.params?.user.id;
-   //       let activeUser = currentUser?.id;
-   //       let roomId = generateRoomId(secUser, activeUser);
-   //       let response =  await fetch(
-   //             `http://192.168.52.183:8080/conversations/read/${roomId}/${activeUser}`,{ method: "PUT" }
-   //          );
-   //       if(response.status != 202){
-   //          let responseBody = await response.json()
-   //          Alert.alert("Update Failed","Failed to update read status")
-            // console.log(responseBody)
-   //       }
-   //     }catch(err){
-         //  console.log(err);
-   //        Alert.alert("Failed", String(err));
-   //     }
-   //    }
-   //   }
-   //   updateReadMessageStatus()
-   // },[])
-
    useEffect(() => {
       let secUser = route.params.user;
       // console.log(secUser);
@@ -363,7 +366,7 @@ const ChatScreen = ({ route }: any) => {
             // console.log("Message from the server", msg);
          });
 
-         //////////  Chat message listener ///////
+         ////////////////////  Chat message listener ///////////////
 
          socket.on(String(roomId), (message: any) => {
             // console.log("From Server", message);
@@ -375,7 +378,7 @@ const ChatScreen = ({ route }: any) => {
             });
          });
 
-         /////// Online Status listener ///////////
+         ///////////// Online Status listener ///////////
 
          socket.on("online", (data) => {
             // console.log("From Online", { online: data.online });
@@ -405,7 +408,7 @@ const ChatScreen = ({ route }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.52.183:8080/chats/${roomId}/${currentPage}/${numberOfChatsRecord}`,
+                  `http://192.168.99.44:8080/chats/${roomId}/${currentPage}/${numberOfChatsRecord}`,
                   { method: "GET" }
                );
                let { chats: chatMessages, count } = await resp.json();
@@ -426,6 +429,105 @@ const ChatScreen = ({ route }: any) => {
       }
    }, [currentUser, currentPage]);
 
+   /////////////// Pick Image ////////////////////////////
+   const openImagePickerAsync = async () => {
+      const permissionResult =
+         await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (permissionResult.granted === false) {
+         Alert.alert(
+            "Permission required",
+            "Permission to access the media library is required."
+         );
+         return;
+      }
+
+      const pickerResult = await ImagePicker.launchImageLibraryAsync();
+
+      if (pickerResult.canceled === true) {
+         return;
+      }
+
+      setImage(pickerResult.assets[0].uri);
+      console.log("Image", pickerResult.assets[0]);
+      onSend();
+   };
+
+   ////////////// Take picture /////////////////////////
+
+   // const takePictureWithPermission = async () => {
+   //    const { status } = await Camera.requestMicrophonePermissionsAsync();
+
+   //    if (status !== "granted") {
+   //       console.log("Camera permission not granted");
+   //       return;
+   //    }
+
+   //    const camera = await Camera.getAvailableCameraTypesAsync();
+   //    const uri = await camera[0];
+   //    //  setImage(uri)
+   //    console.log(uri);
+   //    // Do something with the captured photo
+   // };
+
+   ////////// Choose a video /////////////////////////
+
+   const openVideoPickerAsync = async () => {
+      const permissionResult =
+         await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permissionResult.granted === false) {
+         console.log("Permission to access the media library is required.");
+         return;
+      }
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
+         mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      });
+      if (!pickerResult.canceled) {
+         setSelectedVideo(pickerResult.assets[0].uri);
+         console.log(pickerResult.assets[0].uri);
+         onSend();
+      }
+   };
+
+   ///////////////////// start recording ///////////////////////////
+
+   async function startRecording() {
+      try {
+         console.log("Requesting permissions..");
+         await Audio.requestPermissionsAsync();
+         await Audio.setAudioModeAsync({
+            allowsRecordingIOS: true,
+            playsInSilentModeIOS: true,
+         });
+
+         console.log("Starting recording..");
+         const { recording } = await Audio.Recording.createAsync(
+            Audio.RecordingOptionsPresets.HIGH_QUALITY
+         );
+         setRecording(recording);
+         console.log("Recording started");
+      } catch (err) {
+         console.error("Failed to start recording", err);
+      }
+   }
+
+   ////////////////////////// stop recording //////////////////////////////////
+
+   async function stopRecording() {
+      console.log("Stopping recording..");
+      if (recording) {
+         setRecording(null);
+         await recording.stopAndUnloadAsync();
+         await Audio.setAudioModeAsync({
+            allowsRecordingIOS: false,
+         });
+         const uri = recording.getURI();
+         setAudio(uri);
+         console.log("Recording stopped and stored at", uri);
+         onSend();
+      }
+   }
+
    const onSend = useCallback(() => {
       // console.log("Onsend loading");
       let secUser = route.params.user.id;
@@ -436,12 +538,15 @@ const ChatScreen = ({ route }: any) => {
          receipientId: route.params.user.id,
          text: textValue,
          roomId: roomId,
+         image,
+         video: selectedVideo,
+         audio,
       };
       // console.log(sendData, roomId);
       socket?.emit(String(roomId), sendData);
       setTextValue("");
       setSent(true);
-   }, [textValue]);
+   }, [textValue, image, selectedVideo, audio]);
 
    const handleEmojiSelect = (emoji: any) => {
       setTextValue(textValue + emoji);
@@ -471,15 +576,12 @@ const ChatScreen = ({ route }: any) => {
       );
    }
    return (
-      <View style={{ flex: 1, marginBottom: 10,marginTop:StatusBar.currentHeight }}>
-          <Modal visible={imageOpen}>
-            <ImagePicker
-               onSave={chooseImage}
-               onCancel={cancelImage}
-               multiple
-               limit={8}
-            />
-         </Modal>
+      <View
+         style={{
+            flex: 1,
+            marginBottom: 10,
+            marginTop: StatusBar.currentHeight,
+         }}>
          <View>
             {secondUser && (
                <View
@@ -487,13 +589,17 @@ const ChatScreen = ({ route }: any) => {
                      flexDirection: "row",
                      alignItems: "center",
                      paddingTop: 18,
-                     paddingBottom:10,
+                     paddingBottom: 10,
                      paddingLeft: 15,
                      backgroundColor: theme.colors.primary,
                   }}>
-             
-                  <Ionicons onPress={()=> navigation.goBack()} style={{marginRight:5}} name="md-arrow-back" color={theme.colors.onPrimary} size={20} />
-                
+                  <Ionicons
+                     onPress={() => navigation.goBack()}
+                     style={{ marginRight: 5 }}
+                     name="md-arrow-back"
+                     color={theme.colors.onPrimary}
+                     size={20}
+                  />
                   <Pressable onPress={gotoUserProfile}>
                      <Image
                         style={styles.profileImage}
@@ -544,16 +650,105 @@ const ChatScreen = ({ route }: any) => {
             <GiftedChat
                renderInputToolbar={() => (
                   <ChatBox
-                    handleIsRecording={setAudioRecording}
-                     openMediaPicker={()=> setImageOpen(true)}
+                     openVideoPicker={async () => await openVideoPickerAsync()}
+                     handleIsRecording={async (val: boolean) =>
+                        val ? await startRecording() : await stopRecording()
+                     }
+                     openMediaPicker={async () => await openImagePickerAsync()}
                      sent={sent}
                      getFocused={handleFocus}
                      onSend={onSend}
                      onTextInput={(v) => setTextValue(v)}
                   />
                )}
-               renderAvatar = {() => null }
+               // renderAvatar = {() => null }
                renderBubble={(props) => {
+                  ///////// Audion Playing ///////////////////////
+                
+                  const handleAudioPress = async (audioUri:any) => {
+                     
+                     const { sound, status} = await Audio.Sound.createAsync({
+                        uri: audioUri,
+                     });
+
+                     if(isPlayingAudio){
+                        setIsPlayingAudio(false)
+                     }
+                     if (status.isLoaded) {
+                        await sound.playAsync();
+                        setIsPlayingAudio(true)
+                     }
+                    
+                  };
+
+                  const handleDownload = async (name: string) => {
+                     if (props.currentMessage) {
+                        const { video, image, _id } = props.currentMessage;
+
+                        if (video && name === "video") {
+                           try {
+                              const downloadResumable =
+                                 FileSystem.createDownloadResumable(
+                                    video,
+                                    `${FileSystem.cacheDirectory}${
+                                       video.split("/")[-1]
+                                    }`,
+                                    {},
+                                    (downloadProgress) => {
+                                       const progress =
+                                          downloadProgress.totalBytesWritten /
+                                          downloadProgress.totalBytesExpectedToWrite;
+                                       setVideoDownloadProgress(progress);
+                                       console.log(
+                                          "New Video Progress",
+                                          progress
+                                       );
+                                    }
+                                 );
+
+                              const downloadResult =
+                                 await downloadResumable.downloadAsync();
+
+                              console.log("Video downloaded:", downloadResult);
+                              // Do something with the downloaded video file
+                           } catch (error) {
+                              console.log("Video download error:", error);
+                           }
+                        } else if (image && name === "image") {
+                           try {
+                              const downloadResumable =
+                                 FileSystem.createDownloadResumable(
+                                    image,
+                                    `${FileSystem.cacheDirectory}${
+                                       image.split("/")[-1]
+                                    }`,
+                                    {},
+                                    (downloadProgress) => {
+                                       const progress =
+                                          downloadProgress.totalBytesWritten /
+                                          downloadProgress.totalBytesExpectedToWrite;
+                                       console.log(
+                                          "New Image Progress",
+                                          progress
+                                       );
+                                       setVideoDownloadProgress(progress);
+                                    }
+                                 );
+
+                              const imgDownloadResult =
+                                 await downloadResumable.downloadAsync();
+
+                              console.log(
+                                 "Image downloaded:",
+                                 imgDownloadResult
+                              );
+                              // Do something with the downloaded image file
+                           } catch (error) {
+                              console.log("Image download error:", error);
+                           }
+                        }
+                     }
+                  };
                   return (
                      <Bubble
                         {...props}
@@ -567,6 +762,103 @@ const ChatScreen = ({ route }: any) => {
                               fontFamily: "Poppins_300Light",
                            },
                         }}
+                        renderMessageAudio={({currentMessage})=> currentMessage && currentMessage?.audio ? (
+                            <TouchableOpacity onPress={async() => await handleAudioPress(currentMessage.audio)}>
+                                <IconButton icon="play-circle" size={30} />
+                           </TouchableOpacity>
+                        ):null
+
+                        }
+                        renderMessageImage={({ currentMessage }) => (
+                           <View>
+                              <View style={{ paddingHorizontal: 5 }}>
+                                 {!downloadImageProgress && (
+                                    <Button
+                                       onPress={async () =>
+                                          await handleDownload("image")
+                                       }
+                                       mode="text">
+                                       Download{" "}
+                                       <Feather name="download" size={23} />
+                                    </Button>
+                                 )}
+                                 {downloadImageProgress &&
+                                    downloadImageProgress < 1 && (
+                                       <View>
+                                          <Text
+                                             style={{
+                                                textAlign: "center",
+                                                color: theme.colors.secondary,
+                                                fontFamily: "Poppins_300Light",
+                                                marginVertical: 3,
+                                             }}>
+                                             Downloading...
+                                          </Text>
+                                          <ProgressBar
+                                             style={{
+                                                height: 12,
+                                                borderRadius: 8,
+                                             }}
+                                             progress={downloadImageProgress}
+                                          />
+                                       </View>
+                                    )}
+                              </View>
+                              <Image
+                                 source={{ uri: currentMessage?.image }}
+                                 style={{ width: 200, height: 200 }}
+                              />
+                           </View>
+                        )}
+                        renderMessageVideo={({ currentMessage }) =>
+                           currentMessage && currentMessage?.video ? (
+                              <View>
+                                 {!downloadVideoProgress && (
+                                    <Button
+                                       onPress={async () =>
+                                          await handleDownload("video")
+                                       }
+                                       mode="text">
+                                       Download{" "}
+                                       <Feather name="download" size={23} />
+                                    </Button>
+                                 )}
+                                 {downloadVideoProgress &&
+                                    downloadVideoProgress < 1 && (
+                                       <View>
+                                          <Text
+                                             style={{
+                                                textAlign: "center",
+                                                color: theme.colors.secondary,
+                                                fontFamily: "Poppins_300Light",
+                                                marginVertical: 3,
+                                             }}>
+                                             Downloading...
+                                          </Text>
+                                          <ProgressBar
+                                             style={{
+                                                height: 12,
+                                                borderRadius: 8,
+                                             }}
+                                             progress={downloadVideoProgress}
+                                          />
+                                       </View>
+                                    )}
+
+                                 <Video
+                                    useNativeControls
+                                    resizeMode={ResizeMode.CONTAIN}
+                                    isLooping
+                                    source={{ uri: currentMessage?.video }}
+                                    style={{
+                                       width: 270,
+                                       height: 200,
+                                       margin: 0,
+                                    }}
+                                 />
+                              </View>
+                           ) : null
+                        }
                         wrapperStyle={{
                            left: {
                               backgroundColor: theme.colors.secondaryContainer, // set your desired background color here

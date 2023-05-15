@@ -28,7 +28,7 @@ const NewConversationsScreen = () => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.52.183:8080/conversations/${userId}/${currentPage}/${numberOfConversationsRecord}`,
+                  `http://192.168.99.44:8080/conversations/${userId}/${currentPage}/${numberOfConversationsRecord}`,
                   { method: "GET" }
                );
                let { conversations: newConversations, count } =
@@ -59,7 +59,7 @@ const NewConversationsScreen = () => {
    }
 
    return (
-      <View style={{backgroundColor:"#fff"}}>
+      <View style={{ backgroundColor: "#fff" }}>
          <Text>All Chats</Text>
          {conversations.map((conversation) => {
             return (
@@ -72,11 +72,11 @@ const NewConversationsScreen = () => {
    );
 };
 
-let MemoScreen = React.memo(NewConversationsScreen)
+let MemoScreen = React.memo(NewConversationsScreen);
 
-const ConversationsScreen = ()=>{
-   return <MemoScreen/>
-}
+const ConversationsScreen = () => {
+   return <MemoScreen />;
+};
 
 export default NewConversationsScreen;
 

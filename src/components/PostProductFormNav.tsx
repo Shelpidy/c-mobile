@@ -35,7 +35,7 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
             try {
                if (currentUser) {
                   let response = await fetch(
-                     `http://192.168.52.183:5000/api/auth/users/${user?.id}`,
+                     `http://192.168.99.44:5000/api/auth/users/${user?.id}`,
                      { method: "GET" }
                   );
 

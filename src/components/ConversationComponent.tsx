@@ -46,37 +46,40 @@ const ConversationComponent = ({
       useState<Conversation>(conversation);
 
    //////////////////  GET SECOND USER ///////////////
-   useEffect(function () {
-      if (currentUser) {
-         console.log("Fetching user");
-         let fetchData = async () => {
-            // console.log("Fetching user")
-            //  let activeUserId = 1
-            let userIds = String(conversation.roomId).split("");
-            let secondUserId = Number(
-               userIds.filter((id) => Number(id) != currentUser.id)[0]
-            );
-            try {
-               let response = await fetch(
-                  `http://192.168.52.183:5000/api/auth/users/${secondUserId}`,
-                  { method: "GET" }
+   useEffect(
+      function () {
+         if (currentUser) {
+            console.log("Fetching user");
+            let fetchData = async () => {
+               // console.log("Fetching user")
+               //  let activeUserId = 1
+               let userIds = String(conversation.roomId).split("");
+               let secondUserId = Number(
+                  userIds.filter((id) => Number(id) != currentUser.id)[0]
                );
-               let data = await response.json();
-               if (data.status == "success") {
-                  console.log("User-----", data.data.personal);
-                  setSecondUser(data.data.personal);
-                  // Alert.alert("Success",data.message)
-               } else {
-                  Alert.alert("Failed", data.message);
+               try {
+                  let response = await fetch(
+                     `http://192.168.99.44:5000/api/auth/users/${secondUserId}`,
+                     { method: "GET" }
+                  );
+                  let data = await response.json();
+                  if (data.status == "success") {
+                     console.log("User-----", data.data.personal);
+                     setSecondUser(data.data.personal);
+                     // Alert.alert("Success",data.message)
+                  } else {
+                     Alert.alert("Failed", data.message);
+                  }
+               } catch (err) {
+                  console.log(err);
+                  Alert.alert("Failed", String(err));
                }
-            } catch (err) {
-               console.log(err);
-               Alert.alert("Failed", String(err));
-            }
-         };
-         fetchData();
-      }
-   }, [currentUser]);
+            };
+            fetchData();
+         }
+      },
+      [currentUser]
+   );
 
    ///////////////////////////////// CONNECT TO SOCKETIO //////////////////////////////
    useEffect(() => {
@@ -84,7 +87,7 @@ const ConversationComponent = ({
          let activeUser = currentUser?.id;
          let roomId = generateRoomId(secondUser?.id, activeUser);
          let newSocket = io(
-            `http://192.168.52.183:8080/?roomId=${roomId}&userId=${activeUser}&convId=true`
+            `http://192.168.99.44:8080/?roomId=${roomId}&userId=${activeUser}&convId=true`
          );
          setSocket(newSocket);
          // cleanup function to close the socket connection when the component unmounts
@@ -103,7 +106,7 @@ const ConversationComponent = ({
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.52.183:8080/userstatus/${secondUser.id}`,
+                  `http://192.168.99.44:8080/userstatus/${secondUser.id}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -165,7 +168,7 @@ const ConversationComponent = ({
 
          ///////// check or listen for recording ///////////////
 
-          socket.on("recording", (data) => {
+         socket.on("recording", (data) => {
             console.log("From Recording", { recording: data.recording });
             if (data.userId == secUserId) {
                setRecording(data.recording);
@@ -182,7 +185,7 @@ const ConversationComponent = ({
    }, [socket, currentUser, secondUser]);
 
    const gotoChatScreen = () => {
-      navigation.navigate("ChatScreen",{user:secondUser})
+      navigation.navigate("ChatScreen", { user: secondUser });
    };
    if (!newConversation) {
       return (
@@ -250,27 +253,27 @@ const ConversationComponent = ({
                   }}
                   textLength={15}
                />
-               {
-                  !recording && <Text
-                  style={{
-                     fontFamily: "Poppins_300Light",
-                     color: theme.colors.secondary,
-                     marginLeft: 10,
-                  }}>
-                  {typing ? "typing..." : ""}
-               </Text>
-               }
-               {
-                  !typing && <Text
-                  style={{
-                     fontFamily: "Poppins_300Light",
-                     color: theme.colors.secondary,
-                     marginLeft: 10,
-                  }}>
-                  {recording ? "recording..." : ""}
-               </Text>
-               }
-                
+               {!recording && (
+                  <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        color: theme.colors.secondary,
+                        marginLeft: 10,
+                     }}>
+                     {typing ? "typing..." : ""}
+                  </Text>
+               )}
+               {!typing && (
+                  <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        color: theme.colors.secondary,
+                        marginLeft: 10,
+                     }}>
+                     {recording ? "recording..." : ""}
+                  </Text>
+               )}
+
                <Text>{lastSeen}</Text>
             </View>
 
@@ -283,14 +286,14 @@ const ConversationComponent = ({
                      paddingLeft: 5,
                      alignItems: "center",
                      paddingTop: 5,
-                     height:'auto'
+                     height: "auto",
                   }}>
                   {currentUser?.id == newConversation.receipientId &&
                      newConversation.numberOfUnreadText && (
                         <Badge
                            style={{
                               backgroundColor: theme.colors.primary,
-                              marginBottom:5,
+                              marginBottom: 5,
                            }}
                            size={18}>
                            {newConversation.numberOfUnreadText}
@@ -323,7 +326,7 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       padding: 5,
       height: "auto",
-      marginVertical:2
+      marginVertical: 2,
    },
 
    notTitle: {

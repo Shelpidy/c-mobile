@@ -32,7 +32,7 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
    const handleFollow = async (userId: number) => {
       try {
          let { data } = await axios.put(
-            `http://192.168.52.183:5000/api/media/follows/`,
+            `http://192.168.99.44:5000/api/media/follows/`,
             { followerId: 1, followingId: userId },
             { headers: { Accept: "application/json" } }
          );

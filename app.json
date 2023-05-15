@@ -23,7 +23,8 @@
          "infoPlist": {
             "NSAppTransportSecurity": {
                "allowsArbitraryLoads": true
-            }
+            },
+            "UIBackgroundModes": ["audio"]
          }
       },
       "android": {
