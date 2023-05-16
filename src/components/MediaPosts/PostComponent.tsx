@@ -28,6 +28,7 @@ import UpdatePostForm from "./UpdatePostForm";
 import { Pressable } from "react-native";
 import TextShortener from "../TextShortener";
 import { useCurrentUser } from "../../utils/CustomHooks";
+import LikesComponent from "../LikesComponent";
 
 type NPostComponentProps = PostComponentProps & { navigation: any };
 type PostComment = Omit<CommentProps, "posterId">;
@@ -259,20 +260,8 @@ const PostComponent = (props: NPostComponentProps) => {
             {props.images && <ImagesViewer images={props.images} />}
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>
-         {props.title && <Text style={styles.title}>{props?.title}</Text>}
-
-         {props?.text && (
-            <TextShortener
-               style={{ marginHorizontal: 8, fontFamily: "Poppins_300Light" }}
-               text={props.text}
-               onPressViewMore={() =>
-                  props.navigation.navigate("FullPostViewScreen", { ...props })
-               }
-               showViewMore={true}
-               textLength={100}></TextShortener>
-         )}
-         <View>
-            <View
+           <View style={{marginBottom:5}}>
+                <View
                style={[
                   styles.likeCommentAmountCon,
                   { borderColor: theme.colors.secondary },
@@ -292,8 +281,10 @@ const PostComponent = (props: NPostComponentProps) => {
                         name={liked ? "heart-sharp" : "heart-outline"}
                      />
                   </Pressable>
-
-                  <Text style={styles.commentAmountText}>{likes.length}</Text>
+                   <Text style={styles.commentAmountText}>
+                     {likes.length}
+                  </Text>
+                 
                </View>
                <View
                   style={{
@@ -308,12 +299,31 @@ const PostComponent = (props: NPostComponentProps) => {
                         name="chatbox-outline"
                      />
                   </Pressable>
-
                   <Text style={styles.commentAmountText}>
                      {comments.length}
                   </Text>
                </View>
             </View>
+            <View style={{paddingHorizontal:8}}> 
+               <Text>
+                  <LikesComponent postId={props.id} numberOfLikes={likes.length} />
+               </Text> 
+            </View>
+         </View>
+         {props.title && <Text style={styles.title}>{props?.title}</Text>}
+
+         {props?.text && (
+            <TextShortener
+               style={{ marginHorizontal: 8, fontFamily: "Poppins_300Light" }}
+               text={props.text}
+               onPressViewMore={() =>
+                  props.navigation.navigate("FullPostViewScreen", { ...props })
+               }
+               showViewMore={true}
+               textLength={100}></TextShortener>
+         )}
+         <View>
+          
 
             <View style={{ padding: 5 }}>
                <Comments
@@ -358,12 +368,11 @@ const styles = StyleSheet.create({
    likeCommentAmountCon: {
       flexDirection: "row",
       // justifyContent: "space-between",
-      gap: 20,
-      paddingHorizontal: 10,
-      paddingVertical: 4,
+      gap: 16,
+      paddingVertical: 5,
       // borderWidth:1,
-      marginLeft: 10,
-      borderRadius: 20,
+      marginLeft: 8,
+
       // justifyContent:'center',
    },
    commentAmountText: {
