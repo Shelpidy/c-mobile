@@ -59,7 +59,7 @@ const ConversationComponent = ({
                );
                try {
                   let response = await fetch(
-                     `http://192.168.99.44:5000/api/auth/users/${secondUserId}`,
+                     `http://192.168.0.101:5000/api/auth/users/${secondUserId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -87,7 +87,7 @@ const ConversationComponent = ({
          let activeUser = currentUser?.id;
          let roomId = generateRoomId(secondUser?.id, activeUser);
          let newSocket = io(
-            `http://192.168.99.44:8080/?roomId=${roomId}&userId=${activeUser}&convId=true`
+            `http://192.168.0.101:8080/?roomId=${roomId}&userId=${activeUser}&convId=true`
          );
          setSocket(newSocket);
          // cleanup function to close the socket connection when the component unmounts
@@ -106,7 +106,7 @@ const ConversationComponent = ({
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.99.44:8080/userstatus/${secondUser.id}`,
+                  `http://192.168.0.101:8080/userstatus/${secondUser.id}`,
                   { method: "GET" }
                );
                if (resp.ok) {

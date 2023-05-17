@@ -40,7 +40,7 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
             };
 
             let response = await fetch(
-               `http://192.168.99.44:5000/api/auth/users/login/`,
+               `http://192.168.0.101:5000/api/auth/users/login/`,
                {
                   method: "POST",
                   body: JSON.stringify(loginObj),

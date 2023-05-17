@@ -37,7 +37,13 @@ import * as ImagePicker from "expo-image-picker";
 import config from ".././aws-config";
 import AWS from "aws-sdk";
 import { Camera } from "expo-camera";
-import { Video, Audio, ResizeMode, AVPlaybackStatus, AVPlaybackStatusToSet } from "expo-av";
+import {
+   Video,
+   Audio,
+   ResizeMode,
+   AVPlaybackStatus,
+   AVPlaybackStatusToSet,
+} from "expo-av";
 import * as FileSystem from "expo-file-system";
 
 type ChatBoxProps = {
@@ -220,7 +226,9 @@ const ChatScreen = ({ route }: any) => {
    const [inputFocus, setInputFocus] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(true);
    const [recording, setRecording] = useState<Audio.Recording | null>(null);
-   const [socketRecording, setSocketRecording] = useState<boolean | null>(false);;
+   const [socketRecording, setSocketRecording] = useState<boolean | null>(
+      false
+   );
    const currentUser = useCurrentUser();
    const [secondUser, setSecondUser] = useState<User>();
    const [sound, setSound] = useState<Audio.Sound | null>(null);
@@ -250,6 +258,9 @@ const ChatScreen = ({ route }: any) => {
    const [resetLastSeen, setResetLastSeen] = useState<number>(0);
    const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
    const [audioDuration, setAudioDuration] = useState<number | null>(null);
+   const [audioCurentMillis, setAudioCurrentMillis] = useState<number | null>(
+      null
+   );
 
    const generateRoomId = (secUserId: any, activeUserId: any) => {
       let maxId = Math.max(secUserId, activeUserId);
@@ -263,7 +274,7 @@ const ChatScreen = ({ route }: any) => {
       let activeUser = currentUser?.id;
       let roomId = generateRoomId(secUser, activeUser);
       let newSocket = io(
-         `http://192.168.99.44:8080/?roomId=${roomId}&userId=${activeUser}`
+         `http://192.168.0.101:8080/?roomId=${roomId}&userId=${activeUser}`
       );
       setSocket(newSocket);
       // cleanup function to close the socket connection when the component unmounts
@@ -282,7 +293,7 @@ const ChatScreen = ({ route }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.99.44:8080/userstatus/${secUserId}`,
+                  `http://192.168.0.101:8080/userstatus/${secUserId}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -398,9 +409,9 @@ const ChatScreen = ({ route }: any) => {
             }
          });
 
-      ///////// check or listen for recording ///////////////
+         ///////// check or listen for recording ///////////////
 
-      socket.on("recording", (data) => {
+         socket.on("recording", (data) => {
             console.log("From Recording", { recording: data.recording });
             if (data.userId == secUserId) {
                setSocketRecording(data.recording);
@@ -419,7 +430,7 @@ const ChatScreen = ({ route }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.99.44:8080/chats/${roomId}/${currentPage}/${numberOfChatsRecord}`,
+                  `http://192.168.0.101:8080/chats/${roomId}/${currentPage}/${numberOfChatsRecord}`,
                   { method: "GET" }
                );
                let { chats: chatMessages, count } = await resp.json();
@@ -439,6 +450,16 @@ const ChatScreen = ({ route }: any) => {
          fetchData();
       }
    }, [currentUser, currentPage]);
+
+   //////// REFRESH SOUND ////////////////////////////////
+
+   useEffect(() => {
+      return () => {
+         if (sound) {
+            sound.unloadAsync();
+         }
+      };
+   }, []);
 
    /////////////// Pick Image ////////////////////////////
    const openImagePickerAsync = async () => {
@@ -460,7 +481,7 @@ const ChatScreen = ({ route }: any) => {
       }
 
       setImage(pickerResult.assets[0].uri);
-      await onSend(null,null,pickerResult.assets[0].uri);
+      await onSend(null, null, pickerResult.assets[0].uri);
       console.log("Image", pickerResult.assets[0]);
    };
 
@@ -495,7 +516,7 @@ const ChatScreen = ({ route }: any) => {
       });
       if (!pickerResult.canceled) {
          setSelectedVideo(pickerResult.assets[0].uri);
-         await onSend(null,pickerResult.assets[0].uri,null);
+         await onSend(null, pickerResult.assets[0].uri, null);
          console.log(pickerResult.assets[0].uri);
       }
    };
@@ -510,8 +531,11 @@ const ChatScreen = ({ route }: any) => {
             allowsRecordingIOS: true,
             playsInSilentModeIOS: true,
          });
-         if(socket){
-            socket.emit("recording",{userId:currentUser?.id,recording:true})
+         if (socket) {
+            socket.emit("recording", {
+               userId: currentUser?.id,
+               recording: true,
+            });
          }
          console.log("Starting recording..");
          const { recording } = await Audio.Recording.createAsync(
@@ -528,9 +552,12 @@ const ChatScreen = ({ route }: any) => {
 
    async function stopRecording() {
       console.log("Stopping recording..");
-       if(socket){
-            socket.emit("recording",{userId:currentUser?.id,recording:false})
-         }
+      if (socket) {
+         socket.emit("recording", {
+            userId: currentUser?.id,
+            recording: false,
+         });
+      }
       if (recording) {
          setRecording(null);
          await recording.stopAndUnloadAsync();
@@ -539,13 +566,12 @@ const ChatScreen = ({ route }: any) => {
          });
          const uri = recording.getURI();
          setAudio(uri);
-         await onSend(uri,null,null);
+         await onSend(uri, null, null);
          console.log("Recording stopped and stored at", uri);
-        
       }
    }
 
-   const onSend = async (_audio?:any,_video?:any,_image?:any) => {
+   const onSend = async (_audio?: any, _video?: any, _image?: any) => {
       // console.log("Onsend loading");
       let secUser = route.params.user.id;
       let activeUser = currentUser?.id;
@@ -555,9 +581,9 @@ const ChatScreen = ({ route }: any) => {
          receipientId: route.params.user.id,
          text: textValue,
          roomId: roomId,
-         image:_image,
-         video:_video,
-         audio:_audio,
+         image: _image,
+         video: _video,
+         audio: _audio,
       };
       // console.log(sendData, roomId);
       socket?.emit(String(roomId), sendData);
@@ -642,26 +668,26 @@ const ChatScreen = ({ route }: any) => {
                         alignItems: "center",
                         marginRight: 5,
                      }}>
-               {!socketRecording && (
-                  <Text
-                     style={{
-                        fontFamily: "Poppins_300Light",
-                        color: theme.colors.secondary,
-                        marginLeft: 10,
-                     }}>
-                     {typing ? "typing..." : ""}
-                  </Text>
-               )}
-               {!typing && (
-                  <Text
-                     style={{
-                        fontFamily: "Poppins_300Light",
-                        color: theme.colors.secondary,
-                        marginLeft: 10,
-                     }}>
-                     {socketRecording ? "recording..." : ""}
-                  </Text>
-                    )}
+                     {!socketRecording && (
+                        <Text
+                           style={{
+                              fontFamily: "Poppins_300Light",
+                              color: theme.colors.secondary,
+                              marginLeft: 10,
+                           }}>
+                           {typing ? "typing..." : ""}
+                        </Text>
+                     )}
+                     {!typing && (
+                        <Text
+                           style={{
+                              fontFamily: "Poppins_300Light",
+                              color: theme.colors.secondary,
+                              marginLeft: 10,
+                           }}>
+                           {socketRecording ? "recording..." : ""}
+                        </Text>
+                     )}
                      <Text
                         style={{
                            fontFamily: "Poppins_300Light",
@@ -694,41 +720,51 @@ const ChatScreen = ({ route }: any) => {
                renderBubble={(props) => {
                   ///////// Audion Playing ///////////////////////
 
-                  const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
-                        if (status.isLoaded && isPlayingAudio) {
-                           if(status.durationMillis){
-                               let percentDuration = status.positionMillis/status.durationMillis
-                               setAudioDuration(percentDuration);
-                               console.log("Audio Length played...",percentDuration)
-                           }
+             
+                  const hanldeAudioModulation = async () => {};
+                  const handlePlayAudio = async (audioUri:any) => {
+                     try {
+                        if (sound) {
+                           await sound.unloadAsync();
                         }
-                        if (status.isLoaded && !status.isPlaying) {
+
+                        const { sound: audioSound } =
+                           await Audio.Sound.createAsync(
+                              { uri: audioUri },
+                              { shouldPlay: true },
+                              onPlaybackStatusUpdate
+                           );
+
+                        setSound(audioSound);
+                        setIsPlayingAudio(true);
+                     } catch (error) {
+                        console.log("Error playing audio:", error);
+                     }
+                  };
+
+                  const handlePauseAudio = async () => {
+                     try {
+                        if (sound) {
+                           await sound.pauseAsync();
                            setIsPlayingAudio(false);
                         }
-                     };
-
-                    const handlePause = async () => {
-                           if (sound && isPlayingAudio) {
-                              await sound.pauseAsync();
-                              setIsPlayingAudio(false);
-                           }
-                        };
-                
-                  const handleAudioPress = async (audioUri:any) => {
-                     if(isPlayingAudio){
-                        await handlePause()
-                     }else{
-                          const { sound, status} = await Audio.Sound.createAsync({
-                              uri: audioUri,
-                           },{ shouldPlay: true },onPlaybackStatusUpdate);
-                           if (status.isLoaded) {
-                              await sound.playAsync();
-                              setSound(sound)
-                              setIsPlayingAudio(true)
-                           }
+                     } catch (error) {
+                        console.log("Error pausing audio:", error);
                      }
-                   
                   };
+
+                  const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
+                     if (
+                        status.isLoaded &&
+                        !status.isBuffering &&
+                        status.durationMillis
+                     ) {
+                        setAudioDuration(
+                           status.positionMillis / status.durationMillis
+                        );
+                     }
+                  };
+
                   const handleDownload = async (name: string) => {
                      if (props.currentMessage) {
                         const { video, image, _id } = props.currentMessage;
@@ -810,39 +846,64 @@ const ChatScreen = ({ route }: any) => {
                               fontFamily: "Poppins_300Light",
                            },
                         }}
-                        renderMessageAudio={({currentMessage})=> currentMessage && currentMessage?.audio ? (
-                           <View style={{paddingHorizontal:15,flexDirection:"row",alignItems:"center"}}>
-                              <ProgressBar
-                                 color={theme.colors.inversePrimary}
+                        renderMessageAudio={({ currentMessage }) =>
+                           currentMessage &&
+                           currentMessage?.audio !== undefined ? (
+                              <View
                                  style={{
-                                    height: 6,
-                                    borderRadius: 8,
-                                    width:200
-                                 }}
-                                 progress={audioDuration?audioDuration:0}
-                              />  
-                             <TouchableOpacity onPress={async() => await handleAudioPress(currentMessage.audio)}>
-                                    <IconButton iconColor={theme.colors.inversePrimary} icon={isPlayingAudio?"pause-circle":"play-circle"} size={30} />
-                             </TouchableOpacity>
-                           </View>
-                        ):null
-
+                                    paddingHorizontal: 15,
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                 }}>
+                                 <ProgressBar
+                                    color={theme.colors.inversePrimary}
+                                    style={{
+                                       height: 6,
+                                       borderRadius: 8,
+                                       width: 200,
+                                    }}
+                                    progress={audioDuration ? audioDuration : 0}
+                                 />
+                                 <Text>{audioCurentMillis}</Text>
+                                 {isPlayingAudio ? (
+                                    <IconButton
+                                       onPress={() => handlePauseAudio()}
+                                       iconColor={theme.colors.inversePrimary}
+                                       icon={"pause-circle"}
+                                       size={30}
+                                    />
+                                 ) : (
+                                    <IconButton
+                                       onPress={() =>
+                                          handlePlayAudio(currentMessage.audio)
+                                       }
+                                       iconColor={theme.colors.inversePrimary}
+                                       icon={"play-circle"}
+                                       size={30}
+                                    />
+                                 )}
+                              </View>
+                           ) : null
                         }
                         renderMessageImage={({ currentMessage }) => (
                            <View>
                               <View style={{ paddingHorizontal: 5 }}>
-                                 {!downloadImageProgress && currentUser?.id == currentMessage?.user._id && (
-                                    <Button
-                                       onPress={async () =>
-                                          await handleDownload("image")
-                                       }
-                                       mode="text">
-                                       Download{" "}
-                                       <Feather name="download" size={23} />
-                                    </Button>
-                                 )}
+                                 {!downloadImageProgress &&
+                                    currentUser?.id ==
+                                       currentMessage?.user._id && (
+                                       <Button
+                                          onPress={async () =>
+                                             await handleDownload("image")
+                                          }
+                                          mode="text">
+                                          Download{" "}
+                                          <Feather name="download" size={23} />
+                                       </Button>
+                                    )}
                                  {downloadImageProgress &&
-                                    downloadImageProgress < 1 && currentUser?.id == currentMessage?.user._id && (
+                                    downloadImageProgress < 1 &&
+                                    currentUser?.id ==
+                                       currentMessage?.user._id && (
                                        <View>
                                           <Text
                                              style={{
@@ -870,20 +931,24 @@ const ChatScreen = ({ route }: any) => {
                            </View>
                         )}
                         renderMessageVideo={({ currentMessage }) =>
-                           currentMessage && currentMessage?.video  ? (
+                           currentMessage && currentMessage?.video ? (
                               <View>
-                                 {!downloadVideoProgress && currentUser?.id == currentMessage?.user._id && (
-                                    <Button
-                                       onPress={async () =>
-                                          await handleDownload("video")
-                                       }
-                                       mode="text">
-                                       Download{" "}
-                                       <Feather name="download" size={23} />
-                                    </Button>
-                                 )}
+                                 {!downloadVideoProgress &&
+                                    currentUser?.id ==
+                                       currentMessage?.user._id && (
+                                       <Button
+                                          onPress={async () =>
+                                             await handleDownload("video")
+                                          }
+                                          mode="text">
+                                          Download{" "}
+                                          <Feather name="download" size={23} />
+                                       </Button>
+                                    )}
                                  {downloadVideoProgress &&
-                                    downloadVideoProgress < 1 && currentUser?.id == currentMessage?.user._id && (
+                                    downloadVideoProgress < 1 &&
+                                    currentUser?.id ==
+                                       currentMessage?.user._id && (
                                        <View>
                                           <Text
                                              style={{
@@ -930,6 +995,7 @@ const ChatScreen = ({ route }: any) => {
                   );
                }}
                inverted
+               showAvatarForEveryMessage={true}
                messages={messages}
                user={{
                   _id: route.params.user.id,

@@ -28,7 +28,7 @@ const NewConversationsScreen = () => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.99.44:8080/conversations/${userId}/${currentPage}/${numberOfConversationsRecord}`,
+                  `http://192.168.0.101:8080/conversations/${userId}/${currentPage}/${numberOfConversationsRecord}`,
                   { method: "GET" }
                );
                let { conversations: newConversations, count } =

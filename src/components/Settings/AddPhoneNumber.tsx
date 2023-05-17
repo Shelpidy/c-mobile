@@ -14,7 +14,7 @@ const PhoneNumberForm = () => {
 
       try {
          const response = await axios.put(
-            "http://192.168.99.44:5000/api/auth/users/contact/",
+            "http://192.168.0.101:5000/api/auth/users/contact/",
             {
                key: "phoneNumbers",
                value: phoneNumber,

@@ -52,7 +52,7 @@ export const useLastSeenOrOnlineStatus = (secondUserId: any) => {
          let secUser = secondUserId;
          let activeUser = currentUser?.id;
          let roomId = generateRoomId(secUser, activeUser);
-         let newSocket = io(`http://192.168.99.44:8080/?userId=${activeUser}`);
+         let newSocket = io(`http://192.168.0.101:8080/?userId=${activeUser}`);
          setSocket(newSocket);
          // cleanup function to close the socket connection when the component unmounts
          return () => {

@@ -29,7 +29,7 @@ const TextShortener = ({
       if (text.length <= textLength) {
          setShortenText(text);
       } else {
-         setShortenText(txts +"...");
+         setShortenText(txts + "...");
       }
       if (style) {
          _setStyle(style);
