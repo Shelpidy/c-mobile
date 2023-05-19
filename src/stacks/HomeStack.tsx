@@ -18,13 +18,14 @@ import MarketingScreen from "../screens/MarketingScreen";
 import ProductScreen from "../screens/ProductScreen";
 import UserProductScreen from "../screens/UserProductScreen";
 import ProductsRequestScreen from "../screens/ProductsRequestScreen";
-import UserRequestScreen from "../screens/_";
+import UserRequestScreen from "../screens/UserProductScreen";
 import ChatScreen from "../screens/ChatScreen";
 import SearchScreen from "../screens/SearchScreen";
 import ProductNotificationScreen from "../screens/ProductNotificationScreen";
 import ProductPostScreen from "../screens/ProductPostScreen";
 import ConversationsScreen from "../screens/ConversationsScreen";
-import { useNavigationState } from "@react-navigation/native";
+import { useNavigationState, useRoute } from "@react-navigation/native";
+
 // import { createDrawerNavigator } from '@react-navigation/drawer';
 
 const Stack = createNativeStackNavigator();
@@ -42,22 +43,25 @@ type HomeStackProps = {
 
 const RenderHeader = () => {
    const navigationState = useNavigationState((state) => state);
-   let screenNames = navigationState.routes[
-      navigationState.index
-   ].state?.routes.map((screen) => screen?.name);
-   let chatScreenIndex = screenNames?.lastIndexOf("ChatScreen");
-   if (screenNames === undefined) {
-      return <CustomHeader />;
-   }
-   if (chatScreenIndex === undefined) {
-      return <CustomHeader />;
-   }
-   const isOnChatScreen =
-      navigationState.routes[navigationState.index].state?.routes[
-         chatScreenIndex
-      ]?.name === "ChatScreen" && chatScreenIndex === screenNames.length - 1;
-   console.log(isOnChatScreen);
-   if (isOnChatScreen) return null;
+   const router = useRoute();
+   // let screenNames = navigationState.routes[
+   //    navigationState.index
+   // ].state?.routes.map((screen) => screen?.name);
+   // let chatScreenIndex = screenNames?.lastIndexOf("ChatScreen");
+   // if (screenNames === undefined) {
+   //    console.log(screenNames)
+   //    return <CustomHeader />;
+   // }
+   // if (chatScreenIndex === undefined) {
+   //    return <CustomHeader />;
+   // }
+   // const isOnChatScreen =
+   //    navigationState.routes[navigationState.index].state?.routes[
+   //       chatScreenIndex
+   //    ]?.name === "ChatScreen" && chatScreenIndex === screenNames.length - 1;
+   // console.log(isOnChatScreen);
+   // if (isOnChatScreen) return null;
+   if (router.name === "ChatScreen") return null;
    return <CustomHeader />;
 };
 

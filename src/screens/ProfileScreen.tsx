@@ -10,7 +10,12 @@ import {
    View,
    TextInput,
 } from "react-native";
-import { ActivityIndicator, Button, useTheme } from "react-native-paper";
+import {
+   ActivityIndicator,
+   Avatar,
+   Button,
+   useTheme,
+} from "react-native-paper";
 import PostComponent from "../components/MediaPosts/PostComponent";
 import ProfileNavComponent from "../components/ProfileNavComponent";
 import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -47,7 +52,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.101:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.161.183:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -76,7 +81,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
             let userId = route.params.userId;
             try {
                let response = await fetch(
-                  `http://192.168.0.101:5000/api/media/posts/user/${userId}`
+                  `http://192.168.161.183:5000/api/media/posts/user/${userId}`
                );
                let data = await response.json();
                if (data.status == "success") {
@@ -124,14 +129,20 @@ const ProfileScreen = ({ navigation, route }: any) => {
          {user && (
             <>
                <View style={{ justifyContent: "center", alignItems: "center" }}>
-                  <Image
+                  <Avatar.Image
+                     style={{ borderColor: theme.colors.primary }}
+                     size={120}
+                     source={{ uri: user?.personal?.profileImage }}
+                  />
+
+                  {/* <Image
                      source={{
                         uri: user?.personal?.profileImage,
                      }}
                      style={[
                         styles.profileImage,
                         { borderColor: theme.colors.primary },
-                     ]}></Image>
+                     ]}></Image> */}
                   <Text
                      style={{
                         textAlign: "center",

@@ -13,7 +13,13 @@ import ImagesViewer from "../ImagesViewer";
 import TextShortener from "../TextShortener";
 import ProductComments from "./ProductComments";
 // import { postProductComments, postLikes, users } from "../../data";
-import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
+import {
+   TextInput,
+   useTheme,
+   Button,
+   IconButton,
+   Avatar,
+} from "react-native-paper";
 import { Ionicons, Feather, SimpleLineIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { useCurrentUser } from "../../utils/CustomHooks";
@@ -69,7 +75,7 @@ const ProductComponent = (props: ProductComponentProps) => {
             try {
                if (props) {
                   let { data } = await axios.get(
-                     `http://192.168.0.101:5000/api/marketing/products/cl/${props?.id}`
+                     `http://192.168.161.183:5000/api/marketing/products/cl/${props?.id}`
                   );
                   if (data.status == "success") {
                      // console.log("Comments and Likes -----", data.data);
@@ -109,7 +115,7 @@ const ProductComponent = (props: ProductComponentProps) => {
             try {
                if (props) {
                   let response = await fetch(
-                     `http://192.168.0.101:5000/api/auth/users/${props?.userId}`,
+                     `http://192.168.161.183:5000/api/auth/users/${props?.userId}`,
                      { method: "GET" }
                   );
 
@@ -142,7 +148,7 @@ const ProductComponent = (props: ProductComponentProps) => {
       try {
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.0.101:5000/api/marketing/products/likes/`,
+            `http://192.168.161.183:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
@@ -215,10 +221,14 @@ const ProductComponent = (props: ProductComponentProps) => {
                   padding: 8,
                }}>
                <Pressable onPress={gotoUserProfile}>
-                  <Image
-                     style={styles.profileImage}
+                  <Avatar.Image
+                     size={30}
                      source={{ uri: poster.profileImage }}
                   />
+                  {/* <Image
+                     style={styles.profileImage}
+                     source={{ uri: poster.profileImage }}
+                  /> */}
                </Pressable>
 
                <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>

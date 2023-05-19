@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { EvilIcons, Fontisto } from "@expo/vector-icons";
 import { Skeleton } from "@rneui/base";
-import { Button, useTheme } from "react-native-paper";
+import { Avatar, Button, useTheme } from "react-native-paper";
 import TextShortener from "./TextShortener";
 import axios from "axios";
 import { useCurrentUser } from "../utils/CustomHooks";
@@ -40,12 +40,12 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
       }
       // dispatchPostComment({ type: "", payload: "" });
       SetUser(_user);
-   }, [currentUser]);
+   }, [currentUser, _user]);
 
    const handleFollow = async () => {
       try {
          let { data } = await axios.put(
-            `http://192.168.0.101:5000/api/media/follows/`,
+            `http://192.168.161.183:5000/api/media/follows/`,
             { followerId: currentUser?.id, followingId: user?.id },
             { headers: { Accept: "application/json" } }
          );
@@ -89,60 +89,69 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
       <View
          style={{
             backgroundColor: "#ffffff",
-            margin: 2,
-            borderRadius: 20,
-            width: width - 5,
+            margin: 0,
+            width: width,
          }}>
-         {user && (
-            <View
-               style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  paddingHorizontal: 20,
-                  paddingVertical: 5,
-               }}>
-               <Pressable onPress={gotoUserProfile}>
-                  <Image
+         <View
+            style={{
+               flexDirection: "row",
+               alignItems: "center",
+               paddingHorizontal: 20,
+               paddingVertical: 5,
+            }}>
+            <Pressable onPress={gotoUserProfile}>
+               <Avatar.Image size={40} source={{ uri: user.profileImage }} />
+               {/* <Image
                      style={styles.profileImage}
                      source={{ uri: user.profileImage }}
+                  /> */}
+            </Pressable>
+            <View
+               style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  margin: 4,
+                  paddingHorizontal: 2,
+               }}>
+               {/* <View><Text style={{fontFamily:"Poppins_400Regular"}}>{user?.firstName} {user?.lastName}</Text> </View> */}
+               <View>
+                  <TextShortener
+                     text={
+                        user?.firstName +
+                        " " +
+                        user?.middleName +
+                        " " +
+                        user?.lastName
+                     }
+                     style={{
+                        fontFamily: "Poppins_400Regular",
+                        marginHorizontal: 3,
+                     }}
+                     textLength={16}
                   />
-               </Pressable>
-               <View
-                  style={{
-                     flex: 1,
-                     flexDirection: "row",
-                     alignItems: "center",
-                     justifyContent: "space-between",
-                     margin: 4,
-                     paddingHorizontal: 2,
-                  }}>
-                  {/* <View><Text style={{fontFamily:"Poppins_400Regular"}}>{user?.firstName} {user?.lastName}</Text> </View> */}
-                  <View>
-                     <TextShortener
-                        text={
-                           user?.firstName +
-                           " " +
-                           user?.middleName +
-                           " " +
-                           user?.lastName
-                        }
-                        style={{
-                           fontFamily: "Poppins_400Regular",
-                           marginHorizontal: 3,
-                        }}
-                        textLength={16}
-                     />
-                  </View>
-                  {/* <Pressable style={{marginHorizontal:5}}><Text><EvilIcons name='external-link' size={26} /></Text></Pressable> */}
+               </View>
+               {/* <Pressable style={{marginHorizontal:5}}><Text><EvilIcons name='external-link' size={26} /></Text></Pressable> */}
+               {user.id !== currentUser?.id && (
                   <Button
                      onPress={handleFollow}
                      style={{ marginVertical: 5, alignSelf: "flex-end" }}
                      mode={followed ? "text" : "contained"}>
                      {followed ? "unfollow" : "follow"}
                   </Button>
-               </View>
+               )}
+
+               {user.id === currentUser?.id && (
+                  <Button
+                     onPress={gotoUserProfile}
+                     style={{ marginVertical: 5, alignSelf: "flex-end" }}
+                     mode="text">
+                     profile
+                  </Button>
+               )}
             </View>
-         )}
+         </View>
       </View>
    );
 };

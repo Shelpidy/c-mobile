@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, Alert, ScrollView } from "react-native";
+import {
+   StyleSheet,
+   Text,
+   View,
+   Alert,
+   ScrollView,
+   FlatList,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import ProductComponent from "../components/Marketing/ProductComponent";
 import SearchForm from "../components/SearchForm";
@@ -26,7 +33,7 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       let fetchData = async () => {
          try {
             let response = await fetch(
-               "http://192.168.0.101:5000/api/marketing/products"
+               "http://192.168.161.183:5000/api/marketing/products"
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -84,18 +91,21 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
 
    return (
       <ScrollView style={{ backgroundColor: "#f6f6f6" }}>
-         {/* <Text>ProductsComponent {Products.length}</Text> */}
          <PostProductFormNav page="product" navigation={navigation} />
          <SearchForm setSearchValue={searchProducts} />
-         {products.map((product) => {
-            return (
+
+         <FlatList
+            data={products}
+            keyExtractor={(item) => String(item.id)}
+            indicatorStyle="white"
+            renderItem={({ item, index, separators }) => (
                <ProductComponent
-                  key={String(product.id)}
-                  {...product}
+                  key={String(item.id)}
+                  {...item}
                   navigation={navigation}
                />
-            );
-         })}
+            )}
+         />
       </ScrollView>
    );
 };

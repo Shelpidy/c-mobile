@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import { Fontisto } from "@expo/vector-icons";
 import { Skeleton } from "@rneui/base";
 import { useCurrentUser } from "../utils/CustomHooks";
+import { Avatar } from "react-native-paper";
 
 type PostProductFormNavProps = {
    navigation: any;
@@ -35,7 +36,7 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
             try {
                if (currentUser) {
                   let response = await fetch(
-                     `http://192.168.0.101:5000/api/auth/users/${user?.id}`,
+                     `http://192.168.161.183:5000/api/auth/users/${user?.id}`,
                      { method: "GET" }
                   );
 
@@ -112,9 +113,9 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
                   paddingVertical: 5,
                }}>
                <Pressable onPress={gotoUserProfile}>
-                  <Image
-                     style={styles.profileImage}
+                  <Avatar.Image
                      source={{ uri: poster.profileImage }}
+                     size={40}
                   />
                </Pressable>
                <View

@@ -1,5 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useState, useEffect } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useState, useEffect, useRef } from "react";
 import {
    StyleSheet,
    Text,
@@ -8,11 +8,17 @@ import {
    Alert,
    ScrollView,
    Pressable,
+   StatusBar,
 } from "react-native";
-import { Appbar, FAB, useTheme } from "react-native-paper";
+import { Appbar, Avatar, Badge, FAB, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Drawer } from "react-native-drawer-layout";
-import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
+import {
+   AntDesign,
+   Feather,
+   Ionicons,
+   MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { Image } from "react-native";
 import { useCurrentUser } from "../utils/CustomHooks";
 
@@ -24,9 +30,12 @@ const CustomHeader = () => {
    const [loading, setLoading] = useState<boolean>(false);
    const [user, setUser] = useState<User>();
    const currentUser = useCurrentUser();
-   const [activeTab, setActiveTab] = useState<number>(0);
+   // const [activeTab, setActiveTab] = useState<number>(0);
    const theme = useTheme();
    const navigation = useNavigation<any>();
+   const router = useRoute();
+   let notRef = useRef<any>(null);
+   let chatRef = useRef<any>(null);
 
    useEffect(
       function () {
@@ -37,7 +46,7 @@ const CustomHeader = () => {
             try {
                if (currentUser) {
                   let response = await fetch(
-                     `http://192.168.0.101:5000/api/auth/users/${currentUser?.id}`,
+                     `http://192.168.161.183:5000/api/auth/users/${currentUser?.id}`,
                      { method: "GET" }
                   );
 
@@ -67,109 +76,139 @@ const CustomHeader = () => {
 
    const gotoNextScreen = (screenName: string, params?: any) => {
       if (screenName === "HomeScreen") {
-         setActiveTab(0);
          if (params) {
             navigation.navigate(screenName, params);
          } else {
             navigation.navigate(screenName);
          }
       } else if (screenName === "NotificationScreen") {
-         setActiveTab(1);
          if (params) {
             navigation.navigate(screenName, params);
          } else {
             navigation.navigate(screenName);
          }
       } else if (screenName === "MarketingScreen") {
-         setActiveTab(2);
          if (params) {
             navigation.navigate(screenName, params);
          } else {
             navigation.navigate(screenName);
          }
+         //   setActiveTab(2);
       } else if (screenName === "ProductsRequestScreen") {
-         setActiveTab(3);
          if (params) {
             navigation.navigate(screenName, params);
          } else {
             navigation.navigate(screenName);
          }
+         // setActiveTab(3);
       } else if (screenName === "SearchScreen") {
-         setActiveTab(4);
          if (params) {
             navigation.navigate(screenName, params);
          } else {
             navigation.navigate(screenName);
          }
+         //  setActiveTab(4);
       } else if (screenName === "ProfileScreen") {
-         setActiveTab(5);
          if (params) {
             navigation.navigate(screenName, params);
          } else {
             navigation.navigate(screenName);
          }
+         //  setActiveTab(5);
       } else if (screenName === "ConversationsScreen") {
-         setActiveTab(6);
          if (params) {
             navigation.navigate(screenName, params);
          } else {
             navigation.navigate(screenName);
          }
+         //  setActiveTab(6);
       }
    };
-
+   if (router.name === "ChatScreen") return null;
    return (
       <Appbar.Header style={{ alignItems: "center", backgroundColor: "#fff" }}>
          <ScrollView horizontal>
             {/* <Appbar.Content title="C" /> */}
-            {navigation.canGoBack() && (
+            {navigation.canGoBack() && router.name !== "HomeScreen" && (
                <Appbar.BackAction onPress={() => navigation.goBack()} />
             )}
             <Appbar.Action
                style={{ alignItems: "center", flexDirection: "row" }}
                icon={() => (
-                  <Feather
+                  <Ionicons
                      color={
-                        activeTab === 0
+                        router.name === "HomeScreen"
                            ? theme.colors.primary
                            : theme.colors.secondary
                      }
                      size={20}
-                     name="home"
-                  />
+                     name={
+                        router.name === "HomeScreen"
+                           ? "home-sharp"
+                           : "home-outline"
+                     }></Ionicons>
                )}
                onPress={() => gotoNextScreen("HomeScreen")}
             />
+
             <Appbar.Action
+               ref={chatRef}
                style={{ alignItems: "center", flexDirection: "row" }}
                icon={() => (
                   <Ionicons
                      color={
-                        activeTab === 6
+                        router.name === "ConversationsScreen"
                            ? theme.colors.primary
                            : theme.colors.secondary
                      }
                      size={20}
-                     name="md-chatbubbles-outline"
+                     name={
+                        router.name === "ConversationsScreen"
+                           ? "md-chatbubbles"
+                           : "md-chatbubbles-outline"
+                     }
                   />
                )}
                onPress={() => gotoNextScreen("ConversationsScreen")}
             />
             <Appbar.Action
+               ref={notRef}
                style={{ alignItems: "center", flexDirection: "row" }}
                icon={() => (
-                  <Feather
+                  <Ionicons
                      color={
-                        activeTab === 1
+                        router.name === "NotificationScreen"
                            ? theme.colors.primary
                            : theme.colors.secondary
                      }
                      size={20}
-                     name="bell"
+                     name={
+                        router.name === "NotificationScreen"
+                           ? "notifications-sharp"
+                           : "notifications-outline"
+                     }
                   />
                )}
                onPress={() => gotoNextScreen("NotificationScreen")}
             />
+            <Badge
+               size={20}
+               style={{
+                  position: "absolute",
+                  top: 0,
+                  left: router.name === "HomeScreen" ? 70 : 120,
+               }}>
+               5
+            </Badge>
+            <Badge
+               size={20}
+               style={{
+                  position: "absolute",
+                  top: 0,
+                  left: router.name === "HomeScreen" ? 120 : 170,
+               }}>
+               5
+            </Badge>
             <Appbar.Action
                style={{
                   alignItems: "center",
@@ -177,59 +216,73 @@ const CustomHeader = () => {
                   justifyContent: "center",
                }}
                icon={() => (
-                  <Feather
+                  <MaterialCommunityIcons
                      color={
-                        activeTab === 2
+                        router.name === "MarketingScreen"
                            ? theme.colors.primary
                            : theme.colors.secondary
                      }
                      size={20}
-                     name="shopping-bag"
+                     name={
+                        router.name === "MarketingScreen"
+                           ? "shopping"
+                           : "shopping-outline"
+                     }
                   />
                )}
                onPress={() => gotoNextScreen("MarketingScreen")}
             />
             <Appbar.Action
                icon={() => (
-                  <Feather
+                  <Ionicons
                      color={
-                        activeTab === 3
+                        router.name === "ProductsRequestScreen"
                            ? theme.colors.primary
                            : theme.colors.secondary
                      }
                      size={20}
-                     name="shopping-cart"
+                     name={
+                        router.name === "ProductsRequestScreen"
+                           ? "md-cart"
+                           : "md-cart-outline"
+                     }
                   />
                )}
                onPress={() => gotoNextScreen("ProductsRequestScreen")}
             />
             <Appbar.Action
                icon={() => (
-                  <Feather
+                  <Ionicons
                      color={
-                        activeTab === 4
+                        router.name === "SearchScreen"
                            ? theme.colors.primary
                            : theme.colors.secondary
                      }
                      size={20}
-                     name="search"
+                     name={
+                        router.name === "SearchScreen"
+                           ? "md-search-sharp"
+                           : "md-search-outline"
+                     }
                   />
                )}
                onPress={() => gotoNextScreen("SearchScreen")}
             />
             {/* <Appbar.Action icon={()=><Feather size={20} name='users'/>} onPress={() =>setOpen(!open)} /> */}
             <Pressable
-               style={styles.profileImage}
+               style={{ marginTop: 9, marginRight: 10 }}
                onPress={() =>
                   gotoNextScreen("ProfileScreen", { userId: currentUser?.id })
                }>
-               <Text style={styles.profileImage}>
+               <Avatar.Image size={30} source={{ uri: user?.profileImage }} />
+               {/* <Text style={styles.profileImage}>
                   <Image
                      resizeMode="cover"
                      style={styles.profileImage}
                      source={{ uri: user?.profileImage }}
                   />
-               </Text>
+                
+               </Text> */}
             </Pressable>
          </ScrollView>
       </Appbar.Header>

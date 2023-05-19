@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, Alert } from "react-native";
+import {
+   StyleSheet,
+   Text,
+   View,
+   Alert,
+   FlatList,
+   Platform,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import PostComponent from "./PostComponent";
 import axios from "axios";
@@ -26,7 +33,7 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
                if (currentUser) {
                   let activeUserId = currentUser?.id;
                   let response = await fetch(
-                     `http://192.168.0.101:5000/api/media/posts/${activeUserId}`
+                     `http://192.168.161.183:5000/api/media/posts/${activeUserId}`
                   );
                   let data = await response.json();
                   if (data.status == "success") {
@@ -66,7 +73,7 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
       setPosts(posts.slice(currentIndex, lastIndex));
    }, [pageNumber]);
 
-   if (posts.length === 0 || loading) {
+   if (loading) {
       return (
          <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -76,18 +83,17 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
    }
 
    return (
-      <View>
-         {/* <Text>PostsComponent {posts.length}</Text> */}
-         {posts.map((post) => {
-            return (
-               <PostComponent
-                  key={String(post.id)}
-                  {...post}
-                  navigation={navigation}
-               />
-            );
-         })}
-      </View>
+      <FlatList
+         keyExtractor={(item) => String(item.id)}
+         data={posts}
+         renderItem={({ item, index, separators }) => (
+            <PostComponent
+               key={String(item.id)}
+               {...item}
+               navigation={navigation}
+            />
+         )}
+      />
    );
 };
 

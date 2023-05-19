@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Skeleton } from "@rneui/base";
-import { Badge, useTheme } from "react-native-paper";
+import { Avatar, Badge, useTheme } from "react-native-paper";
 import { Image } from "react-native";
 import axios from "axios";
 import moment from "moment";
@@ -59,7 +59,7 @@ const ConversationComponent = ({
                );
                try {
                   let response = await fetch(
-                     `http://192.168.0.101:5000/api/auth/users/${secondUserId}`,
+                     `http://192.168.161.183:5000/api/auth/users/${secondUserId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -87,7 +87,7 @@ const ConversationComponent = ({
          let activeUser = currentUser?.id;
          let roomId = generateRoomId(secondUser?.id, activeUser);
          let newSocket = io(
-            `http://192.168.0.101:8080/?roomId=${roomId}&userId=${activeUser}&convId=true`
+            `http://192.168.161.183:8080/?roomId=${roomId}&userId=${activeUser}&convId=true`
          );
          setSocket(newSocket);
          // cleanup function to close the socket connection when the component unmounts
@@ -106,7 +106,7 @@ const ConversationComponent = ({
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.0.101:8080/userstatus/${secondUser.id}`,
+                  `http://192.168.161.183:8080/userstatus/${secondUser.id}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -214,7 +214,12 @@ const ConversationComponent = ({
          style={styles.container}
          key={String(conversation.id)}>
          <View>
-            <Image
+            <Avatar.Image
+               style={{ marginTop: 3 }}
+               size={42}
+               source={{ uri: secondUser.profileImage }}
+            />
+            {/* <Image
                resizeMode="cover"
                source={{ uri: secondUser.profileImage }}
                style={{
@@ -223,7 +228,7 @@ const ConversationComponent = ({
                   borderRadius: 30,
                   marginRight: 3,
                }}
-            />
+            /> */}
          </View>
          <View>
             <View
@@ -285,14 +290,13 @@ const ConversationComponent = ({
                      justifyContent: "flex-start",
                      paddingLeft: 5,
                      alignItems: "center",
-                     paddingTop: 5,
+                     paddingTop: 2,
                      height: "auto",
                   }}>
                   {currentUser?.id == newConversation.receipientId &&
                      newConversation.numberOfUnreadText && (
                         <Badge
                            style={{
-                              backgroundColor: theme.colors.primary,
                               marginBottom: 5,
                            }}
                            size={18}>

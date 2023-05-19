@@ -18,7 +18,7 @@ const FollowersScreen = ({ navigation, route }: any) => {
          let userId = route.params.user.id;
          try {
             let response = await fetch(
-               `http://192.168.0.101:5000/api/media/followers/${userId}`,
+               `http://192.168.161.183:5000/api/media/followers/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -56,21 +56,22 @@ const FollowersScreen = ({ navigation, route }: any) => {
       );
    return (
       <View style={{ backgroundColor: "#f6f6f6" }}>
-         <ScrollView horizontal style={styles.container}>
+         <ScrollView style={styles.container}>
             {users.length < 1 && (
                <View>
                   <Text>No Follower</Text>
                </View>
             )}
-            {users?.map((user) => {
-               return (
-                  <UserComponent
-                     key={String(user.id)}
-                     navigation={navigation}
-                     _user={user}
-                  />
-               );
-            })}
+            {users.length > 1 &&
+               users.map((user) => {
+                  return (
+                     <UserComponent
+                        key={String(user.id)}
+                        navigation={navigation}
+                        _user={user}
+                     />
+                  );
+               })}
          </ScrollView>
       </View>
    );

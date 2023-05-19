@@ -13,7 +13,13 @@ import VideoPlayer from "../VideoPlayer";
 import TextViewer from "../TextViewer";
 import Comments from "./Comments";
 import { postComments, postLikes, users } from "../../data";
-import { TextInput, useTheme, Button, IconButton } from "react-native-paper";
+import {
+   TextInput,
+   useTheme,
+   Button,
+   IconButton,
+   Avatar,
+} from "react-native-paper";
 import {
    AntDesign,
    Entypo,
@@ -29,6 +35,7 @@ import { Pressable } from "react-native";
 import TextShortener from "../TextShortener";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import LikesComponent from "../LikesComponent";
+import moment from "moment";
 
 type NPostComponentProps = PostComponentProps & { navigation: any };
 type PostComment = Omit<CommentProps, "posterId">;
@@ -84,7 +91,7 @@ const PostComponent = (props: NPostComponentProps) => {
             try {
                if (props) {
                   let { data } = await axios.get(
-                     `http://192.168.0.101:5000/api/media/posts/cl/${props?.id}`
+                     `http://192.168.161.183:5000/api/media/posts/cl/${props?.id}`
                   );
                   if (data.status == "success") {
                      // console.log(data.data);
@@ -122,7 +129,7 @@ const PostComponent = (props: NPostComponentProps) => {
             try {
                if (props) {
                   let response = await fetch(
-                     `http://192.168.0.101:5000/api/auth/users/${props?.userId}`,
+                     `http://192.168.161.183:5000/api/auth/users/${props?.userId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -161,7 +168,7 @@ const PostComponent = (props: NPostComponentProps) => {
       try {
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.0.101:5000/api/media/posts/likes/`,
+            `http://192.168.161.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -226,10 +233,14 @@ const PostComponent = (props: NPostComponentProps) => {
                   padding: 8,
                }}>
                <Pressable onPress={gotoUserProfile}>
-                  <Image
-                     style={styles.profileImage}
+                  <Avatar.Image
+                     size={45}
                      source={{ uri: poster.profileImage }}
                   />
+                  {/* <Image
+                     style={styles.profileImage}
+                     
+                  /> */}
                </Pressable>
 
                <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
@@ -257,6 +268,27 @@ const PostComponent = (props: NPostComponentProps) => {
             </View>
          )}
          <View>
+            <View
+               style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 8,
+                  paddingVertical: 8,
+                  gap: 4,
+               }}>
+               {/* <Text style={{textAlignVertical:"center",color:theme.colors.secondary,fontFamily:"Poppins_300Light",marginRight:2}}>posted</Text> */}
+               <AntDesign color={theme.colors.secondary} name="clockcircleo" />
+               <Text
+                  style={{
+                     textAlignVertical: "center",
+                     color: theme.colors.secondary,
+                     fontFamily: "Poppins_300Light",
+                  }}>
+                  posted {moment(props.createdAt, "YYYYMMDD").fromNow()}
+               </Text>
+            </View>
+
             {props.images && <ImagesViewer images={props.images} />}
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>

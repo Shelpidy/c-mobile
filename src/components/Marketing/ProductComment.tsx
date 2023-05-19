@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Feather, SimpleLineIcons, FontAwesome } from "@expo/vector-icons";
-import { Button, useTheme } from "react-native-paper";
+import { Avatar, Button, useTheme } from "react-native-paper";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import axios from "axios";
 
@@ -33,7 +33,7 @@ const Comment = (props: ProductCommentProps) => {
             try {
                if (props) {
                   let response = await fetch(
-                     `http://192.168.0.101:5000/api/auth/users/${props?.userId}`,
+                     `http://192.168.161.183:5000/api/auth/users/${props?.userId}`,
                      { method: "GET" }
                   );
 
@@ -67,7 +67,7 @@ const Comment = (props: ProductCommentProps) => {
          try {
             let putObj = { text: comment, id: props.id };
             let response = await axios.put(
-               "`http://192.168.0.101:5000/marketing/products/comments",
+               "`http://192.168.161.183:5000/marketing/products/comments",
                putObj
             );
             if (response.status == 202) {
@@ -164,10 +164,14 @@ const Comment = (props: ProductCommentProps) => {
          {commentor && (
             <View>
                <View style={styles.commentorMedia}>
-                  <Image
-                     style={styles.profileImage}
+                  <Avatar.Image
+                     size={24}
                      source={{ uri: commentor.profileImage }}
                   />
+                  {/* <Image
+                     style={styles.profileImage}
+                     source={{ uri: commentor.profileImage }}
+                  /> */}
                   <View
                      style={{
                         backgroundColor: "#f5f5f5",

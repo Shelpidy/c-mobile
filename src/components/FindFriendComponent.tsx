@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import { Button, IconButton, useTheme } from "react-native-paper";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import axios from "axios";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,22 +24,24 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
    const theme = useTheme();
    const [followed, setFollowed] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
+   const currentUser = useCurrentUser();
 
    const gotoUserProfile = () => {
       console.log(user.id);
       navigation.navigate("UserProfileScreen", { userId: user.id });
    };
 
-   const handleFollow = async (userId: number) => {
+   const handleFollow = async () => {
+      setLoading(true);
       try {
          let { data } = await axios.put(
-            `http://192.168.0.101:5000/api/media/follows/`,
-            { followerId: 1, followingId: userId },
+            `http://192.168.161.183:5000/api/media/follows/`,
+            { followerId: currentUser?.id, followingId: user?.id },
             { headers: { Accept: "application/json" } }
          );
          if (data.status == "success") {
             console.log(data.data);
-            setFollowed(!followed);
+            setFollowed(data.data.followed);
             Alert.alert("Success", data.message);
          } else {
             Alert.alert("Failed", data.message);
@@ -49,6 +52,7 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
          setLoading(false);
       }
    };
+
    return (
       <Pressable onPress={gotoUserProfile}>
          <View style={styles.container}>
@@ -65,7 +69,7 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
                <Button
                   loading={loading}
                   disabled={loading}
-                  onPress={() => handleFollow(user.id)}
+                  onPress={() => handleFollow()}
                   mode={followed ? "contained-tonal" : "contained"}
                   style={{ borderColor: theme.colors.primary }}>
                   <SimpleLineIcons
@@ -93,7 +97,7 @@ const styles = StyleSheet.create({
       borderRadius: 20,
    },
    container: {
-      width: width / 2,
+      width: width / 1.5,
       borderRadius: 5,
       backgroundColor: "#fff",
       margin: 5,

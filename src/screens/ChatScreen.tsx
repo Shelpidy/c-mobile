@@ -274,7 +274,7 @@ const ChatScreen = ({ route }: any) => {
       let activeUser = currentUser?.id;
       let roomId = generateRoomId(secUser, activeUser);
       let newSocket = io(
-         `http://192.168.0.101:8080/?roomId=${roomId}&userId=${activeUser}`
+         `http:// 192.168.1.138:8080/?roomId=${roomId}&userId=${activeUser}`
       );
       setSocket(newSocket);
       // cleanup function to close the socket connection when the component unmounts
@@ -293,7 +293,7 @@ const ChatScreen = ({ route }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.0.101:8080/userstatus/${secUserId}`,
+                  `http:// 192.168.1.138:8080/userstatus/${secUserId}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -430,7 +430,7 @@ const ChatScreen = ({ route }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.0.101:8080/chats/${roomId}/${currentPage}/${numberOfChatsRecord}`,
+                  `http:// 192.168.1.138:8080/chats/${roomId}/${currentPage}/${numberOfChatsRecord}`,
                   { method: "GET" }
                );
                let { chats: chatMessages, count } = await resp.json();
@@ -720,33 +720,29 @@ const ChatScreen = ({ route }: any) => {
                renderBubble={(props) => {
                   ///////// Audion Playing ///////////////////////
 
-             
                   const hanldeAudioModulation = async () => {};
-                  const handlePlayAudio = async (audioUri:any) => {
+                  const handlePlayAudio = async (audioUri: any) => {
                      try {
                         if (sound) {
                            await sound.unloadAsync();
                         }
-
                         const { sound: audioSound } =
                            await Audio.Sound.createAsync(
                               { uri: audioUri },
                               { shouldPlay: true },
                               onPlaybackStatusUpdate
                            );
-
                         setSound(audioSound);
                         setIsPlayingAudio(true);
                      } catch (error) {
                         console.log("Error playing audio:", error);
                      }
                   };
-
                   const handlePauseAudio = async () => {
                      try {
                         if (sound) {
-                           await sound.pauseAsync();
                            setIsPlayingAudio(false);
+                           await sound.pauseAsync();
                         }
                      } catch (error) {
                         console.log("Error pausing audio:", error);

@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { users } from "../../data";
 import { Feather, SimpleLineIcons, FontAwesome } from "@expo/vector-icons";
-import { Button, useTheme } from "react-native-paper";
+import { Avatar, Button, useTheme } from "react-native-paper";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { useCurrentUser } from "../../utils/CustomHooks";
@@ -37,7 +37,7 @@ const Comment = (props: CommentProps) => {
             try {
                if (props) {
                   let response = await fetch(
-                     `http://192.168.0.101:5000/api/auth/users/${props?.userId}`,
+                     `http://192.168.161.183:5000/api/auth/users/${props?.userId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -70,7 +70,7 @@ const Comment = (props: CommentProps) => {
          try {
             let putObj = { text: comment, id: props.id };
             let response = await axios.put(
-               "`http://192.168.0.101:5000/media/posts/comments",
+               "`http://192.168.161.183:5000/media/posts/comments",
                putObj
             );
             if (response.status == 202) {
@@ -169,10 +169,14 @@ const Comment = (props: CommentProps) => {
             <View>
                <View style={styles.commentorMedia}>
                   <Pressable onPress={gotoUserProfile}>
-                     <Image
+                     <Avatar.Image
+                        source={{ uri: commentor.profileImage }}
+                        size={30}
+                     />
+                     {/* <Image
                         style={styles.profileImage}
                         source={{ uri: commentor.profileImage }}
-                     />
+                     /> */}
                   </Pressable>
 
                   <View

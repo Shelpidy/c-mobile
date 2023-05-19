@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, Alert } from "react-native";
+import {
+   StyleSheet,
+   Text,
+   View,
+   Alert,
+   ScrollView,
+   FlatList,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { ActivityIndicator } from "react-native-paper";
 import { useCurrentUser } from "../utils/CustomHooks";
@@ -28,7 +35,7 @@ const NewConversationsScreen = () => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.0.101:8080/conversations/${userId}/${currentPage}/${numberOfConversationsRecord}`,
+                  `http://192.168.161.183:8080/conversations/${userId}/${currentPage}/${numberOfConversationsRecord}`,
                   { method: "GET" }
                );
                let { conversations: newConversations, count } =
@@ -59,16 +66,15 @@ const NewConversationsScreen = () => {
    }
 
    return (
-      <View style={{ backgroundColor: "#fff" }}>
-         <Text>All Chats</Text>
-         {conversations.map((conversation) => {
-            return (
-               <View key={String(conversation.id)}>
-                  <ConversationComponent conversation={conversation} />
-               </View>
-            );
-         })}
-      </View>
+      <FlatList
+         data={conversations}
+         keyExtractor={(item) => String(item.id)}
+         renderItem={({ item, index, separators }) => (
+            <View key={String(item.id)}>
+               <ConversationComponent conversation={item} />
+            </View>
+         )}
+      />
    );
 };
 

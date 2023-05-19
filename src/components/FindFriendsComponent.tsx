@@ -1,4 +1,11 @@
-import { ScrollView, StyleSheet, Text, View, Alert } from "react-native";
+import {
+   ScrollView,
+   StyleSheet,
+   Text,
+   View,
+   Alert,
+   FlatList,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { users as commodityUsers } from "../data";
 import FindFriendComponent from "./FindFriendComponent";
@@ -8,7 +15,7 @@ import { ActivityIndicator } from "react-native-paper";
 import { useCurrentUser } from "../utils/CustomHooks";
 
 const FindFriendsComponent = ({ navigation }: any) => {
-   const [users, setUsers] = useState<User[]>();
+   const [users, setUsers] = useState<User[] | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
    const currentUser = useCurrentUser();
 
@@ -23,7 +30,7 @@ const FindFriendsComponent = ({ navigation }: any) => {
                if (currentUser) {
                   let activeUserId = currentUser?.id;
                   let response = await fetch(
-                     `http://192.168.0.101:5000/api/media/unfollowing/${activeUserId}`,
+                     `http://192.168.161.183:5000/api/media/unfollowing/${activeUserId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -31,17 +38,13 @@ const FindFriendsComponent = ({ navigation }: any) => {
                      // console.log("Users-----", data.data);
                      setUsers(data.data?.sort(() => 0.5 - Math.random()));
                      // Alert.alert("Success",data.message)
-                     setLoading(false);
                   } else {
                      Alert.alert("Failed", data.message);
                   }
                }
-
-               setLoading(false);
             } catch (err) {
                console.log(err);
                Alert.alert("Failed", String(err));
-               setLoading(false);
             }
          };
          fetchData();
@@ -49,7 +52,7 @@ const FindFriendsComponent = ({ navigation }: any) => {
       [currentUser]
    );
 
-   if (loading)
+   if (!users)
       return (
          <View
             style={{
@@ -64,23 +67,19 @@ const FindFriendsComponent = ({ navigation }: any) => {
          </View>
       );
    return (
-      <View>
-         {/* <Text
-            style={{ fontFamily: "Poppins_600SemiBold", marginHorizontal: 15 }}>
-            <Feather size={20} name="users" /> Users
-         </Text> */}
-         <ScrollView horizontal style={styles.container}>
-            {users?.map((user) => {
-               return (
-                  <FindFriendComponent
-                     key={String(user.id)}
-                     user={user}
-                     navigation={navigation}
-                  />
-               );
-            })}
-         </ScrollView>
-      </View>
+      <FlatList
+         data={users}
+         horizontal
+         keyExtractor={(item) => String(item.id)}
+         indicatorStyle="white"
+         renderItem={({ item, index, separators }) => (
+            <FindFriendComponent
+               key={String(item.id)}
+               user={item}
+               navigation={navigation}
+            />
+         )}
+      />
    );
 };
 
@@ -89,6 +88,6 @@ export default FindFriendsComponent;
 const styles = StyleSheet.create({
    container: {
       backgroundColor: "#f5f5f5",
-      padding: 5,
+      paddingHorizontal: 5,
    },
 });
