@@ -270,11 +270,10 @@ const ChatScreen = ({ route }: any) => {
 
    ///////////////////////////////// CONNECT TO SOCKETIO //////////////////////////////
    useEffect(() => {
-      let secUser = route.params?.user.id;
       let activeUser = currentUser?.id;
-      let roomId = generateRoomId(secUser, activeUser);
+      let roomId = route.params?.roomId;
       let newSocket = io(
-         `http:// 192.168.1.138:8080/?roomId=${roomId}&userId=${activeUser}`
+         `http://192.168.232.183:8080/?roomId=${roomId}&userId=${activeUser}&inChatScreen=true&roomType=c`
       );
       setSocket(newSocket);
       // cleanup function to close the socket connection when the component unmounts
@@ -282,6 +281,15 @@ const ChatScreen = ({ route }: any) => {
          newSocket.close();
       };
    }, [currentUser]);
+
+   ////////////////////// ADD USER STATUS TO AS BEING IN THIS ROOM/////////////////
+
+   useEffect(()=>{
+      if(socket && currentUser){
+         let roomId = route.params?.roomId;
+         socket.emit("activeRoom",{userId:currentUser.id,activeRoom:roomId})
+      }
+   },[socket,currentUser])
 
    //////////////////////////////// GET SECOND USER STATUS ///////////////////////////
 
@@ -293,7 +301,7 @@ const ChatScreen = ({ route }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http:// 192.168.1.138:8080/userstatus/${secUserId}`,
+                  `http://192.168.232.183:8080/api/userstatus/${secUserId}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -370,7 +378,7 @@ const ChatScreen = ({ route }: any) => {
    useEffect(() => {
       let secUserId = route.params.user.id;
       let activeUser = currentUser?.id;
-      let roomId = generateRoomId(secUserId, activeUser);
+      let roomId = route.params.roomId
       // console.log(roomId);
       // console.log("Socket connecting");
 
@@ -381,7 +389,7 @@ const ChatScreen = ({ route }: any) => {
 
          ////////////////////  Chat message listener ///////////////
 
-         socket.on(String(roomId), (message: any) => {
+         socket.on(`c-${roomId}`, (message: any) => {
             // console.log("From Server", message);
             setMessages((previousMessages) => {
                if (previousMessages) {
@@ -425,15 +433,15 @@ const ChatScreen = ({ route }: any) => {
          // console.log("Fetching chats");
          let secUser = route.params.user.id;
          let activeUser = currentUser?.id;
-         let roomId = generateRoomId(secUser, activeUser);
+         let roomId = route.params?.roomId;
 
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http:// 192.168.1.138:8080/chats/${roomId}/${currentPage}/${numberOfChatsRecord}`,
+                  `http://192.168.232.183:8080/api/messages/${roomId}/${currentPage}/${numberOfChatsRecord}`,
                   { method: "GET" }
                );
-               let { chats: chatMessages, count } = await resp.json();
+               let { messages: chatMessages, count } = await resp.json();
                console.log("Chats Messages", chatMessages);
                setTotalChats(count);
                if (messages && currentPage > 1) {
@@ -575,7 +583,7 @@ const ChatScreen = ({ route }: any) => {
       // console.log("Onsend loading");
       let secUser = route.params.user.id;
       let activeUser = currentUser?.id;
-      let roomId = generateRoomId(secUser, activeUser);
+      let roomId = route.params.roomId;
       let sendData = {
          senderId: currentUser?.id,
          receipientId: route.params.user.id,
@@ -586,7 +594,7 @@ const ChatScreen = ({ route }: any) => {
          audio: _audio,
       };
       // console.log(sendData, roomId);
-      socket?.emit(String(roomId), sendData);
+      socket?.emit(`c-${roomId}`, sendData);
       setTextValue("");
       setSent(true);
    };

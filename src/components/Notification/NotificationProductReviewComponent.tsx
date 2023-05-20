@@ -83,7 +83,7 @@ const NotificationProductReviewComponent = ({
          try {
             if (props) {
                let response = await fetch(
-                  `http://192.168.161.183:5000/api/auth/users/${props.userId}`,
+                  `http://192.168.232.183:5000/api/auth/users/${props.userId}`,
                   { method: "GET" }
                );
 
@@ -118,7 +118,7 @@ const NotificationProductReviewComponent = ({
          try {
             if (props) {
                let response = await fetch(
-                  `http://192.168.161.183:5000/api/auth/users/${buyerId}`,
+                  `http://192.168.232.183:5000/api/auth/users/${buyerId}`,
                   { method: "GET" }
                );
 

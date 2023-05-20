@@ -53,13 +53,13 @@ const ConversationComponent = ({
             let fetchData = async () => {
                // console.log("Fetching user")
                //  let activeUserId = 1
-               let userIds = String(conversation.roomId).split("");
+               let userIds = [conversation.senderId,conversation.recipientId];
                let secondUserId = Number(
                   userIds.filter((id) => Number(id) != currentUser.id)[0]
                );
                try {
                   let response = await fetch(
-                     `http://192.168.161.183:5000/api/auth/users/${secondUserId}`,
+                     `http://192.168.232.183:5000/api/auth/users/${secondUserId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -85,9 +85,9 @@ const ConversationComponent = ({
    useEffect(() => {
       if (secondUser && currentUser) {
          let activeUser = currentUser?.id;
-         let roomId = generateRoomId(secondUser?.id, activeUser);
+         let roomId = conversation.id;
          let newSocket = io(
-            `http://192.168.161.183:8080/?roomId=${roomId}&userId=${activeUser}&convId=true`
+            `http://192.168.232.183:8080/?roomId=${roomId}&userId=${activeUser}&inChatScreen=false&roomType=c`
          );
          setSocket(newSocket);
          // cleanup function to close the socket connection when the component unmounts
@@ -106,7 +106,7 @@ const ConversationComponent = ({
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.161.183:8080/userstatus/${secondUser.id}`,
+                  `http://192.168.232.183:8080/api/userstatus/${secondUser.id}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -185,7 +185,7 @@ const ConversationComponent = ({
    }, [socket, currentUser, secondUser]);
 
    const gotoChatScreen = () => {
-      navigation.navigate("ChatScreen", { user: secondUser });
+      navigation.navigate("ChatScreen", { user: secondUser,roomId:conversation.id});
    };
    if (!newConversation) {
       return (
@@ -194,7 +194,6 @@ const ConversationComponent = ({
          </View>
       );
    }
-
    if (!secondUser) {
       return (
          <View style={{ flexDirection: "row", margin: 2 }}>
@@ -250,8 +249,8 @@ const ConversationComponent = ({
                   }
                   style={{
                      fontFamily:
-                        currentUser?.id == newConversation.receipientId &&
-                        !newConversation.receipientReadStatus
+                        currentUser?.id == newConversation.recipientId &&
+                        !newConversation.recipientReadStatus
                            ? "Poppins_500Medium"
                            : "Poppins_300Light",
                      marginHorizontal: 3,
@@ -293,7 +292,7 @@ const ConversationComponent = ({
                      paddingTop: 2,
                      height: "auto",
                   }}>
-                  {currentUser?.id == newConversation.receipientId &&
+                  {currentUser?.id == newConversation.recipientId &&
                      newConversation.numberOfUnreadText && (
                         <Badge
                            style={{
@@ -307,8 +306,8 @@ const ConversationComponent = ({
                      text={newConversation.lastText}
                      style={{
                         fontFamily:
-                           currentUser?.id == newConversation.receipientId &&
-                           !newConversation.receipientReadStatus
+                           currentUser?.id == newConversation.recipientId &&
+                           !newConversation.recipientReadStatus
                               ? "Poppins_500Medium"
                               : "Poppins_300Light",
                         marginHorizontal: 3,

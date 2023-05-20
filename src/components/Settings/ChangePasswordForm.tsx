@@ -15,7 +15,7 @@ const ChangePasswordForm = () => {
    const handleCheckPassword = async () => {
       try {
          const response = await axios.post(
-            "http://192.168.161.183:5000/api/auth/users/checkpassword/",
+            "http://192.168.232.183:5000/api/auth/users/checkpassword/",
             {
                password: oldPassword,
                userId: currentUser?.id, // Replace with the actual user ID
@@ -56,7 +56,7 @@ const ChangePasswordForm = () => {
 
       try {
          const response = await axios.put(
-            "http://192.168.161.183:5000/api/auth/users/personal/",
+            "http://192.168.232.183:5000/api/auth/users/personal/",
             {
                key: "password",
                value: password,

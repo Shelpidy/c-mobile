@@ -43,7 +43,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.161.183:5000/api/auth/users/${route.params?.userId}`,
+                  `http://192.168.232.183:5000/api/auth/users/${route.params?.userId}`,
                   { method: "GET" }
                );
                let data = await response.json();
@@ -77,7 +77,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
             let userId = route.params?.userId;
             try {
                let response = await fetch(
-                  `http://192.168.161.183:5000/api/media/posts/user/${userId}`
+                  `http://192.168.232.183:5000/api/media/posts/user/${userId}`
                );
                let data = await response.json();
                if (data.status == "success") {
@@ -122,7 +122,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
       setLoading(true);
       try {
          let { data } = await axios.put(
-            `http://192.168.161.183:5000/api/media/follows/`,
+            `http://192.168.232.183:5000/api/media/follows/`,
             { followerId: currentUser?.id, followingId: user?.personal.id },
             { headers: { Accept: "application/json" } }
          );

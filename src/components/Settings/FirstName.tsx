@@ -14,7 +14,7 @@ const FirstNameForm = () => {
 
       try {
          const response = await axios.put(
-            "http://192.168.161.183:5000/api/auth/users/personal/",
+            "http://192.168.232.183:5000/api/auth/users/personal/",
             {
                key: "firstName",
                value: firstName,

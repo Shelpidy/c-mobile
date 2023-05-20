@@ -37,7 +37,7 @@ const TransactionNotificationComponent = ({
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.161.183:5000/api/auth/users/${notification.notificationFrom}`,
+               `http://192.168.232.183:5000/api/auth/users/${notification.notificationFrom}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -63,7 +63,7 @@ const TransactionNotificationComponent = ({
       let notId = notification.id;
       try {
          let { data } = await axios.get(
-            `http://192.168.161.183:5000/api/notifications/read/${notId}`
+            `http://192.168.232.183:5000/api/notifications/read/${notId}`
          );
          if (data.status == "success") {
             navigation.navigate("UserProfileScreen", {

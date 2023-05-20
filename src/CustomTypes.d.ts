@@ -172,10 +172,20 @@ declare type CustomNotification = {
 declare type Conversation = {
    id: number;
    senderId: number;
-   receipientId: number;
+   recipientId: number;
    lastText: string | null;
-   receipientReadStatus: boolean | null;
-   roomId: number;
+   recipientReadStatus: boolean | null;
+   numberOfUnreadText: number | null;
+   createdAt: Date;
+   updatedAt: null;
+};
+
+declare type Chat = {
+   id: number;
+   senderId: number;
+   recipientId: number;
+   lastText: string | null;
+   recipientReadStatus: boolean | null;
    numberOfUnreadText: number | null;
    createdAt: Date;
    updatedAt: null;
