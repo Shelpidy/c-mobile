@@ -22,6 +22,7 @@ const NewConversationsScreen = () => {
       null
    );
    const [currentPage, setCurrentPage] = useState<number>(1);
+   const [convId, setConvId] = useState<any>(1);
    const [totalConversations, setTotalConversations] = useState<number>(0);
    const [numberOfConversationsRecord, setNumberOfConversationsRecord] =
       useState<number>(30);
@@ -54,7 +55,7 @@ const NewConversationsScreen = () => {
          };
          fetchData();
       }
-   }, [currentUser, currentPage]);
+   }, [currentUser, currentPage,convId]);
 
    if (!conversations) {
       return (
@@ -71,7 +72,7 @@ const NewConversationsScreen = () => {
          keyExtractor={(item) => String(item.id)}
          renderItem={({ item, index, separators }) => (
             <View key={String(item.id)}>
-               <ConversationComponent conversation={item} />
+               <ConversationComponent setTopConvId={(id)=>setConvId(id)} conversation={item} />
             </View>
          )}
       />

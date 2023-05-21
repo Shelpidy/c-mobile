@@ -217,7 +217,7 @@ const ChatBox = ({
    );
 };
 
-const ChatScreen = ({ route }: any) => {
+const ChatScreen = ({ route,navigation }: any) => {
    const [messages, setMessages] = useState<IMessage[] | null>(null);
    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
    const theme = useTheme();
@@ -241,7 +241,7 @@ const ChatScreen = ({ route }: any) => {
    const [totalChats, setTotalChats] = useState<number>(0);
    const [numberOfChatsRecord, setNumberOfChatsRecord] = useState<number>(30);
    const navigationState = useNavigationState((state) => state);
-   const navigation = useNavigation<any>();
+   // const navigation = useNavigation<any>();
    const [imageOpen, setImageOpen] = useState<boolean>(false);
    const [videoOpen, setVideoOpen] = useState<boolean>(false);
    const [image, setImage] = useState<string | null>(null);
@@ -284,12 +284,13 @@ const ChatScreen = ({ route }: any) => {
 
    ////////////////////// ADD USER STATUS TO AS BEING IN THIS ROOM/////////////////
 
-   useEffect(()=>{
-      if(socket && currentUser){
-         let roomId = route.params?.roomId;
-         socket.emit("activeRoom",{userId:currentUser.id,activeRoom:roomId})
-      }
-   },[socket,currentUser])
+   // useEffect(()=>{
+   //    if(socket && currentUser){
+   //       console.log("Activating room...")
+   //       let roomId = route.params?.roomId;
+   //       socket.emit("activeRoom",{userId:currentUser.id,activeRoom:`c-${roomId}`})
+   //    }
+   // },[socket,currentUser])
 
    //////////////////////////////// GET SECOND USER STATUS ///////////////////////////
 
@@ -311,9 +312,7 @@ const ChatScreen = ({ route }: any) => {
                      setLastSeen("online");
                   } else {
                      let lastSeenDate = moment(
-                        data.data.updatedAt,
-                        "YYYYMMDD"
-                     ).fromNow();
+                        data.data.updatedAt).fromNow();
                      setLastSeen(lastSeenDate);
                   }
                } else {
@@ -334,13 +333,12 @@ const ChatScreen = ({ route }: any) => {
 
    useEffect(() => {
       const unsubscribe = navigation.addListener("blur", () => {
-         // console.log("User left the screen");
+         console.log("User left the screen");
          // Perform actions when user leaves the screen
          if (socket && currentUser) {
-            let activeUser = currentUser.id;
-            socket.emit("chatScreen", {
-               userId: activeUser,
-               onChatScreen: false,
+            socket.emit("activeRoom", {
+               userId: currentUser.id,
+               activeRoom:null,
             });
          }
       });
@@ -404,6 +402,14 @@ const ChatScreen = ({ route }: any) => {
          socket.on("online", (data) => {
             // console.log("From Online", { online: data.online });
             if (data.userId == secondUser?.id) {
+                console.log("From Online",data);
+                 if (data.online) {
+                     setLastSeen("online");
+                  } else {
+                     let lastSeenDate = moment(
+                        data.updatedAt).fromNow();
+                     setLastSeen(lastSeenDate);
+                  }
                setResetLastSeen(resetLastSeen + 1);
             }
          });
@@ -442,7 +448,7 @@ const ChatScreen = ({ route }: any) => {
                   { method: "GET" }
                );
                let { messages: chatMessages, count } = await resp.json();
-               console.log("Chats Messages", chatMessages);
+               // console.log("Chats Messages", chatMessages);
                setTotalChats(count);
                if (messages && currentPage > 1) {
                   setMessages([...messages, ...chatMessages]);
@@ -586,7 +592,7 @@ const ChatScreen = ({ route }: any) => {
       let roomId = route.params.roomId;
       let sendData = {
          senderId: currentUser?.id,
-         receipientId: route.params.user.id,
+         recipientId: route.params.user.id,
          text: textValue,
          roomId: roomId,
          image: _image,
@@ -680,7 +686,7 @@ const ChatScreen = ({ route }: any) => {
                         <Text
                            style={{
                               fontFamily: "Poppins_300Light",
-                              color: theme.colors.secondary,
+                              color: theme.colors.inversePrimary,
                               marginLeft: 10,
                            }}>
                            {typing ? "typing..." : ""}
@@ -690,7 +696,7 @@ const ChatScreen = ({ route }: any) => {
                         <Text
                            style={{
                               fontFamily: "Poppins_300Light",
-                              color: theme.colors.secondary,
+                              color: theme.colors.inversePrimary,
                               marginLeft: 10,
                            }}>
                            {socketRecording ? "recording..." : ""}

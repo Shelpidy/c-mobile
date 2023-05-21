@@ -33,6 +33,39 @@ const UserProfileScreen = ({ navigation, route }: any) => {
    const [loading, setLoading] = useState<boolean>(false);
    const currentUser = useCurrentUser();
    const [followed, setFollowed] = useState<boolean>(false);
+   const [roomId, setRoomId] = useState<number|null>(null);
+
+
+   //////////////////// GET ROOM ID /////////////////
+
+   useEffect(
+      function () {
+         
+         let fetchData = async () => {
+            // console.log("Fetching user")
+            //  let activeUserId = 1
+            try {
+               let response = await fetch(
+                  `http://192.168.232.183:8080/api/room/${route.params?.userId}/${currentUser?.id}`,
+                  { method: "GET" }
+               );
+               let data = await response.json();
+               if (data.status == "success") {
+                  console.log("RoomId", data.data.roomId);
+                  setRoomId(data.data.roomId);
+
+            }} catch (err) {
+               console.log(err);
+               Alert.alert("Failed", String(err));
+            }
+         };
+         if(currentUser){
+             fetchData();
+         }
+       
+      },
+      [currentUser, route.params]
+   );
 
    useEffect(
       function () {
@@ -48,7 +81,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                );
                let data = await response.json();
                if (data.status == "success") {
-                  console.log("Users-----", data.data);
+                  // console.log("Users-----", data.data);
                   setUser(data.data);
 
                   if (
@@ -322,7 +355,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      style={{ flex: 2 }}
                      onPress={() =>
                         navigation.navigate("ChatScreen", {
-                           user: user?.personal,
+                           user: user?.personal,roomId
                         })
                      }>
                      <AntDesign name="message1" /> message

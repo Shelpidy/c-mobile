@@ -19,6 +19,7 @@ import { useCurrentUser } from "../utils/CustomHooks";
 
 type ConversationComponentProps = {
    conversation: Conversation;
+   setTopConvId:(id:any)=> void
 };
 
 const { width, height } = Dimensions.get("window");
@@ -31,6 +32,7 @@ const generateRoomId = (secUserId: any, activeUserId: any) => {
 
 const ConversationComponent = ({
    conversation,
+   setTopConvId
 }: ConversationComponentProps) => {
    const [secondUser, setSecondUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
@@ -116,9 +118,8 @@ const ConversationComponent = ({
                      setLastSeen("online");
                   } else {
                      let lastSeenDate = moment(
-                        data.data.updatedAt,
-                        "YYYYMMDD"
-                     ).fromNow();
+                        data.data.updatedAt
+                       ).fromNow();
                      setLastSeen(lastSeenDate);
                   }
                } else {
@@ -151,8 +152,16 @@ const ConversationComponent = ({
          /////// Online Status listener ///////////
 
          socket.on("online", (data) => {
-            console.log("From Online", { online: data.online });
+            
             if (data.userId == secondUser?.id) {
+               console.log("From Online",data);
+                 if (data.online) {
+                     setLastSeen("online");
+                  } else {
+                     let lastSeenDate = moment(
+                        data.updatedAt).fromNow();
+                     setLastSeen(lastSeenDate);
+                  }
                setResetLastSeen(resetLastSeen + 1);
             }
          });
@@ -180,11 +189,26 @@ const ConversationComponent = ({
          socket.on("conversation", (data) => {
             console.log("From Conversation", { conversation: data });
             setNewConversation(data);
+            setTopConvId(data.id)
          });
       }
    }, [socket, currentUser, secondUser]);
 
-   const gotoChatScreen = () => {
+   const gotoChatScreen = async() => {
+      if(conversation.recipientId === currentUser?.id && !conversation.recipientReadStatus){
+         try{
+            let {data,status} = await axios.put(`http://192.168.232.183:8080/api/messages/chats/read/${conversation.id}/${conversation.recipientId}`)
+            if(status === 202){
+               setNewConversation({...newConversation,numberOfUnreadText:null,recipientReadStatus:true})
+               navigation.navigate("ChatScreen", { user: secondUser,roomId:conversation.id});
+            }else{
+               console.log(data.messages)
+               navigation.navigate("ChatScreen", { user: secondUser,roomId:conversation.id});
+            }
+         }catch(error){
+
+         }
+      }
       navigation.navigate("ChatScreen", { user: secondUser,roomId:conversation.id});
    };
    if (!newConversation) {
@@ -329,7 +353,7 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       padding: 5,
       height: "auto",
-      marginVertical: 2,
+      marginVertical: 0,
    },
 
    notTitle: {
