@@ -45,6 +45,9 @@ import {
    AVPlaybackStatusToSet,
 } from "expo-av";
 import * as FileSystem from "expo-file-system";
+import { useSelector } from "react-redux";
+
+
 
 type ChatBoxProps = {
    onSend: () => void;
@@ -232,7 +235,7 @@ const ChatScreen = ({ route,navigation }: any) => {
    const currentUser = useCurrentUser();
    const [secondUser, setSecondUser] = useState<User>();
    const [sound, setSound] = useState<Audio.Sound | null>(null);
-   const [socket, setSocket] = useState<Socket | null>(null);
+   const {socket} = useSelector((state:any)=> state.rootReducer)
    const isOnline = useNetworkStatus();
    const [lastSeen, setLastSeen] = useState<any>();
    const [typing, setTyping] = useState<boolean | null>(false);
@@ -268,29 +271,17 @@ const ChatScreen = ({ route,navigation }: any) => {
       return Number(`${maxId}${minId}`);
    };
 
-   ///////////////////////////////// CONNECT TO SOCKETIO //////////////////////////////
-   useEffect(() => {
-      let activeUser = currentUser?.id;
-      let roomId = route.params?.roomId;
-      let newSocket = io(
-         `http://192.168.232.183:8080/?roomId=${roomId}&userId=${activeUser}&inChatScreen=true&roomType=c`
-      );
-      setSocket(newSocket);
-      // cleanup function to close the socket connection when the component unmounts
-      return () => {
-         newSocket.close();
-      };
-   }, [currentUser]);
+   
 
-   ////////////////////// ADD USER STATUS TO AS BEING IN THIS ROOM/////////////////
+   //////////////////// ADD USER STATUS TO AS BEING IN THIS ROOM/////////////////
 
-   // useEffect(()=>{
-   //    if(socket && currentUser){
-   //       console.log("Activating room...")
-   //       let roomId = route.params?.roomId;
-   //       socket.emit("activeRoom",{userId:currentUser.id,activeRoom:`c-${roomId}`})
-   //    }
-   // },[socket,currentUser])
+   useEffect(()=>{
+      if(socket && currentUser){
+         console.log("Activating room...")
+         let roomId = route.params?.roomId;
+         socket.emit("activeRoom",{userId:currentUser.id,activeRoom:`c-${roomId}`})
+      }
+   },[socket,currentUser])
 
    //////////////////////////////// GET SECOND USER STATUS ///////////////////////////
 
@@ -399,7 +390,7 @@ const ChatScreen = ({ route,navigation }: any) => {
 
          ///////////// Online Status listener ///////////
 
-         socket.on("online", (data) => {
+         socket.on("online", (data:any) => {
             // console.log("From Online", { online: data.online });
             if (data.userId == secondUser?.id) {
                 console.log("From Online",data);
@@ -416,7 +407,7 @@ const ChatScreen = ({ route,navigation }: any) => {
 
          //////// Check or listen for typing status //////////
 
-         socket.on("typing", (data) => {
+         socket.on("typing", (data:any) => {
             // console.log("From Typing", { typing: data.typing });
             if (data.userId == secUserId) {
                setTyping(data.typing);
@@ -425,7 +416,7 @@ const ChatScreen = ({ route,navigation }: any) => {
 
          ///////// check or listen for recording ///////////////
 
-         socket.on("recording", (data) => {
+         socket.on("recording", (data:any) => {
             console.log("From Recording", { recording: data.recording });
             if (data.userId == secUserId) {
                setSocketRecording(data.recording);

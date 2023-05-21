@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ProfileScreen from "../screens/ProfileScreen";
 import HomeScreen from "../screens/HomeScreen";
@@ -25,6 +25,12 @@ import ProductNotificationScreen from "../screens/ProductNotificationScreen";
 import ProductPostScreen from "../screens/ProductPostScreen";
 import ConversationsScreen from "../screens/ConversationsScreen";
 import { useNavigationState, useRoute } from "@react-navigation/native";
+import { useDispatch,useSelector } from "react-redux";
+import { setPersonalInfoForm, setSocket } from "../redux/action";
+import { useCurrentUser, useNetworkStatus } from "../utils/CustomHooks";
+import {io,Socket} from "socket.io-client"
+import { Alert } from "react-native";
+
 
 // import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -66,7 +72,28 @@ const RenderHeader = () => {
 };
 
 const HomeStack = (props: HomeStackProps) => {
-   const [open, setOpen] = React.useState(false);
+   const [socket, _setSocket] = React.useState<Socket | null>(null);
+   const isConnectedToInternet = useNetworkStatus()
+   const currentUser = useCurrentUser()
+   const dispatch = useDispatch()
+
+
+   React.useEffect(() => {
+      if(currentUser){
+         let newSocket = io(
+            `http://192.168.232.183:8080/?userId=${currentUser.id}`
+         );
+         _setSocket(newSocket)
+         dispatch(setSocket(newSocket))
+
+         // cleanup function to close the socket connection when the component unmounts
+         return () => {
+            newSocket.close();
+         }
+      }
+   }, [currentUser]);
+
+
 
    return (
       <Stack.Navigator screenOptions={{ header: () => RenderHeader() }}>

@@ -45,6 +45,9 @@ import {
 import HomeStack from "./src/stacks/HomeStack";
 import AuthStack from "./src/stacks/AuthStack";
 import StartUpLoadingScreen from "./src/screens/StartUpLoadingScreen";
+import {Provider} from "react-redux"
+import store from "./src/redux/store";
+
 
 // 192.168.0.102
 
@@ -118,8 +121,10 @@ export default function App() {
       return <StartUpLoadingScreen />;
    }
    return (
+      <Provider store={store}>
       <PaperProvider theme={CombinedDefaultTheme}>
          <LayoutContainer />
-      </PaperProvider>
+      </PaperProvider>         
+      </Provider>
    );
 }

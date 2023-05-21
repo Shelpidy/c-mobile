@@ -15,7 +15,7 @@ const generateRoomId = (secondUserId: any, activeUserId: any) => {
 };
 
 export const useNetworkStatus = () => {
-   const [isOnline, setIsOnline] = useState<boolean | null>(true);
+   const [isOnline, setIsOnline] = useState<boolean  | null>(false);
 
    useEffect(() => {
       const checkOnlineStatus = async () => {

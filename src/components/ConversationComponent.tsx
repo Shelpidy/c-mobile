@@ -16,6 +16,7 @@ import TextShortener from "./TextShortener";
 import { useNavigation } from "@react-navigation/native";
 import { io, Socket } from "socket.io-client";
 import { useCurrentUser } from "../utils/CustomHooks";
+import { useSelector } from "react-redux";
 
 type ConversationComponentProps = {
    conversation: Conversation;
@@ -38,7 +39,7 @@ const ConversationComponent = ({
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
    const navigation = useNavigation<any>();
-   const [socket, setSocket] = useState<Socket | null>(null);
+   // const [socket, setSocket] = useState<Socket | null>(null);
    const [lastSeen, setLastSeen] = useState<any>("");
    const [typing, setTyping] = useState<boolean | null>(false);
    const [recording, setRecording] = useState<boolean | null>(false);
@@ -46,6 +47,7 @@ const ConversationComponent = ({
    const currentUser = useCurrentUser();
    const [newConversation, setNewConversation] =
       useState<Conversation>(conversation);
+   const {socket} = useSelector((state:any)=> state.rootReducer)
 
    //////////////////  GET SECOND USER ///////////////
    useEffect(
@@ -83,21 +85,12 @@ const ConversationComponent = ({
       [currentUser]
    );
 
-   ///////////////////////////////// CONNECT TO SOCKETIO //////////////////////////////
+   ///////////////////////////////// Join a room //////////////////////////////
    useEffect(() => {
-      if (secondUser && currentUser) {
-         let activeUser = currentUser?.id;
-         let roomId = conversation.id;
-         let newSocket = io(
-            `http://192.168.232.183:8080/?roomId=${roomId}&userId=${activeUser}&inChatScreen=false&roomType=c`
-         );
-         setSocket(newSocket);
-         // cleanup function to close the socket connection when the component unmounts
-         return () => {
-            newSocket.close();
-         };
+      if(socket && conversation && currentUser){
+         socket.emit("joinRoom",{room:`c-${conversation.id}`,userId:currentUser.id})
       }
-   }, [currentUser, secondUser]);
+   }, [conversation,socket,currentUser]);
 
    //////////////////////////////// GET SECOND USER STATUS ///////////////////////////
 
@@ -151,7 +144,7 @@ const ConversationComponent = ({
 
          /////// Online Status listener ///////////
 
-         socket.on("online", (data) => {
+         socket.on("online", (data:any) => {
             
             if (data.userId == secondUser?.id) {
                console.log("From Online",data);
@@ -168,7 +161,7 @@ const ConversationComponent = ({
 
          //////// Check or listen for typing status //////////
 
-         socket.on("typing", (data) => {
+         socket.on("typing", (data:any) => {
             console.log("From Typing", { typing: data.typing });
             if (data.userId == secUserId) {
                setTyping(data.typing);
@@ -177,7 +170,7 @@ const ConversationComponent = ({
 
          ///////// check or listen for recording ///////////////
 
-         socket.on("recording", (data) => {
+         socket.on("recording", (data:any) => {
             console.log("From Recording", { recording: data.recording });
             if (data.userId == secUserId) {
                setRecording(data.recording);
@@ -186,7 +179,7 @@ const ConversationComponent = ({
 
          ////////////// check for conversation /////////////////
 
-         socket.on("conversation", (data) => {
+         socket.on("conversation", (data:any) => {
             console.log("From Conversation", { conversation: data });
             setNewConversation(data);
             setTopConvId(data.id)
