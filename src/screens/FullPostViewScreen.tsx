@@ -31,6 +31,8 @@ import {
 } from "@expo/vector-icons";
 import axios from "axios";
 import { useCurrentUser } from "../utils/CustomHooks";
+import LikesComponent from "../components/LikesComponent";
+import moment from "moment";
 
 type FullPostComponentpost = { navigation: any; route: any };
 type PostComment = Omit<CommentProps, "posterId">;
@@ -298,6 +300,26 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                </View>
             )}
             <View>
+                <View
+               style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 8,
+                  paddingBottom: 8,
+                  gap: 4,
+               }}>
+               {/* <Text style={{textAlignVertical:"center",color:theme.colors.secondary,fontFamily:"Poppins_300Light",marginRight:2}}>posted</Text> */}
+               <AntDesign color={theme.colors.secondary} name="clockcircleo" />
+               <Text
+                  style={{
+                     textAlignVertical: "center",
+                     color: theme.colors.secondary,
+                     fontFamily: "Poppins_300Light",
+                  }}>
+                  posted {moment(post.createdAt, "YYYYMMDD").fromNow()}
+               </Text>
+            </View>
                {post?.images && <ImagesViewer images={post?.images} />}
                {/* {post?.video && <VideoPlayer video={post?.video}/>} */}
             </View>
@@ -305,6 +327,14 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
 
             {post?.text && <TextViewer text={post.text} />}
             <View>
+               <View style={{ paddingHorizontal: 8 }}>
+               <Text>
+                  <LikesComponent
+                     postId={post.id}
+                     numberOfLikes={likes.length}
+                  />
+               </Text>
+            </View>
                <View
                   style={[
                      styles.likeCommentAmountCon,
@@ -509,8 +539,8 @@ const styles = StyleSheet.create({
    likeCommentAmountCon: {
       flexDirection: "row",
       // justifyContent: "space-between",
-      gap: 25,
-      padding: 10,
+      gap: 10,
+      paddingVertical: 10,
       // borderWidth:1,
       marginLeft: 10,
       borderRadius: 20,

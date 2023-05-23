@@ -36,6 +36,14 @@ import TextShortener from "../TextShortener";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import LikesComponent from "../LikesComponent";
 import moment from "moment";
+import config from "../.././aws-config";
+import AWS from "aws-sdk";
+
+const s3 = new AWS.S3({
+   accessKeyId: config.accessKeyId,
+   secretAccessKey: config.secretAccessKey,
+   region: config.region,
+});
 
 type NPostComponentProps = PostComponentProps & { navigation: any };
 type PostComment = Omit<CommentProps, "posterId">;
@@ -75,14 +83,19 @@ const PostComponent = (props: NPostComponentProps) => {
    );
    const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
+   const [openShareModal, setOpenShareModal] = useState<boolean>(false);
    const [comments, setComments] = useState<Omit<CommentProps, "posterId">[]>(
       []
    );
    const [likes, setLikes] = useState<Like[] | null>(null);
-   const [poster, SetPoster] = useState<any>();
+   const [shares, setShares] = useState<ShareData[] | null>(null);
    const [liked, setLiked] = useState<boolean>(false);
+   const [poster, SetPoster] = useState<any>();
+   const [shared, setShared] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
+   const [loadingShare, setLoadingShare] = useState<boolean>(false);
    const theme = useTheme();
+   const [reloadCLS,setRelaodCLS] = useState<number>(0)
 
    useEffect(
       function () {
@@ -91,14 +104,16 @@ const PostComponent = (props: NPostComponentProps) => {
             try {
                if (props) {
                   let { data } = await axios.get(
-                     `http://192.168.232.183:5000/api/media/posts/cl/${props?.id}`
+                     `http://192.168.232.183:5000/api/media/posts/cls/${props?.id}`
                   );
                   if (data.status == "success") {
                      // console.log(data.data);
-                     let ls: any[] = data.data.likes;
-                     let cs = data.data.comments;
+                     let ls: any[] = data.data.likes.rows;
+                     let cs = data.data.comments.rows;
+                     let sh = data.data.shares.rows
                      setComments(cs);
                      setLikes(ls);
+                     setShares(sh)
                      if (ls.map((like) => like.userId).includes(activeUserId)) {
                         setLiked(true);
                      }
@@ -116,7 +131,7 @@ const PostComponent = (props: NPostComponentProps) => {
          };
          fetchData();
       },
-      [currentUser, props]
+      [currentUser, props,reloadCLS]
    );
 
    useEffect(
@@ -197,6 +212,57 @@ const PostComponent = (props: NPostComponentProps) => {
       }
    };
 
+   
+   const handleSharedPost = async () => {
+      setLoadingShare(true);
+      let activeUserId = currentUser?.id;
+      let postObj = {userId: activeUserId,title:props.title,images:props.images,video:props.video,text:props.text,fromId:props.userId,shared:true};
+      // Upload images to S3
+      // const uploadedImageURLs = [];
+      // for (const imageUri of postObj.images) {
+      //    const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
+      //    const imageKey = `${Date.now()}-${imageName}`;
+      //    const imageParams = {
+      //       Bucket: config.bucketName,
+      //       Key: imageKey,
+      //       Body: { uri: imageUri },
+      //    };
+
+      //    try {
+      //       const uploadResponse = await s3.upload(imageParams).promise();
+      //       uploadedImageURLs.push(uploadResponse.Location);
+      //    } catch (error) {
+      //       console.log("Image upload error:", error);
+      //       setLoading(false);
+      //       Alert.alert("Failed", "Image upload failed");
+      //       return;
+      //    }
+      // }
+
+      // Update product with uploaded image URLs
+      // postObj.images = uploadedImageURLs;
+      try {
+         let response = await axios.post(
+            "http://192.168.232.183:5000/api/media/posts/",
+            postObj
+         );
+         if (response.status === 201) {
+            console.log(response.data);
+            setLoadingShare(false);
+            setRelaodCLS(reloadCLS + 1)
+            Alert.alert("Successful", "Post successfully");
+         } else {
+            setLoadingShare(false);
+            Alert.alert("Failed", "Post Failed");
+         }
+      } catch (err) {
+         setLoadingShare(false);
+         console.log(err);
+      }
+
+      // console.log(postState);
+   };
+
    if (!likes) {
       return (
          <View>
@@ -207,7 +273,7 @@ const PostComponent = (props: NPostComponentProps) => {
 
    return (
       <View style={styles.postContainer}>
-         <Modal visible={openModal}>
+         <Modal visible={openShareModal}>
             <View
                style={{
                   flex: 1,
@@ -216,9 +282,34 @@ const PostComponent = (props: NPostComponentProps) => {
                   alignItems: "center",
                   paddingVertical: 4,
                }}>
-               <View style={{ backgroundColor: "#ffffff", paddingTop: 10 }}>
+               <View style={{ backgroundColor: "#ffffff", padding: 10,width:width - 20,borderRadius:5,gap:20}}>
                   {/* <IconButton name='plus'/> */}
-                  <Button mode="text" onPress={() => setOpenModal(false)}>
+                  <Button mode="text"  onPress={() => setOpenShareModal(false)}>
+                     <Feather size={26} name="x" />
+                  </Button>
+                  <Button style={{backgroundColor:shared?"green":theme.colors.primary}} disabled={loadingShare} loading={loadingShare} onPress={handleSharedPost} mode="contained"><Ionicons/>
+                  <Ionicons
+                  style={{marginHorizontal:4}}
+                        size={18}
+                        name={shared?"checkmark":"share-social-outline"}
+                     />
+                     <Text>{shared?"Shared Post Successfully":"Continue to share as a post"}</Text>
+                  </Button>
+               </View>
+            </View>
+         </Modal>
+          <Modal visible={openModal}>
+            <View
+               style={{
+                  flex: 1,
+                  backgroundColor: "#00000068",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingVertical: 4,
+               }}>
+               <View style={{ backgroundColor: "#ffffff", paddingTop: 10}}>
+                  {/* <IconButton name='plus'/> */}
+                  <Button mode="text" onPress={() => setOpenShareModal(false)}>
                      <Feather size={26} name="x" />
                   </Button>
                   <UpdatePostForm {...props} />
@@ -294,44 +385,41 @@ const PostComponent = (props: NPostComponentProps) => {
          </View>
          <View style={{ marginBottom: 5 }}>
             <View
-               style={[
-                  styles.likeCommentAmountCon,
-                  { borderColor: theme.colors.secondary },
-               ]}>
-               <View
-                  style={{
-                     flexDirection: "row",
-                     alignItems: "center",
-                     justifyContent: "flex-start",
-                  }}>
-                  <Pressable
-                     disabled={loading}
-                     onPress={() => handleLike(props.id)}>
-                     <Ionicons
-                        size={30}
+               style={styles.likeCommentAmountCon}>
+                  <Button disabled={loading}
+                     onPress={() => handleLike(props.id)} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1,alignItems:"center"}}>
+                      <Ionicons
+                        size={18}
                         color={theme.colors.secondary}
                         name={liked ? "heart-sharp" : "heart-outline"}
                      />
-                  </Pressable>
-                  <Text style={styles.commentAmountText}>{likes.length}</Text>
-               </View>
-               <View
-                  style={{
-                     flexDirection: "row",
-                     alignItems: "center",
-                     justifyContent: "flex-start",
-                  }}>
-                  <Pressable>
-                     <Ionicons
-                        size={30}
+                      <Text style={styles.commentAmountText}>{likes.length}</Text>
+                  </Button>
+              
+                  <Button contentStyle={{
+                     backgroundColor:"#f6f6f6",flex:1,alignItems:"center",flexDirection:"row"
+                  }} onPress = {()=>props.navigation.navigate("FullPostViewScreen", { ...props })} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1,alignItems:"center"}}>
+                   <Ionicons
+                        size={18}
+                       
                         color={theme.colors.secondary}
                         name="chatbox-outline"
                      />
-                  </Pressable>
-                  <Text style={styles.commentAmountText}>
+                      <Text style={styles.commentAmountText}>
                      {comments.length}
                   </Text>
-               </View>
+                  </Button>
+                  <Button onPress={()=>setOpenShareModal(true)} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1}}>
+                     <Ionicons
+                        size={18}
+                        color={theme.colors.secondary}
+                        name="share-social-outline"
+                     />
+                     <Text style={styles.commentAmountText}>
+                     {shares?.length}
+                  </Text>
+                  </Button>
+          
             </View>
             <View style={{ paddingHorizontal: 8 }}>
                <Text>
@@ -396,12 +484,12 @@ const styles = StyleSheet.create({
       marginHorizontal: 5,
    },
    likeCommentAmountCon: {
+      flex:1,
       flexDirection: "row",
-      // justifyContent: "space-between",
-      gap: 16,
+      gap: 14,
       paddingVertical: 5,
-      // borderWidth:1,
-      marginLeft: 8,
+      paddingHorizontal:8,
+
 
       // justifyContent:'center',
    },

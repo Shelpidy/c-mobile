@@ -50,6 +50,25 @@ declare type Like = {
    updatedAt?: Date;
 };
 
+declare type PostShare = {
+   id?: number;
+   postId?: number;
+   userId?: number;
+   createdAt?: Date;
+   updatedAt?: Date;
+};
+
+
+declare type ProductReview = {
+   id?: number;
+   productId?: number;
+   userId?: number;
+   createdAt?: Date;
+   updatedAt?: Date;
+};
+
+
+
 declare type ProductLike = {
    id?: number;
    productId?: number;
@@ -65,6 +84,8 @@ declare type PostComponentProps = {
    images: string[] | null;
    video: string | null;
    userId: number;
+   fromId?:number |null;
+   shared?:number|null;
    createdAt: Date;
    updatedAt: Date;
 };
