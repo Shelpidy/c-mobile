@@ -11,6 +11,7 @@ import PostComponent from "./PostComponent";
 import axios from "axios";
 import { posts as _fetchedPost } from "../../data";
 import { useCurrentUser } from "../../utils/CustomHooks";
+import SharedPostComponent from "./SharedPostComponent";
 
 type PostsComponentProps = {
    navigation?: any;
@@ -23,6 +24,7 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
    const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
+   const [refreshing, setRefreshing] = useState<boolean>(false);
    const currentUser = useCurrentUser();
 
    useEffect(
@@ -84,15 +86,27 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
 
    return (
       <FlatList
+         refreshing={refreshing}
+         onRefresh={()=> setRefreshing(true)}
          keyExtractor={(item) => String(item.id)}
          data={posts}
-         renderItem={({ item, index, separators }) => (
+         renderItem={({ item, index, separators }) => {if(item?.fromId) { return (
+            <SharedPostComponent
+               key={String(item.id)}
+               {...item}
+               navigation={navigation}
+            />
+         )}else{
+             return (
             <PostComponent
                key={String(item.id)}
                {...item}
                navigation={navigation}
             />
-         )}
+         )
+
+         }
+      }}
       />
    );
 };

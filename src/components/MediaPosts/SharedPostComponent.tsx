@@ -19,6 +19,7 @@ import {
    Button,
    IconButton,
    Avatar,
+   Divider,
 } from "react-native-paper";
 import {
    AntDesign,
@@ -38,6 +39,7 @@ import LikesComponent from "../LikesComponent";
 import moment from "moment";
 import config from "../.././aws-config";
 import AWS from "aws-sdk";
+import UserComponent from "../UserComponent";
 
 const s3 = new AWS.S3({
    accessKeyId: config.accessKeyId,
@@ -45,7 +47,7 @@ const s3 = new AWS.S3({
    region: config.region,
 });
 
-type NPostComponentProps = PostComponentProps & { navigation: any };
+type NSharedPostComponentProps = PostComponentProps & { navigation: any };
 type PostComment = Omit<CommentProps, "posterId">;
 const initialState: PostComment = {};
 
@@ -76,7 +78,7 @@ const postCommentReducer = (
    }
 };
 
-const PostComponent = (props: NPostComponentProps) => {
+const SharedPostComponent = (props: NSharedPostComponentProps) => {
    const [postCommentState, dispatchPostComment] = useReducer(
       postCommentReducer,
       initialState
@@ -88,14 +90,47 @@ const PostComponent = (props: NPostComponentProps) => {
       []
    );
    const [likes, setLikes] = useState<Like[] | null>(null);
-   const [shares, setShares] = useState<ShareData[] | null>(null);
+   const [secondUser, setSecondUser] = useState<User| null>(null);
    const [liked, setLiked] = useState<boolean>(false);
+   const [shares, setShares] = useState<ShareData[]|null>(null);
    const [poster, SetPoster] = useState<any>();
    const [shared, setShared] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
    const [loadingShare, setLoadingShare] = useState<boolean>(false);
    const theme = useTheme();
    const [reloadCLS,setRelaodCLS] = useState<number>(0)
+
+   
+   useEffect(function () {
+      console.log("Fetching user");
+      setLoading(true);
+      let fetchData = async () => {
+         // console.log("Fetching user")
+         //  let activeUserId = 1
+         try {
+            let response = await fetch(
+               `http://192.168.232.183:5000/api/auth/users/${props.fromId}`,
+               { method: "GET" }
+            );
+            let data = await response.json();
+            if (data.status == "success") {
+               // console.log("Users-----", data.data);
+               setSecondUser(data.data.personal);
+               // Alert.alert("Success",data.message)
+            
+            } else {
+               Alert.alert("Failed", data.message);
+            }
+          
+         } catch (err) {
+            console.log(err);
+            Alert.alert("Failed", String(err));
+         
+         }
+      };
+      fetchData();
+   }, []);
+
 
    useEffect(
       function () {
@@ -167,7 +202,7 @@ const PostComponent = (props: NPostComponentProps) => {
          };
          fetchData();
       },
-      []
+      [props]
    );
 
    const gotoUserProfile = () => {
@@ -213,35 +248,6 @@ const PostComponent = (props: NPostComponentProps) => {
    };
 
    
-   const handleSharedPost = async () => {
-      let activeUserId = currentUser?.id;
-      setLoadingShare(true)
-      setShared(false)
-      // let images = props.images?.map(image => image?.trimEnd())
-      let postObj = {postObj:{userId:activeUserId,title:props.title,images:JSON.parse(String(props.images)),video:props.video,text:props.text,fromId:props.userId,shared:true},sharedPostId:props.id};
-      console.log(postObj)
-      try {
-         let response = await axios.post(
-            "http://192.168.232.183:5000/api/media/posts/",
-            postObj
-         );
-         if (response.status === 201) {
-            console.log(response.data);
-            setLoadingShare(false);
-            setShared(true)
-            setRelaodCLS(reloadCLS + 1)
-            // Alert.alert("Successful", "Post successfully");
-         } else {
-            setLoadingShare(false);
-            Alert.alert("Failed", "Post Failed");
-         }
-      } catch (err) {
-         setLoadingShare(false);
-         console.log(err);
-      }
-
-      // console.log(postState);
-   };
 
    if (!likes) {
       return (
@@ -253,92 +259,11 @@ const PostComponent = (props: NPostComponentProps) => {
 
    return (
       <View style={styles.postContainer}>
-         <Modal visible={openShareModal}>
-            <View
-               style={{
-                  flex: 1,
-                  backgroundColor: "#00000068",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  paddingVertical: 4,
-               }}>
-               <View style={{ backgroundColor: "#ffffff", padding: 10,width:width - 20,borderRadius:5,gap:20}}>
-                  {/* <IconButton name='plus'/> */}
-                  <Button mode="text"  onPress={() => setOpenShareModal(false)}>
-                     <Feather size={26} name="x" />
-                  </Button>
-                  <Button style={{backgroundColor:shared?"green":theme.colors.primary}} disabled={loadingShare} loading={loadingShare} onPress={handleSharedPost} mode="contained"><Ionicons/>
-                  <Ionicons
-                  style={{marginHorizontal:4}}
-                        size={18}
-                        name={shared?"checkmark":"share-social-outline"}
-                     />
-                     <Text>{shared?"Shared Post Successfully":"Continue to share as a post"}</Text>
-                  </Button>
-               </View>
-            </View>
-         </Modal>
-          <Modal visible={openModal}>
-            <View
-               style={{
-                  flex: 1,
-                  backgroundColor: "#00000068",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  paddingVertical: 4,
-               }}>
-               <View style={{ backgroundColor: "#ffffff", paddingTop: 10}}>
-                  {/* <IconButton name='plus'/> */}
-                  <Button mode="text" onPress={() => setOpenShareModal(false)}>
-                     <Feather size={26} name="x" />
-                  </Button>
-                  <UpdatePostForm {...props} />
-               </View>
-            </View>
-         </Modal>
-         {poster && (
-            <View
-               style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: 8,
-               }}>
-               <Pressable onPress={gotoUserProfile}>
-                  <Avatar.Image
-                     size={45}
-                     source={{ uri: poster.profileImage }}
-                  />
-                  {/* <Image
-                     style={styles.profileImage}
-                     
-                  /> */}
-               </Pressable>
-
-               <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
-                  {poster.firstName} {poster.middleName} {poster.lastName}
-               </Text>
-               <View
-                  style={{
-                     flex: 1,
-                     justifyContent: "flex-end",
-                     alignItems: "flex-end",
-                     marginBottom: 2,
-                     paddingHorizontal: 1,
-                     borderRadius: 3,
-                  }}>
-                  {currentUser?.id == props?.userId && (
-                     <View>
-                        <Button
-                           style={{ backgroundColor: "#f9f9f9" }}
-                           onPress={() => setOpenModal(true)}>
-                           <SimpleLineIcons name="options-vertical" />
-                        </Button>
-                     </View>
-                  )}
-               </View>
-            </View>
-         )}
-         <View>
+        {
+            poster && (
+               <UserComponent _user = {poster} navigation={props.navigation} />
+            )
+        }
             <View
                style={{
                   flex: 1,
@@ -349,6 +274,7 @@ const PostComponent = (props: NPostComponentProps) => {
                   gap: 4,
                }}>
                {/* <Text style={{textAlignVertical:"center",color:theme.colors.secondary,fontFamily:"Poppins_300Light",marginRight:2}}>posted</Text> */}
+                <MaterialCommunityIcons size={20} style={{marginRight:10}} name="share-all-outline" />
                <AntDesign color={theme.colors.secondary} name="clockcircleo" />
                <Text
                   style={{
@@ -356,9 +282,38 @@ const PostComponent = (props: NPostComponentProps) => {
                      color: theme.colors.secondary,
                      fontFamily: "Poppins_300Light",
                   }}>
-                  posted {moment(props.createdAt).fromNow()}
+                 {moment(props.createdAt).fromNow()}
                </Text>
             </View>
+        <View style={{flexDirection:'row'}}>
+         
+        </View>
+         <Divider />
+         {secondUser && (
+            <View
+               style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 8,
+               }}>
+               <Pressable onPress={gotoUserProfile}>
+                  <Avatar.Image
+                     size={45}
+                     source={{ uri: secondUser.profileImage }}
+                  />
+                  {/* <Image
+                     style={styles.profileImage}
+                     
+                  /> */}
+               </Pressable>
+
+               <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
+                  {secondUser.firstName} {secondUser.middleName} {secondUser.lastName}
+               </Text>
+            </View>
+         )}
+         <View>
+        
 
             {props.images && <ImagesViewer images={props.images} />}
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
@@ -376,8 +331,9 @@ const PostComponent = (props: NPostComponentProps) => {
                showViewMore={true}
                textLength={100}></TextShortener>
          )}
+         <Divider style={{marginVertical:10}} />
           <View style={{ marginBottom:1}}>
-             <View style={{ paddingHorizontal: 8,marginVertical:4 }}>
+             <View style={{ paddingHorizontal: 8,marginVertical:5}}>
                <Text>
                   <LikesComponent
                      postId={props.id}
@@ -410,17 +366,6 @@ const PostComponent = (props: NPostComponentProps) => {
                      {comments.length}
                   </Text>
                   </Button>
-                  <Button onPress={()=>setOpenShareModal(true)} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1}}>
-                     <Ionicons
-                        size={18}
-                        color={theme.colors.secondary}
-                        name="share-social-outline"
-                     />
-                     <Text style={styles.commentAmountText}>
-                     {shares?.length}
-                  </Text>
-                  </Button>
-          
             </View>
            
          </View>
@@ -433,12 +378,11 @@ const PostComponent = (props: NPostComponentProps) => {
                />
             </View>
          </View>
-
       </View>
    );
 };
 
-export default React.memo(PostComponent);
+export default SharedPostComponent;
 
 const styles = StyleSheet.create({
    postContainer: {

@@ -68,6 +68,7 @@ const RenderHeader = () => {
    // console.log(isOnChatScreen);
    // if (isOnChatScreen) return null;
    if (router.name === "ChatScreen") return null;
+   else if (router.name === "CommentsViewerScreen") return null;
    return <CustomHeader />;
 };
 

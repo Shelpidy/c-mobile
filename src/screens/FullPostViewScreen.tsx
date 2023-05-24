@@ -17,7 +17,7 @@ import VideoPlayer from "../components/VideoPlayer";
 import TextViewer from "../components/TextViewer";
 import Comments from "../components/MediaPosts/Comments";
 import { postComments, postLikes, users } from "../data";
-import { useTheme, Button, IconButton } from "react-native-paper";
+import { useTheme, Button, IconButton, Divider } from "react-native-paper";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import {
    AntDesign,
@@ -78,11 +78,17 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
    );
    const [likes, setLikes] = useState<Like[]>([]);
    const [poster, SetPoster] = useState<any>();
+   // const [shared, setShared] = useState<boolean>(false);
    const [liked, setLiked] = useState<boolean>(false);
+   const [shared, setShared] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
+   const [loadingShare, setLoadingShare] = useState<boolean>(false);
+   const [shares, setShares] = useState<ShareData[] | null>(null);
    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
    const [textValue, setTextValue] = useState<string>("");
+   const [openShareModal, setOpenShareModal] = useState<boolean>(false);
    const theme = useTheme();
+   const [reloadCLS,setRelaodCLS] = useState<number>(0)
 
    useEffect(() => {
       setPost(route.params);
@@ -96,13 +102,14 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
             let postId = route.params.id;
             try {
                let { data } = await axios.get(
-                  `http://192.168.232.183:5000/api/media/posts/cl/${postId}`
+                  `http://192.168.232.183:5000/api/media/posts/cls/${postId}`
                );
                if (data.status == "success") {
                   console.log(data.data);
-                  let ls: any[] = data.data.likes;
-                  setComments(data.data.comments);
-                  setLikes(data.data.likes);
+                  let ls: any[] = data.data.likes.rows;
+                  setComments(data.data.comments.rows);
+                  setLikes(data.data.likes.rows);
+                  setShares(data.data.shares.rows);
                   if (ls.map((like) => like.userId).includes(activeUserId)) {
                      setLiked(true);
                   }
@@ -193,6 +200,36 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
       }
    };
 
+     const handleSharedPost = async () => {
+      let activeUserId = currentUser?.id;
+      setLoadingShare(true)
+      setShared(false)
+      // let images = props.images?.map(image => image?.trimEnd())
+      let postObj = {postObj:{userId:activeUserId,title:post?.title,images:JSON.parse(String(post?.images)),video:post?.video,text:post?.text,fromId:post?.userId,shared:true},sharedPostId:post?.id};
+      console.log(postObj)
+      try {
+         let response = await axios.post(
+            "http://192.168.232.183:5000/api/media/posts/",
+            postObj
+         );
+         if (response.status === 201) {
+            console.log(response.data);
+            setLoadingShare(false);
+            setShared(true)
+            setRelaodCLS(reloadCLS + 1)
+            // Alert.alert("Successful", "Post successfully");
+         } else {
+            setLoadingShare(false);
+            Alert.alert("Failed", "Post Failed");
+         }
+      } catch (err) {
+         setLoadingShare(false);
+         console.log(err);
+      }
+
+      // console.log(postState);
+   };
+
    const handleLike = async (postId: number) => {
       console.log(postId);
       try {
@@ -244,6 +281,31 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
    return (
       <View>
          <ScrollView style={styles.postContainer}>
+                <Modal visible={openShareModal}>
+            <View
+               style={{
+                  flex: 1,
+                  backgroundColor: "#00000068",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingVertical: 4,
+               }}>
+               <View style={{ backgroundColor: "#ffffff", padding: 10,width:width - 20,borderRadius:5,gap:20}}>
+                  {/* <IconButton name='plus'/> */}
+                  <Button mode="text"  onPress={() => setOpenShareModal(false)}>
+                     <Feather size={26} name="x" />
+                  </Button>
+                  <Button style={{backgroundColor:shared?"green":theme.colors.primary}} disabled={loadingShare} loading={loadingShare} onPress={handleSharedPost} mode="contained"><Ionicons/>
+                  <Ionicons
+                  style={{marginHorizontal:4}}
+                        size={18}
+                        name={shared?"checkmark":"share-social-outline"}
+                     />
+                     <Text>{shared?"Shared Post Successfully":"Continue to share as a post"}</Text>
+                  </Button>
+               </View>
+            </View>
+         </Modal>
             <Modal visible={openModal}>
                <View
                   style={{
@@ -317,7 +379,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                      color: theme.colors.secondary,
                      fontFamily: "Poppins_300Light",
                   }}>
-                  posted {moment(post.createdAt, "YYYYMMDD").fromNow()}
+                  posted {moment(post.createdAt).fromNow()}
                </Text>
             </View>
                {post?.images && <ImagesViewer images={post?.images} />}
@@ -327,7 +389,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
 
             {post?.text && <TextViewer text={post.text} />}
             <View>
-               <View style={{ paddingHorizontal: 8 }}>
+               <View style={{ paddingHorizontal: 8,marginVertical:4 }}>
                <Text>
                   <LikesComponent
                      postId={post.id}
@@ -335,57 +397,44 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                   />
                </Text>
             </View>
-               <View
-                  style={[
-                     styles.likeCommentAmountCon,
-                     { borderColor: theme.colors.secondary },
-                  ]}>
-                  <View
-                     style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "flex-start",
-                     }}>
-                     <Pressable
-                        disabled={loading}
-                        onPress={() => handleLike(post.id)}>
-                        <Ionicons
-                           size={30}
-                           color={theme.colors.secondary}
-                           name={liked ? "heart-sharp" : "heart-outline"}
-                        />
-                     </Pressable>
-                     {/* <IconButton
-                     disabled={loading}
-                     onPress={() => handleLike(post.id)}
-                     mode="outlined"
-                     size={20}
-                     icon={liked ? "heart" : "heart-outline"}
-                  /> */}
+           <View
+               style={styles.likeCommentAmountCon}>
+                  <Button disabled={loading}
+                     onPress={() => handleLike(post.id)} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1,alignItems:"center"}}>
+                      <Ionicons
+                        size={18}
+                        color={theme.colors.secondary}
+                        name={liked ? "heart-sharp" : "heart-outline"}
+                     />
+                      <Text style={styles.commentAmountText}>{likes.length}</Text>
+                  </Button>
+              
+                  <Button contentStyle={{
+                     backgroundColor:"#f6f6f6",flex:1,alignItems:"center",flexDirection:"row"
+                  }} onPress = {()=> navigation.navigate("FullPostViewScreen", { ...post })} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1,alignItems:"center"}}>
+                   <Ionicons
+                        size={18}
+                       
+                        color={theme.colors.secondary}
+                        name="chatbox-outline"
+                     />
+                      <Text style={styles.commentAmountText}>
+                     {comments.length}
+                  </Text>
+                  </Button>
+                  <Button onPress={()=>setOpenShareModal(true)} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1}}>
+                     <Ionicons
+                        size={18}
+                        color={theme.colors.secondary}
+                        name="share-social-outline"
+                     />
                      <Text style={styles.commentAmountText}>
-                        {likes.length}
-                     </Text>
-                  </View>
-                  <View
-                     style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "flex-start",
-                     }}>
-                     <Pressable>
-                        <Ionicons
-                           size={30}
-                           color={theme.colors.secondary}
-                           name="chatbox-outline"
-                        />
-                     </Pressable>
-
-                     <Text style={styles.commentAmountText}>
-                        {comments.length}
-                     </Text>
-                  </View>
-                  {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
-               </View>
+                     {shares?.length}
+                  </Text>
+                  </Button>
+          
+            </View>
+            {/* <Divider/> */}
 
                {/* <Modal visible={showEmojiPicker}>
                   <View style={{flex:1,backgroundColor:"#000000ff"}}>  
@@ -410,6 +459,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
             </Modal> */}
                <View
                   style={{
+                     marginTop:5,
                      paddingHorizontal: 15,
                      flexDirection: "row",
                      alignItems: "center",
@@ -537,13 +587,13 @@ const styles = StyleSheet.create({
       marginHorizontal: 5,
    },
    likeCommentAmountCon: {
+      flex:1,
       flexDirection: "row",
-      // justifyContent: "space-between",
-      gap: 10,
-      paddingVertical: 10,
-      // borderWidth:1,
-      marginLeft: 10,
-      borderRadius: 20,
+      gap: 14,
+      paddingVertical: 5,
+      paddingHorizontal:8,
+
+
       // justifyContent:'center',
    },
    commentAmountText: {
