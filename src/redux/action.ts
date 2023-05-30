@@ -5,7 +5,7 @@ export const SOCKET = 'SOCKET'
 export const PERSONALINFO = 'PERSONALINFO'
 export const CONTACTINFO = 'CONTACTINFO'
 
-export const setSocket = (socket:any)=>{
+export const setSocket = (socket:Socket)=>{
    return{
     type:SOCKET,
     payload:socket

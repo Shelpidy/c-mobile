@@ -45,7 +45,7 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
    const handleFollow = async () => {
       try {
          let { data } = await axios.put(
-            `http://192.168.232.183:5000/api/media/follows/`,
+            `http://192.168.136.183:5000/api/media/follows/`,
             { followerId: currentUser?.id, followingId: user?.id },
             { headers: { Accept: "application/json" } }
          );

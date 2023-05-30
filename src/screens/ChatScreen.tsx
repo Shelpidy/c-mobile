@@ -293,7 +293,7 @@ const ChatScreen = ({ route,navigation }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.232.183:8080/api/userstatus/${secUserId}`,
+                  `http://192.168.136.183:8080/api/userstatus/${secUserId}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -435,7 +435,7 @@ const ChatScreen = ({ route,navigation }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.232.183:8080/api/messages/${roomId}/${currentPage}/${numberOfChatsRecord}`,
+                  `http://192.168.136.183:8080/api/messages/${roomId}/${currentPage}/${numberOfChatsRecord}`,
                   { method: "GET" }
                );
                let { messages: chatMessages, count } = await resp.json();

@@ -17,7 +17,7 @@ const SearchScreen = ({ navigation }: any) => {
       setLoading(true);
       try {
          let { data, status } = await axios.get(
-            `http://192.168.232.183:5000/api/search/?searchValue=${searchData}`
+            `http://192.168.136.183:5000/api/search/?searchValue=${searchData}`
          );
          if (status === 200) {
             setPosts(data.data.posts);

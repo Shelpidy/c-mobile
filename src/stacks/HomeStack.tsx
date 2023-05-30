@@ -30,6 +30,7 @@ import { setPersonalInfoForm, setSocket } from "../redux/action";
 import { useCurrentUser, useNetworkStatus } from "../utils/CustomHooks";
 import {io,Socket} from "socket.io-client"
 import { Alert } from "react-native";
+import BuyCommodityScreen from "../screens/BuyCommodityScreen";
 
 
 // import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -67,8 +68,8 @@ const RenderHeader = () => {
    //    ]?.name === "ChatScreen" && chatScreenIndex === screenNames.length - 1;
    // console.log(isOnChatScreen);
    // if (isOnChatScreen) return null;
-   if (router.name === "ChatScreen") return null;
-   else if (router.name === "CommentsViewerScreen") return null;
+   
+   if (router.name === "ChatScreen" || router.name === 'ProductCommentsViewerScreen' || router.name === "CommentsViewerScreen") return null;
    return <CustomHeader />;
 };
 
@@ -82,7 +83,7 @@ const HomeStack = (props: HomeStackProps) => {
    React.useEffect(() => {
       if(currentUser){
          let newSocket = io(
-            `http://192.168.232.183:8080/?userId=${currentUser.id}`
+            `http://192.168.136.183:8080/?userId=${currentUser.id}`
          );
          _setSocket(newSocket)
          dispatch(setSocket(newSocket))
@@ -97,7 +98,7 @@ const HomeStack = (props: HomeStackProps) => {
 
 
    return (
-      <Stack.Navigator screenOptions={{ header: () => RenderHeader() }}>
+      <Stack.Navigator screenOptions={{ header:RenderHeader}}>
          <Stack.Screen name="HomeScreen" component={HomeScreen}></Stack.Screen>
          <Stack.Screen
             name="ProfileScreen"
@@ -155,6 +156,9 @@ const HomeStack = (props: HomeStackProps) => {
          <Stack.Screen
             name="ProductPostScreen"
             component={ProductPostScreen}></Stack.Screen>
+          <Stack.Screen
+            name="BuyCommodityScreen"
+            component={BuyCommodityScreen}></Stack.Screen>
          <Stack.Screen
             name="SearchScreen"
             component={SearchScreen}></Stack.Screen>

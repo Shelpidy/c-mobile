@@ -30,7 +30,7 @@ const FindFriendsComponent = ({ navigation }: any) => {
                if (currentUser) {
                   let activeUserId = currentUser?.id;
                   let response = await fetch(
-                     `http://192.168.232.183:5000/api/media/unfollowing/${activeUserId}`,
+                     `http://192.168.136.183:5000/api/media/unfollowing/${activeUserId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();

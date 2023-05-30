@@ -37,7 +37,7 @@ const Comment = (props: CommentProps) => {
             try {
                if (props) {
                   let response = await fetch(
-                     `http://192.168.232.183:5000/api/auth/users/${props?.userId}`,
+                     `http://192.168.136.183:5000/api/auth/users/${props?.userId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -70,7 +70,7 @@ const Comment = (props: CommentProps) => {
          try {
             let putObj = { text: comment, id: props.id };
             let response = await axios.put(
-               "`http://192.168.232.183:5000/media/posts/comments",
+               "`http://192.168.136.183:5000/media/posts/comments",
                putObj
             );
             if (response.status == 202) {

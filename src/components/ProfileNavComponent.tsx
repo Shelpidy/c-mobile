@@ -78,6 +78,26 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                </Button>
             </View>
          )}
+          {currentUser?.id === user?.id && (
+            <View style={styles.navLink}>
+               <MaterialCommunityIcons
+                  name="transfer"
+                  size={20}
+                  color={theme.colors.secondary}
+               />
+               <Text
+                  style={{
+                     fontFamily: "Poppins_500Medium",
+                     color: theme.colors.secondary,
+                  }}>
+                  Buy Commodity
+               </Text>
+               <Button
+                  onPress={() => navigation.navigate("BuyCommodityScreen")}>
+                  <Entypo name="chevron-thin-right" />
+               </Button>
+            </View>
+         )}
          {currentUser?.id === user?.id && (
             <View style={styles.navLink}>
                <MaterialIcons
