@@ -1,4 +1,3 @@
-import { Theme } from "@rneui/themed";
 import React from "react";
 import {
    Dimensions,
@@ -10,7 +9,6 @@ import {
 } from "react-native";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 type PersonalInfoRegistrationFormProps = {
    navigation: any;

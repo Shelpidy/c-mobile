@@ -1,14 +1,21 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import PostForm from "../components/MediaPosts/PostForm";
 
 const PostScreen = () => {
-  return (
-    <View>
-      <Text>PostScreen</Text>
-    </View>
-  )
-}
+   return (
+      <ScrollView style={styles.container}>
+         {/* <Text>PostScreen</Text> */}
+         <PostForm />
+      </ScrollView>
+   );
+};
 
-export default PostScreen
+export default PostScreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+   container: {
+      backgroundColor: "#ffffff",
+      flex: 1,
+   },
+});

@@ -1,8 +1,16 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+   ActivityIndicator,
+   ScrollView,
+   StyleSheet,
+   Text,
+   View,
+} from "react-native";
+import React, { useEffect } from "react";
 import { Button } from "react-native-paper";
-import PostsComponent from "../components/PostsComponent";
+import PostsComponent from "../components/MediaPosts/PostsComponent";
 import FindFriendsComponent from "../components/FindFriendsComponent";
+import PostProductFormNav from "../components/PostProductFormNav";
+import { useCurrentUser } from "../utils/CustomHooks";
 // import { withTheme,Button,Theme } from "@rneui/themed";
 // import { Theme, Button } from "@rneui/base";
 
@@ -11,18 +19,22 @@ type HomeScreenProps = {
    navigation: any;
 };
 
-const HomeScreen = ({ theme, navigation }: HomeScreenProps) => {
+const HomeScreen = ({ navigation }: HomeScreenProps) => {
+   const currentUser = useCurrentUser();
+
+   if (!currentUser) {
+      return (
+         <View>
+            <ActivityIndicator />
+         </View>
+      );
+   }
+
    return (
       <ScrollView style={styles.container}>
-         <FindFriendsComponent/>
-         <PostsComponent navigation={navigation}/>
-         <Button onPress={() => navigation.navigate("ProfileScreen")}>
-            Profile
-         </Button>
-         <Button onPress={() => navigation.navigate("SettingsScreen")}>
-            Settings
-         </Button>
-         <Text>HomeScreen</Text>
+         <PostProductFormNav page="post" navigation={navigation} />
+         <FindFriendsComponent navigation={navigation} />
+         <PostsComponent navigation={navigation} />
       </ScrollView>
    );
 };
@@ -31,6 +43,6 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
    container: {
-      backgroundColor: "#f9f9f9",
+      backgroundColor: "#f5f5f5",
    },
 });

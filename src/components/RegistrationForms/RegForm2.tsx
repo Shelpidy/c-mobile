@@ -43,6 +43,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
             source={require("../../../assets/Illustrators/ani-signup.gif")}></Image>
          <View style={styles.form}>
             <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Password"
@@ -56,6 +57,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                      }></TextInput.Icon>
                }></TextInput>
             <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Confirm Password"
@@ -69,6 +71,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                      }></TextInput.Icon>
                }></TextInput>
             <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Pincode"
@@ -82,6 +85,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                      }></TextInput.Icon>
                }></TextInput>
             <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Confirm Pincode"
@@ -99,9 +103,9 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                   mode="contained"
                   onPress={() => submitForm2(0)}
                   style={styles.button}>
-                  <MaterialCommunityIcons
+                  {/* <MaterialCommunityIcons
                      name="chevron-double-left"
-                     color="white"></MaterialCommunityIcons>{" "}
+                     color="white"></MaterialCommunityIcons>{" "} */}
                   BACK
                </Button>
                <Button
@@ -109,9 +113,9 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                   onPress={() => submitForm2(2)}
                   style={styles.button}>
                   NEXT{" "}
-                  <MaterialCommunityIcons
+                  {/* <MaterialCommunityIcons
                      name="chevron-double-right"
-                     color="white"></MaterialCommunityIcons>
+                     color="white"></MaterialCommunityIcons> */}
                </Button>
             </View>
          </View>
@@ -130,6 +134,7 @@ const styles = StyleSheet.create({
       width: width - 60,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
+      backgroundColor: "#f6f6f6",
    },
    button: {
       width: width / 3,

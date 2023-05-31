@@ -15,8 +15,6 @@ export default function PositionIndicator({
    const [positions, setPositions] = React.useState<any[]>([]);
    const theme = useTheme();
 
-   const { width } = Dimensions.get("window");
-
    React.useEffect(() => {
       let positions = Array.from(
          {

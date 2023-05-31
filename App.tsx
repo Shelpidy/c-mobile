@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
-import { View, Text } from "react-native";
+import { View, Text, LogBox } from "react-native";
 import {
    NavigationContainer,
    // adaptNavigationTheme,
@@ -45,6 +45,9 @@ import {
 import HomeStack from "./src/stacks/HomeStack";
 import AuthStack from "./src/stacks/AuthStack";
 import StartUpLoadingScreen from "./src/screens/StartUpLoadingScreen";
+import {Provider} from "react-redux"
+import store from "./src/redux/store";
+
 
 // 192.168.0.102
 
@@ -86,6 +89,7 @@ function LayoutContainer() {
 
 export default function App() {
    const [loading, setLoading] = React.useState(true);
+   LogBox.ignoreAllLogs();
    let [fontsLoaded] = useFonts({
       Poppins_100Thin,
       Poppins_100Thin_Italic,
@@ -117,8 +121,10 @@ export default function App() {
       return <StartUpLoadingScreen />;
    }
    return (
+      <Provider store={store}>
       <PaperProvider theme={CombinedDefaultTheme}>
          <LayoutContainer />
-      </PaperProvider>
+      </PaperProvider>         
+      </Provider>
    );
 }

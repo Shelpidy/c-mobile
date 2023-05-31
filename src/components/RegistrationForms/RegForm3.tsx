@@ -103,6 +103,7 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
             </View>
 
             <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Email"
@@ -117,9 +118,9 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
                   mode="contained"
                   onPress={() => submitForm3(1)}
                   style={styles.button}>
-                  <MaterialCommunityIcons
+                  {/* <MaterialCommunityIcons
                      name="chevron-double-left"
-                     color="white"></MaterialCommunityIcons>{" "}
+                     color="white"></MaterialCommunityIcons>{" "} */}
                   BACK
                </Button>
                <Button
@@ -127,9 +128,9 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
                   onPress={() => submitForm3(3)}
                   style={styles.button}>
                   NEXT{" "}
-                  <MaterialCommunityIcons
+                  {/* <MaterialCommunityIcons
                      name="chevron-double-right"
-                     color="white"></MaterialCommunityIcons>
+                     color="white"></MaterialCommunityIcons> */}
                </Button>
             </View>
          </View>
@@ -146,8 +147,9 @@ const styles = StyleSheet.create({
    },
    input: {
       width: width - 60,
-      marginVertical: 10,
+      marginBottom: 10,
       fontFamily: "Poppins_300Light",
+      backgroundColor: "#f6f6f6",
    },
    button: {
       width: width / 3,
@@ -159,6 +161,7 @@ const styles = StyleSheet.create({
       marginTop: 10,
       fontFamily: "Poppins_300Light",
       marginVertical: 10,
+      backgroundColor: "#f6f6f6",
    },
 
    buttonGroup: {

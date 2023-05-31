@@ -1,12 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
-import {
-    Dimensions,
-    Image,
-    StyleSheet,
-    Text,
-    View
-} from "react-native";
+import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { Button, TextInput, useTheme } from "react-native-paper";
 
 type Form1Props = {
@@ -38,33 +32,32 @@ const Form1 = ({ navigation, setActiveTab }: Form1Props) => {
             source={require("../../../assets/Illustrators/ani-signup.gif")}></Image>
          <View style={styles.form}>
             <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
-               label="FirstName"
-              ></TextInput>
+               label="FirstName"></TextInput>
             <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
-               label="MiddleName"
-              ></TextInput>
+               label="MiddleName"></TextInput>
             <TextInput
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
-               label="LastName"
-              ></TextInput>
+               label="LastName"></TextInput>
             <View style={styles.buttonGroup}>
                <Button
                   mode="contained"
                   onPress={() => submitForm1(1)}
                   style={styles.button}>
                   NEXT{" "}
-                  <MaterialCommunityIcons
+                  {/* <MaterialCommunityIcons
                      name="chevron-double-right"
-                     color="white"></MaterialCommunityIcons>
+                     color="white"></MaterialCommunityIcons> */}
                </Button>
             </View>
-            <View
-               style={styles.signInCon}>
+            <View style={styles.signInCon}>
                <Text style={{ fontFamily: "Poppins_300Light_Italic" }}>
                   Already have an account ?
                </Text>
@@ -90,6 +83,7 @@ const styles = StyleSheet.create({
       width: width - 60,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
+      backgroundColor: "#f6f6f6",
    },
    button: {
       width: width - 60,
@@ -100,11 +94,11 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       gap: 10,
    },
-   signInCon:{
-         flexDirection: "row",
-         gap: 5,
-         alignItems: "center",
-         justifyContent: "center",
-         marginTop: 20,
-      }
+   signInCon: {
+      flexDirection: "row",
+      gap: 5,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 20,
+   },
 });

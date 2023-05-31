@@ -1,14 +1,58 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import {
+   Dimensions,
+   StyleSheet,
+   Text,
+   View,
+   Image,
+   KeyboardAvoidingView,
+} from "react-native";
+import React from "react";
+import { TextInput, Button, useTheme } from "react-native-paper";
+import LoginForm from "../components/LoginForm";
+import { StatusBar } from "expo-status-bar";
+import TransferMoneyForm from "../components/Transactions/TransferMoneyForm";
 
-const TransferMoneyScreen = () => {
-  return (
-    <View>
-      <Text>TransferMoneyScreen</Text>
-    </View>
-  )
-}
+type TransferMoneyProps = {
+   navigation: any;
+};
 
-export default TransferMoneyScreen
+const { width, height } = Dimensions.get("window");
 
-const styles = StyleSheet.create({})
+const TransferMoneyScreen = (props: TransferMoneyProps) => {
+   let theme = useTheme();
+
+   return (
+      <KeyboardAvoidingView style={styles.container}>
+         <Image
+            resizeMode="stretch"
+            style={{
+               width: width - 10,
+               height: "40%",
+               marginBottom: 0,
+               paddingBottom: 0,
+            }}
+            source={require("../../assets/Illustrators/signin.png")}></Image>
+         <TransferMoneyForm navigation={props.navigation} />
+      </KeyboardAvoidingView>
+   );
+};
+
+export default TransferMoneyScreen;
+
+const styles = StyleSheet.create({
+   container: {
+      flex: 1,
+      backgroundColor: "#fff",
+      alignItems: "center",
+      justifyContent: "center",
+      fontFamily: "Poppins_300Light",
+   },
+   form: {
+      padding: 0,
+   },
+   input: {
+      width: width - 60,
+      marginBottom: 10,
+      fontFamily: "Poppins_300Light",
+   },
+});
