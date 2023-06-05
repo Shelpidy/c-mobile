@@ -70,7 +70,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                      fontFamily: "Poppins_500Medium",
                      color: theme.colors.secondary,
                   }}>
-                  Send Money
+                  Send Commodity
                </Text>
                <Button
                   onPress={() => navigation.navigate("TransferMoneyScreen")}>
@@ -94,7 +94,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                </Text>
                <Button
                   onPress={() => navigation.navigate("BuyCommodityScreen")}>
-                  <Entypo name="chevron-thin-right" />
+                  <Entypo name="chevron-thin-right"/>
                </Button>
             </View>
          )}
@@ -116,21 +116,6 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                   onPress={() =>
                      Alert.alert("", "Your Commodity blanace is C 20000.00")
                   }>
-                  <Entypo name="chevron-thin-right" />
-               </Button>
-            </View>
-         )}
-         {currentUser?.id === user?.id && (
-            <View style={styles.navLink}>
-               <Feather name="users" size={20} color={theme.colors.secondary} />
-               <Text
-                  style={{
-                     fontFamily: "Poppins_500Medium",
-                     color: theme.colors.secondary,
-                  }}>
-                  Transferees
-               </Text>
-               <Button>
                   <Entypo name="chevron-thin-right" />
                </Button>
             </View>
