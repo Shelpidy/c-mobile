@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import {useDispatch,useSelector} from "react-redux"
+import { setContactInfoForm } from "../../redux/action";
 
 type Form4Props = {
    navigation: any;
@@ -20,9 +22,11 @@ const { width, height } = Dimensions.get("window");
 
 const Form4 = ({ navigation, setActiveTab }: Form4Props) => {
    let theme = useTheme();
+   let state = useSelector((state:any)=> state.rootReducer)
+   let dispatch = useDispatch()
 
    const submitForm4 = () => {
-      console.log("Form 4 submitted");
+      console.log("Form 4 submitted",state);
       setActiveTab(4);
    };
 
@@ -39,18 +43,21 @@ const Form4 = ({ navigation, setActiveTab }: Form4Props) => {
             source={require("../../../assets/Illustrators/signin.png")}></Image>
          <View style={styles.form}>
             <TextInput
+                onChangeText={(value)=> dispatch(setContactInfoForm({city:value}))}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="city"
                inputMode="text"></TextInput>
             <TextInput
+               onChangeText={(value)=> dispatch(setContactInfoForm({permanentAddress:value}))}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
                label="Permanent Adress"
                inputMode="text"></TextInput>
             <TextInput
+               onChangeText={(value)=> dispatch(setContactInfoForm({currentAddress:value}))}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}

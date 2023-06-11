@@ -109,7 +109,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.136.183:5000/api/auth/users/${props.fromId}`,
+               `http://192.168.144.183:5000/api/auth/users/${props.fromId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -139,7 +139,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
             try {
                if (props) {
                   let { data } = await axios.get(
-                     `http://192.168.136.183:5000/api/media/posts/cls/${props?.id}`
+                     `http://192.168.144.183:5000/api/media/posts/cls/${props?.id}`
                   );
                   if (data.status == "success") {
                      // console.log(data.data);
@@ -179,7 +179,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
             try {
                if (props) {
                   let response = await fetch(
-                     `http://192.168.136.183:5000/api/auth/users/${props?.userId}`,
+                     `http://192.168.144.183:5000/api/auth/users/${props?.userId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -218,7 +218,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
       try {
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.136.183:5000/api/media/posts/likes/`,
+            `http://192.168.144.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {

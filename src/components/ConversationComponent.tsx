@@ -63,7 +63,7 @@ const ConversationComponent = ({
                );
                try {
                   let response = await fetch(
-                     `http://192.168.136.183:5000/api/auth/users/${secondUserId}`,
+                     `http://192.168.144.183:5000/api/auth/users/${secondUserId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -101,7 +101,7 @@ const ConversationComponent = ({
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.136.183:8080/api/userstatus/${secondUser.id}`,
+                  `http://192.168.144.183:8080/api/userstatus/${secondUser.id}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -190,7 +190,7 @@ const ConversationComponent = ({
    const gotoChatScreen = async() => {
       if(conversation.recipientId === currentUser?.id && !conversation.recipientReadStatus){
          try{
-            let {data,status} = await axios.put(`http://192.168.136.183:8080/api/messages/chats/read/${conversation.id}/${conversation.recipientId}`)
+            let {data,status} = await axios.put(`http://192.168.144.183:8080/api/messages/chats/read/${conversation.id}/${conversation.recipientId}`)
             if(status === 202){
                setNewConversation({...newConversation,numberOfUnreadText:null,recipientReadStatus:true})
                navigation.navigate("ChatScreen", { user: secondUser,roomId:conversation.id});

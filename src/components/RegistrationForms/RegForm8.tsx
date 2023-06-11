@@ -8,24 +8,33 @@ import {
    View,
    Alert,
 } from "react-native";
-import { Button, IconButton, TextInput, useTheme } from "react-native-paper";
+import { ActivityIndicator, Button, IconButton, TextInput, useTheme } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CountDown from "react-native-countdown-component";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import OTPTextInput from "../OTPTextInput";
 import { TouchableHighlight } from "react-native-gesture-handler";
+import {useDispatch,useSelector} from "react-redux";
 
 type Form8Props = {
    navigation: any;
    setActiveTab: (index: number) => void;
+
 };
 
 const { width, height } = Dimensions.get("window");
 
-const Form8 = ({ navigation, setActiveTab }: Form8Props) => {
+const Form8 = ({ navigation, setActiveTab}: Form8Props) => {
    const [resetTimer, setResetTimer] = React.useState<any>("0");
    const [timer, setTimer] = React.useState<any>(60 * 3 + 1);
+   let state = useSelector((state:any)=> state.rootReducer)
    let theme = useTheme();
+   const [verificationCode,setVerificationCode] = React.useState<string|number|null>(null)
+   React.useEffect(()=>{
+      /// send email for verification
+      console.log("Registration Data =>",state)
+      let email = state?.personalInfo?.email
+   },[])
 
    const verifyEmailCode = () => {
       Alert.alert("Email verified", "You have successfully verified");
@@ -33,9 +42,15 @@ const Form8 = ({ navigation, setActiveTab }: Form8Props) => {
    };
 
    const submitForm8 = (n: number) => {
-      console.log("Form 1 submitted");
+      console.log("Last form submitted");
       setActiveTab(n);
    };
+
+   if(!verificationCode){
+      return  <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
+              <ActivityIndicator/>
+         </View>
+   }
 
    return (
       <View>
@@ -56,7 +71,7 @@ const Form8 = ({ navigation, setActiveTab }: Form8Props) => {
                      fontFamily: "Poppins_300Light",
                      marginVertical: 10,
                   }}>
-                  Enter the confirmation sent to the email ingshelpidy@gmail.com
+                  Enter the confirmation sent to the email {state?.personalInfo?.emal}
                </Text>
                <TouchableHighlight>
                   <Text

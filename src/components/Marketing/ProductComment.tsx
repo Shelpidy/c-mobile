@@ -33,7 +33,7 @@ const Comment = (props: ProductCommentProps) => {
             try {
                if (props) {
                   let response = await fetch(
-                     `http://192.168.136.183:5000/api/auth/users/${props?.userId}`,
+                     `http://192.168.144.183:5000/api/auth/users/${props?.userId}`,
                      { method: "GET" }
                   );
 
@@ -67,7 +67,7 @@ const Comment = (props: ProductCommentProps) => {
          try {
             let putObj = { text: comment, id: props.id };
             let response = await axios.put(
-               "`http://192.168.136.183:5000/marketing/products/comments",
+               "`http://192.168.144.183:5000/marketing/products/comments",
                putObj
             );
             if (response.status == 202) {

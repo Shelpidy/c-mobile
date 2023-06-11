@@ -2,6 +2,18 @@ import { StyleSheet, Text, View, Alert, Modal } from "react-native";
 import React, { useState, useEffect, useReducer, useMemo } from "react";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { RichTextEditor, RichTextViewer, ActionMap, ActionKey } from '@siposdani87/expo-rich-text-editor';
+
+const htmlStr = '<p><i><u>Underline italic text</u></i> <b>bold word</b> normal words</p>';
+// import {
+//    RichTextEditor,
+//    RichTextViewer,
+//    ActionMap,
+//    ActionKey,
+// } from "@siposdani87/expo-rich-text-editor";
+import axios from "axios";
+import { ImagePicker } from "expo-image-multiple-picker";
+import { useCurrentUser } from "../../utils/CustomHooks";
 import config from "../.././aws-config";
 import AWS from "aws-sdk";
 
@@ -10,9 +22,6 @@ const s3 = new AWS.S3({
    secretAccessKey: config.secretAccessKey,
    region: config.region,
 });
-import axios from "axios";
-import { ImagePicker } from "expo-image-multiple-picker";
-import { useCurrentUser } from "../../utils/CustomHooks";
 
 type Post = Partial<Omit<PostComponentProps, "id" | "updatedAt" | "createdAt">>;
 
@@ -31,8 +40,6 @@ const postReducer = (state: Post = initialState, action: Action) => {
          return { ...state, video: action.payload };
       case "IMAGES":
          return { ...state, images: action.payload };
-      case "ID":
-         return { ...state, id: action.payload };
       case "USERID":
          return { ...state, userId: action.payload };
       default:
@@ -40,9 +47,7 @@ const postReducer = (state: Post = initialState, action: Action) => {
    }
 };
 
-type NPostComponentProps = PostComponentProps & { navigation: any };
-
-const UpdatePostForm = (post: NPostComponentProps) => {
+const PostForm = () => {
    const [loading, setLoading] = useState<boolean>(false);
    const [postState, postDispatch] = useReducer(postReducer, initialState);
    const [imageOpen, setImageOpen] = useState(false);
@@ -50,56 +55,52 @@ const UpdatePostForm = (post: NPostComponentProps) => {
    const currentUser = useCurrentUser();
    const theme = useTheme();
 
-   useEffect(() => {
-      postDispatch({ type: "TEXT", payload: post.text });
-      postDispatch({ type: "TITLE", payload: post.title });
-      postDispatch({ type: "TITLE", payload: post.title });
-      postDispatch({ type: "IMAGES", payload: post.images });
-      postDispatch({ type: "ID", payload: post.id });
-      postDispatch({ type: "USERID", payload: post.userId });
-   }, [post]);
+   const handlePost = async () => {
+      let activeUserId = currentUser?.id;
+      setLoading(true)
+      let postObj = { ...postState, userId: activeUserId };
+      // let images = props.images?.map(image => image?.trimEnd())
+       // Upload images to S3
+      // const uploadedImageURLs = [];
+      // for (const imageUri of postObj.images) {
+      //    const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
+      //    const imageKey = `${Date.now()}-${imageName}`;
+      //    const imageParams = {
+      //       Bucket: config.bucketName,
+      //       Key: imageKey,
+      //       Body: { uri: imageUri },
+      //    };
 
-   const handleUpdate = async () => {
-      setLoading(true);
-
-      let postObj = { ...postState };
-
-      // Upload images to S3
-      const uploadedImageURLs = [];
-      for (const imageUri of postObj.images) {
-         const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
-         const imageKey = `${Date.now()}-${imageName}`;
-         const imageParams = {
-            Bucket: config.bucketName,
-            Key: imageKey,
-            Body: { uri: imageUri },
-         };
-
-         try {
-            const uploadResponse = await s3.upload(imageParams).promise();
-            uploadedImageURLs.push(uploadResponse.Location);
-         } catch (error) {
-            console.log("Image upload error:", error);
-            setLoading(false);
-            Alert.alert("Failed", "Image upload failed");
-            return;
-         }
-      }
+      //    try {
+      //       const uploadResponse = await s3.upload(imageParams).promise();
+      //       uploadedImageURLs.push(uploadResponse.Location);
+      //    } catch (error) {
+      //       console.log("Image upload error:", error);
+      //       setLoading(false);
+      //       Alert.alert("Failed", "Image upload failed");
+      //       return;
+      //    }
+      // }
 
       // Update product with uploaded image URLs
-      postObj.images = uploadedImageURLs;
+      // postObj.images = uploadedImageURLs;
+      
+      let finalPostObj = {postObj,sharedPostId:null};
+      console.log(postObj)
       try {
-         let response = await axios.put(
+         let response = await axios.post(
             "http://192.168.144.183:5000/api/media/posts/",
-            postObj
+            finalPostObj
          );
-         if (response.status === 202) {
+         if (response.status === 201) {
             console.log(response.data);
             setLoading(false);
-            Alert.alert("Successful", "Update successfully.");
+            Alert.alert("Successful", "Post successfully");
+          
+            // Alert.alert("Successful", "Post successfully");
          } else {
             setLoading(false);
-            Alert.alert("Failed", "Post Faile");
+            Alert.alert("Failed", "Post Failed");
          }
       } catch (err) {
          setLoading(false);
@@ -108,6 +109,7 @@ const UpdatePostForm = (post: NPostComponentProps) => {
 
       // console.log(postState);
    };
+
 
    const chooseImage = (assets: any[]) => {
       let imageSrcs = assets.map((asset) => asset.uri);
@@ -143,8 +145,20 @@ const UpdatePostForm = (post: NPostComponentProps) => {
       postDispatch({ type: "TITLE", payload: v });
    };
 
+   const onRTEValueChange = (v: string): void => {
+      console.log('onValueChange', v);
+      postDispatch({ type: "TEXT", payload: v });;
+  };
+
+  const getActionMap = ()=> {
+   
+};
+
    return (
-      <View style={{ borderRadius: 3, margin: 8, backgroundColor: "#ffffff" }}>
+      <View
+         style={{
+            margin: 8,
+         }}>
          <Modal visible={imageOpen}>
             <ImagePicker
                onSave={chooseImage}
@@ -163,28 +177,29 @@ const UpdatePostForm = (post: NPostComponentProps) => {
             />
          </Modal>
          <View style={styles.formContainer}>
-            <Text
-               style={{
-                  textAlign: "center",
-                  marginBottom: 4,
-                  fontFamily: "Poppins_500Medium",
-               }}>
-               Update Post
-            </Text>
             <TextInput
+               outlineStyle={{ borderColor: "#f0f0f0" }}
                onChangeText={onValueChangeTitle}
                mode="outlined"
                label="Title"
-               value={postState.title}
             />
 
             <TextInput
+               outlineStyle={{ borderColor: "#f0f0f0" }}
                onChangeText={onValueChangeContent}
                mode="outlined"
                label="Content"
                multiline
                numberOfLines={5}
-               value={postState.text}
+            />
+             <RichTextEditor
+                minHeight={150}
+                value={postState.text}
+                selectionColor="green"
+               //  actionMap={getActionMap()}
+                onValueChange={onRTEValueChange}
+                toolbarStyle={styles.toolbar}
+                editorStyle={styles.editor}
             />
             <Text
                style={{
@@ -208,20 +223,19 @@ const UpdatePostForm = (post: NPostComponentProps) => {
                   <AntDesign size={20} name="videocamera" />
                </Button>
             </View>
-
             <Button
                mode="contained"
-               onPress={handleUpdate}
+               onPress={handlePost}
                disabled={loading}
                loading={loading}>
-               Update <AntDesign size={20} name="upload" />
+               Upload <AntDesign size={20} name="upload" />
             </Button>
          </View>
       </View>
    );
 };
 
-export default UpdatePostForm;
+export default PostForm;
 
 const styles = StyleSheet.create({
    formContainer: {
@@ -237,4 +251,15 @@ const styles = StyleSheet.create({
       flex: 1,
       marginHorizontal: 3,
    },
+   editor: {
+      borderColor: 'blue',
+      borderWidth: 1,
+      padding: 5,
+      // fontFamily: 'Inter_500Medium',
+      fontSize: 18,
+  },
+  toolbar: {
+   borderColor: 'red',
+   borderWidth: 1,
+},
 });

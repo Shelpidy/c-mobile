@@ -95,7 +95,7 @@ const ProductScreen = ({ navigation, route }: any) => {
             let productId = route.params.productId;
             try {
                let { data } = await axios.get(
-                  `http://192.168.136.183:5000/api/marketing/products/${productId}`
+                  `http://192.168.144.183:5000/api/marketing/products/${productId}`
                );
                if (data.status == "success") {
                   // console.log("Product", data.data);
@@ -121,7 +121,7 @@ const ProductScreen = ({ navigation, route }: any) => {
             let productId = route.params.productId;
             try {
                let { data } = await axios.get(
-                  `http://192.168.136.183:5000/api/marketing/products/cl/${productId}`
+                  `http://192.168.144.183:5000/api/marketing/products/cl/${productId}`
                );
                if (data.status == "success") {
                   // console.log(data.data);
@@ -156,7 +156,7 @@ const ProductScreen = ({ navigation, route }: any) => {
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.136.183:5000/api/auth/users/${userId}`,
+                  `http://192.168.144.183:5000/api/auth/users/${userId}`,
                   { method: "GET" }
                );
                let data = await response.json();
@@ -195,7 +195,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       };
       try {
          let { data } = await axios.post(
-            `http://192.168.136.183:5000/api/marketing/products/request/`,
+            `http://192.168.144.183:5000/api/marketing/products/request/`,
             requestObj
          );
          if (data.status == "success") {
@@ -224,7 +224,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(requestObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.136.183:5000/api/marketing/affiliates/`,
+            `http://192.168.144.183:5000/api/marketing/affiliates/`,
             requestObj
          );
          if (data.status == "success") {
@@ -256,7 +256,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.136.183:5000/api/marketing/products/comments/`,
+            `http://192.168.144.183:5000/api/marketing/products/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -286,7 +286,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          };
          console.log(buyObj);
          let { data } = await axios.post(
-            `http://192.168.136.183:5000/api/marketing/buy`,
+            `http://192.168.144.183:5000/api/marketing/buy`,
             buyObj
          );
          if (data.status == "success") {
@@ -309,7 +309,7 @@ const ProductScreen = ({ navigation, route }: any) => {
       try {
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.136.183:5000/api/marketing/products/likes/`,
+            `http://192.168.144.183:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
