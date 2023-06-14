@@ -2,9 +2,6 @@ import { StyleSheet, Text, View, Alert, Modal } from "react-native";
 import React, { useState, useEffect, useReducer, useMemo } from "react";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-import { RichTextEditor, RichTextViewer, ActionMap, ActionKey } from '@siposdani87/expo-rich-text-editor';
-
-const htmlStr = '<p><i><u>Underline italic text</u></i> <b>bold word</b> normal words</p>';
 // import {
 //    RichTextEditor,
 //    RichTextViewer,
@@ -54,7 +51,6 @@ const PostForm = () => {
    const [videoOpen, setVideoOpen] = useState(false);
    const currentUser = useCurrentUser();
    const theme = useTheme();
-
    const handlePost = async () => {
       let activeUserId = currentUser?.id;
       setLoading(true)
@@ -145,15 +141,6 @@ const PostForm = () => {
       postDispatch({ type: "TITLE", payload: v });
    };
 
-   const onRTEValueChange = (v: string): void => {
-      console.log('onValueChange', v);
-      postDispatch({ type: "TEXT", payload: v });;
-  };
-
-  const getActionMap = ()=> {
-   
-};
-
    return (
       <View
          style={{
@@ -192,15 +179,6 @@ const PostForm = () => {
                multiline
                numberOfLines={5}
             />
-             <RichTextEditor
-                minHeight={150}
-                value={postState.text}
-                selectionColor="green"
-               //  actionMap={getActionMap()}
-                onValueChange={onRTEValueChange}
-                toolbarStyle={styles.toolbar}
-                editorStyle={styles.editor}
-            />
             <Text
                style={{
                   textAlign: "center",
@@ -223,6 +201,7 @@ const PostForm = () => {
                   <AntDesign size={20} name="videocamera" />
                </Button>
             </View>
+
             <Button
                mode="contained"
                onPress={handlePost}
@@ -251,15 +230,10 @@ const styles = StyleSheet.create({
       flex: 1,
       marginHorizontal: 3,
    },
-   editor: {
-      borderColor: 'blue',
-      borderWidth: 1,
-      padding: 5,
-      // fontFamily: 'Inter_500Medium',
-      fontSize: 18,
-  },
-  toolbar: {
-   borderColor: 'red',
-   borderWidth: 1,
-},
 });
+
+
+
+
+
+
