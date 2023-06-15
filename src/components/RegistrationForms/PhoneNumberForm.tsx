@@ -4,6 +4,50 @@ import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { Button, useTheme } from "react-native-paper";
 import PhoneInput from "react-native-phone-number-input";
 import OTPTextInput from "../OTPTextInput";
+import {useDispatch,useSelector} from "react-redux"
+import { setContactInfoForm } from "../../redux/action";
+
+
+function getPhoneNumberCompany(
+   phoneNumber: string
+): ("africell" | "orange" | "qcell") {
+   let code = phoneNumber.slice(0, 6);
+   // console.log(code);
+   let companiesCode: Record<string, string[]> = {
+       africell: [
+           "+23277",
+           "+23233",
+           "+23230",
+           "+23288",
+           "+23299",
+           "+23270",
+           "+23280",
+           "+23290",
+       ],
+       orange: [
+           "+23271",
+           "+23272",
+           "+23273",
+           "+23274",
+           "+23275",
+           "+23276",
+           "+23278",
+           "+23279",
+       ],
+       qcell: ["+23231", "+23232", "+23234"],
+   };
+   for (let key of Object.keys(companiesCode)) {
+       let codes = companiesCode[key];
+       if (codes.includes(code)) {
+           return key == "africell"
+               ? "africell"
+               : key == "qcell"
+               ? "qcell"
+               : "orange";
+       }
+   }
+   return "qcell";
+}
 
 type PhoneNumberFormProps = {
    navigation: any;
@@ -20,18 +64,22 @@ const PhoneNumberForm = ({
    logo,
    formPosition,
 }: PhoneNumberFormProps) => {
+
+   let state = useSelector((state:any)=> state.rootReducer)
+   let dispatch = useDispatch()
    const [phoneNumber, setPhoneNumber] = React.useState<string>("");
    const [country, setCountry] = React.useState<any>("");
    const [modalVisibility, setModalVisibility] = React.useState<boolean>(false);
    const [resetTimer, setResetTimer] = React.useState<any>("0");
    const theme = useTheme();
+ 
    const submitPhoneNumber = (n: number) => {
-      console.log("Phone number is=> ", phoneNumber);
+      let phoneCompany = getPhoneNumberCompany(phoneNumber)
+      let phoneNumberObj = phoneCompany === "africell"? {africell:phoneNumber}:phoneCompany === 'orange'?{orange:phoneNumber}:{qcell:phoneNumber}
+      dispatch(setContactInfoForm({phoneNumbers:phoneNumberObj}))
+      console.log("Phone numberObj is=> ", phoneNumberObj);
       setActiveTab(n);
-      if (n === formPosition + 1) {
-         setActiveTab(formPosition);
-      }
-   };
+     };
 
    return (
       <View>
@@ -140,7 +188,7 @@ const PhoneNumberForm = ({
                   style={styles.button}>
                   BACK
                </Button>
-               {formPosition > 4 && (
+               {formPosition > 5 && (
                   <Button
                      mode="contained-tonal"
                      onPress={() => submitPhoneNumber(formPosition + 1)}

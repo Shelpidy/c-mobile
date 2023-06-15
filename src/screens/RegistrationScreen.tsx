@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView, KeyboardAvoidingView,Platform} from "react-native";
 import React from "react";
 import PersonalInfoRegistrationForm from "../components/MediaPosts/RegistrationFormPersonal";
 import { Button } from "react-native-paper";
@@ -7,8 +7,7 @@ import PositionIndicator from "../components/PositionIndicator";
 import Form2 from "../components/RegistrationForms/RegForm2";
 import Form3 from "../components/RegistrationForms/RegForm3";
 import Form4 from "../components/RegistrationForms/Regform4";
-import Form7 from "../components/RegistrationForms/RegForm7";
-import Form8 from "../components/RegistrationForms/RegForm8";
+import Form5 from "../components/RegistrationForms/RegForm5";
 import PhoneNumberForm from "../components/RegistrationForms/PhoneNumberForm";
 
 // import { ScrollView } from "react-native-gesture-handler";
@@ -20,11 +19,11 @@ type RegistrationScreenProps = {
 const RegistrationScreen = (props: RegistrationScreenProps) => {
    const [activeFormPosition, setActiveFormPosition] = React.useState(0);
    return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
          <View>
             <PositionIndicator
                position={activeFormPosition}
-               numberOfPosition={8}
+               numberOfPosition={5}
             />
          </View>
          {activeFormPosition === 0 && (
@@ -36,23 +35,18 @@ const RegistrationScreen = (props: RegistrationScreenProps) => {
          {activeFormPosition === 2 && (
             <Form3 setActiveTab={setActiveFormPosition} {...props} />
          )}
-         {activeFormPosition === 3 && (
+          {activeFormPosition === 3 && (
+            <Form4 setActiveTab={setActiveFormPosition} {...props} />
+         )}
+         {activeFormPosition === 4 && (
             <PhoneNumberForm
-               formPosition={4}
+               formPosition={5}
                logo="../../../assets/Illustrators/siginin.png"
                setActiveTab={setActiveFormPosition}
                {...props}
             />
          )}
-         {activeFormPosition === 4 && (
-            <PhoneNumberForm
-               formPosition={5}
-               logo="siginin.png"
-               setActiveTab={setActiveFormPosition}
-               {...props}
-            />
-         )}
-         {activeFormPosition === 5 && (
+         {/* {activeFormPosition === 5 && (
             <PhoneNumberForm
                formPosition={6}
                logo="siginin.png"
@@ -61,12 +55,17 @@ const RegistrationScreen = (props: RegistrationScreenProps) => {
             />
          )}
          {activeFormPosition === 6 && (
-            <Form7 setActiveTab={setActiveFormPosition} {...props} />
+            <PhoneNumberForm
+               formPosition={7}
+               logo="siginin.png"
+               setActiveTab={setActiveFormPosition}
+               {...props}
+            />
+         )} */}
+         {activeFormPosition === 5 && (
+            <Form5 setActiveTab={setActiveFormPosition} {...props} />
          )}
-         {activeFormPosition === 7 && (
-            <Form8 setActiveTab={setActiveFormPosition} {...props} />
-         )}
-      </View>
+      </KeyboardAvoidingView>
    );
 };
 

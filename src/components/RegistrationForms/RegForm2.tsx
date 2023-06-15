@@ -56,7 +56,11 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
          setActiveTab(n);
       }
    };
+    
+   const goBack =(n:number)=>{
+      setActiveTab(n);
 
+   }
    return (
       <KeyboardAvoidingView>
          <Image
@@ -71,7 +75,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
             source={require("../../../assets/Illustrators/ani-signup.gif")}></Image>
          <View style={styles.form}>
             <TextInput
-               
+               onChangeText={(value)=> setPassword(value)}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
@@ -86,6 +90,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                      }></TextInput.Icon>
                }></TextInput>
             <TextInput
+               onChangeText={(value)=> setConPassword(value)}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
@@ -100,6 +105,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                      }></TextInput.Icon>
                }></TextInput>
             <TextInput
+               onChangeText={(value)=> setPinCode(value)}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
@@ -114,6 +120,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                      }></TextInput.Icon>
                }></TextInput>
             <TextInput
+               onChangeText={(value)=> setConPinCode(value)}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
@@ -130,7 +137,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
             <View style={styles.buttonGroup}>
                <Button
                   mode="contained"
-                  onPress={() => submitForm2(0)}
+                  onPress={() => goBack(0)}
                   style={styles.button}>
                   {/* <MaterialCommunityIcons
                      name="chevron-double-left"

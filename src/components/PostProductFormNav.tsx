@@ -20,7 +20,7 @@ type PostProductFormNavProps = {
 };
 
 const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
-   const [poster, SetPoster] = useState<any>(null);
+   const [user, setUser] = useState<any>(null);
    const [loading, setLoading] = useState<boolean>(false);
    const currentUser = useCurrentUser();
    const { width, height } = Dimensions.get("window");
@@ -29,10 +29,10 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
       function () {
          console.log("Fetching a user");
          let user = currentUser;
-         setLoading(true);
          let fetchData = async () => {
             // console.log("Fetching user")
             //  let activeUserId = 1
+            console.log(user?.id)
             try {
                if (currentUser) {
                   let response = await fetch(
@@ -42,21 +42,18 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
 
                   if (response.ok) {
                      let data = await response.json();
-                     // console.log("Users-----", data.data);
-                     SetPoster(data.data.personal);
-                     // Alert.alert("Success",data.message)
-                     setLoading(false);
+                     console.log("User Top-----", data.data);
+                     setUser(data.data.personal);
+                    
                   } else {
                      let data = await response.json();
                      Alert.alert("Failed", data.message);
                   }
                }
 
-               setLoading(false);
             } catch (err) {
                console.log(err);
                Alert.alert("Failed", String(err));
-               setLoading(false);
             }
          };
          fetchData();
@@ -77,14 +74,14 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
    };
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === poster.id) {
-         navigation.navigate("ProfileScreen", { userId: poster.id });
+      if (currentUser?.id === user.id) {
+         navigation.navigate("ProfileScreen", { userId: user.id });
       } else {
-         navigation.navigate("UserProfileScreen", { userId: poster.id });
+         navigation.navigate("UserProfileScreen", { userId: user.id });
       }
    };
 
-   if (!poster) {
+   if (!user) {
       return (
          <View
             style={{
@@ -104,7 +101,7 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
    }
    return (
       <View>
-         {poster && (
+         {user && (
             <View
                style={{
                   flexDirection: "row",
@@ -114,7 +111,7 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
                }}>
                <Pressable onPress={gotoUserProfile}>
                   <Avatar.Image
-                     source={{ uri: poster.profileImage }}
+                     source={{ uri: user.profileImage }}
                      size={40}
                   />
                </Pressable>

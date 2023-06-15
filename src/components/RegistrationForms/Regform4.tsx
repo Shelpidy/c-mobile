@@ -63,6 +63,26 @@ const Form4 = ({ navigation, setActiveTab }: Form4Props) => {
                style={styles.input}
                label="Current Address"
                inputMode="text"></TextInput>
+               <View style={styles.buttonGroup}>
+               <Button
+                  mode="contained"
+                  onPress={() => setActiveTab(2)}
+                  style={styles.button}>
+                  {/* <MaterialCommunityIcons
+                     name="chevron-double-left"
+                     color="white"></MaterialCommunityIcons>{" "} */}
+                  BACK
+               </Button>
+               <Button
+                  mode="contained"
+                  onPress={() => submitForm4()}
+                  style={styles.button}>
+                  NEXT{" "}
+                  {/* <MaterialCommunityIcons
+                     name="chevron-double-right"
+                     color="white"></MaterialCommunityIcons> */}
+               </Button>
+            </View>
             <Button
                mode="contained"
                onPress={submitForm4}
@@ -81,7 +101,8 @@ export default Form4;
 
 const styles = StyleSheet.create({
    form: {
-      paddingTop: 70,
+      paddingTop: 0,
+      alignItems: "center",
    },
    input: {
       width: width - 60,
@@ -89,4 +110,37 @@ const styles = StyleSheet.create({
       fontFamily: "Poppins_300Light",
       backgroundColor: "#f6f6f6",
    },
+   button: {
+      width: width / 3,
+      marginTop: 10,
+      fontFamily: "Poppins_300Light",
+   },
+   dobButton: {
+      width: width - 60,
+      marginTop: 10,
+      fontFamily: "Poppins_300Light",
+      marginVertical: 10,
+      backgroundColor: "#f6f6f6",
+   },
+
+   buttonGroup: {
+      flexDirection: "row",
+      gap: 10,
+   },
+   checkBoxGroup: {
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      alignItems: "center",
+      left: 0,
+      gap: 20,
+   },
+   checkBoxGroupInner: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      alignItems: "center",
+      gap: 0,
+      margin: 10,
+   },
 });
+

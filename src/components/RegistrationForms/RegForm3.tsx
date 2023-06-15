@@ -61,9 +61,14 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
       dispatch(setPersonalInfoForm({email}))
       dispatch(setPersonalInfoForm({dob}))
       dispatch(setPersonalInfoForm({gender:checkBoxValue}))
-      console.log("Form 3 submitted",{email,gender:checkBoxValue,dob});
+      console.log("Form 3 submitted",{email,gender:checkBoxValue,dob},personalInfo);
       setActiveTab(n);
    };
+
+   const goBack =(n:number)=>{
+      setActiveTab(n);
+
+   }
 
    return (
       <View>
@@ -119,6 +124,7 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
             </View>
 
             <TextInput
+               onChangeText={(value)=> setEmail(value)}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
@@ -132,7 +138,7 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
             <View style={styles.buttonGroup}>
                <Button
                   mode="contained"
-                  onPress={() => submitForm3(1)}
+                  onPress={() => goBack(1)}
                   style={styles.button}>
                   {/* <MaterialCommunityIcons
                      name="chevron-double-left"

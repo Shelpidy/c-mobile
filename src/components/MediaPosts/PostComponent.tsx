@@ -38,6 +38,9 @@ import LikesComponent from "../LikesComponent";
 import moment from "moment";
 import config from "../.././aws-config";
 import AWS from "aws-sdk";
+import { Skeleton } from "@rneui/themed";
+import { useWindowDimensions } from 'react-native';
+import RenderHtml from 'react-native-render-html';
 
 const s3 = new AWS.S3({
    accessKeyId: config.accessKeyId,
@@ -96,6 +99,14 @@ const PostComponent = (props: NPostComponentProps) => {
    const [loadingShare, setLoadingShare] = useState<boolean>(false);
    const theme = useTheme();
    const [reloadCLS,setRelaodCLS] = useState<number>(0)
+   const { width } = useWindowDimensions();
+
+   const source = {
+      html: `
+    <p style='text-align:center;'>
+      Hello World!
+    </p>`
+    };
 
    useEffect(
       function () {
@@ -243,10 +254,15 @@ const PostComponent = (props: NPostComponentProps) => {
       // console.log(postState);
    };
 
-   if (!likes) {
+   if (!props) {
       return (
          <View>
-            <Text>Loading post</Text>
+            <View style={{flexDirection:"row",gap:4,alignItems:"center"}}>
+               <Skeleton circle width={40} height={40} />
+            </View>
+            <View>
+                <Skeleton width={350} height={400} />
+            </View>
          </View>
       );
    }
@@ -367,7 +383,12 @@ const PostComponent = (props: NPostComponentProps) => {
          {props.title && <Text style={styles.title}>{props?.title}</Text>}
 
          {props?.text && (
-            <TextShortener
+            <View>
+                <RenderHtml
+                     contentWidth={width}
+                     source={source}
+                  />
+               <TextShortener
                style={{ marginHorizontal: 8, fontFamily: "Poppins_300Light" }}
                text={props.text}
                onPressViewMore={() =>
@@ -375,13 +396,16 @@ const PostComponent = (props: NPostComponentProps) => {
                }
                showViewMore={true}
                textLength={100}></TextShortener>
+
+            </View>
+            
          )}
           <View style={{ marginBottom:1}}>
              <View style={{ paddingHorizontal: 8,marginVertical:4 }}>
                <Text>
                   <LikesComponent
                      postId={props.id}
-                     numberOfLikes={likes.length}
+                     numberOfLikes={likes?likes.length:0}
                   />
                </Text>
             </View>
@@ -394,7 +418,7 @@ const PostComponent = (props: NPostComponentProps) => {
                         color={theme.colors.secondary}
                         name={liked ? "heart-sharp" : "heart-outline"}
                      />
-                      <Text style={styles.commentAmountText}>{likes.length}</Text>
+                      <Text style={styles.commentAmountText}>{likes?likes.length:0}</Text>
                   </Button>
               
                   <Button contentStyle={{

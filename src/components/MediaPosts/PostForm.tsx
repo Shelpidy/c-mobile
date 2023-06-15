@@ -1,19 +1,13 @@
-import { StyleSheet, Text, View, Alert, Modal } from "react-native";
+import { StyleSheet, Text, View, Alert, Modal, KeyboardAvoidingView,Platform} from "react-native";
 import React, { useState, useEffect, useReducer, useMemo } from "react";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-// import {
-//    RichTextEditor,
-//    RichTextViewer,
-//    ActionMap,
-//    ActionKey,
-// } from "@siposdani87/expo-rich-text-editor";
 import axios from "axios";
 import { ImagePicker } from "expo-image-multiple-picker";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import config from "../.././aws-config";
 import AWS from "aws-sdk";
-
+import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 const s3 = new AWS.S3({
    accessKeyId: config.accessKeyId,
    secretAccessKey: config.secretAccessKey,
@@ -51,6 +45,8 @@ const PostForm = () => {
    const [videoOpen, setVideoOpen] = useState(false);
    const currentUser = useCurrentUser();
    const theme = useTheme();
+   const richText = React.useRef<any>(null);
+
    const handlePost = async () => {
       let activeUserId = currentUser?.id;
       setLoading(true)
@@ -144,7 +140,7 @@ const PostForm = () => {
    return (
       <View
          style={{
-            margin: 8,
+            marginVertical:4,
          }}>
          <Modal visible={imageOpen}>
             <ImagePicker
@@ -163,22 +159,30 @@ const PostForm = () => {
                image={false}
             />
          </Modal>
-         <View style={styles.formContainer}>
+         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.formContainer}>
             <TextInput
+              contentStyle={{backgroundColor:"#f6f6f6"}}
                outlineStyle={{ borderColor: "#f0f0f0" }}
                onChangeText={onValueChangeTitle}
                mode="outlined"
                label="Title"
             />
-
-            <TextInput
-               outlineStyle={{ borderColor: "#f0f0f0" }}
-               onChangeText={onValueChangeContent}
-               mode="outlined"
-               label="Content"
-               multiline
-               numberOfLines={5}
+             <Text style={{marginTop:5,fontFamily:"Poppins_300Light"}}>Content</Text>
+             <RichToolbar
+             
+            editor={richText}
+            actions={[ actions.setBold, actions.setItalic, actions.setUnderline,actions.setStrikethrough,actions.blockquote,actions.alignCenter,actions.alignFull,actions.alignLeft,
+                actions.alignRight,actions.insertBulletsList,
+                actions.insertOrderedList,actions.undo,actions.redo,actions.indent,actions.setSuperscript,actions.setSubscript]}
             />
+             <RichEditor
+             editorStyle={{backgroundColor:"#f6f6f6"}}
+             initialHeight={200}
+             initialContentHTML="<b>Write your content here</b>"
+   
+              ref={richText}
+              onChange={onValueChangeContent}
+          />
             <Text
                style={{
                   textAlign: "center",
@@ -190,13 +194,13 @@ const PostForm = () => {
             <View style={styles.buttonGroup}>
                <Button
                   style={styles.button}
-                  mode="contained-tonal"
+                  mode="contained"
                   onPress={() => setImageOpen(true)}>
-                  <AntDesign size={20} name="picture" />
+                  <AntDesign size={20} name="picture"/>
                </Button>
                <Button
                   style={styles.button}
-                  mode="contained-tonal"
+                  mode="contained"
                   onPress={() => setVideoOpen(true)}>
                   <AntDesign size={20} name="videocamera" />
                </Button>
@@ -209,7 +213,7 @@ const PostForm = () => {
                loading={loading}>
                Upload <AntDesign size={20} name="upload" />
             </Button>
-         </View>
+         </KeyboardAvoidingView>
       </View>
    );
 };

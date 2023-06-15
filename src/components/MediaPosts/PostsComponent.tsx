@@ -12,6 +12,8 @@ import axios from "axios";
 import { posts as _fetchedPost } from "../../data";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import SharedPostComponent from "./SharedPostComponent";
+import { ActivityIndicator } from "react-native-paper";
+import LoadingPostComponent from "./LoadingPostComponent";
 
 type PostsComponentProps = {
    navigation?: any;
@@ -35,7 +37,7 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
                if (currentUser) {
                   let activeUserId = currentUser?.id;
                   let response = await fetch(
-                     `http://192.168.144.183:5000/api/media/posts/${activeUserId}`
+                     `http://192.168.144.183:5000/api/media/posts/${activeUserId}/1/10`
                   );
                   let data = await response.json();
                   if (data.status == "success") {
@@ -77,9 +79,10 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
 
    if (loading) {
       return (
-         <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <Text>Loading Posts...</Text>
+         <View style={{padding:2}}>
+           <LoadingPostComponent/>
+           <LoadingPostComponent/>
+           <LoadingPostComponent/>
          </View>
       );
    }

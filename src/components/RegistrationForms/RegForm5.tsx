@@ -16,7 +16,7 @@ import OTPTextInput from "../OTPTextInput";
 import { TouchableHighlight } from "react-native-gesture-handler";
 import {useDispatch,useSelector} from "react-redux";
 
-type Form8Props = {
+type Form5Props = {
    navigation: any;
    setActiveTab: (index: number) => void;
 
@@ -24,7 +24,7 @@ type Form8Props = {
 
 const { width, height } = Dimensions.get("window");
 
-const Form8 = ({ navigation, setActiveTab}: Form8Props) => {
+const Form5 = ({ navigation, setActiveTab}: Form5Props) => {
    const [resetTimer, setResetTimer] = React.useState<any>("0");
    const [timer, setTimer] = React.useState<any>(60 * 3 + 1);
    let state = useSelector((state:any)=> state.rootReducer)
@@ -41,8 +41,8 @@ const Form8 = ({ navigation, setActiveTab}: Form8Props) => {
       navigation.navigate("HomeStack", { screen: "HomeScreen" });
    };
 
-   const submitForm8 = (n: number) => {
-      console.log("Last form submitted");
+   const submitForm5 = (n: number) => {
+      console.log("Registraion Object =>",state);
       setActiveTab(n);
    };
 
@@ -51,7 +51,6 @@ const Form8 = ({ navigation, setActiveTab}: Form8Props) => {
               <ActivityIndicator/>
          </View>
    }
-
    return (
       <View>
          {/* <Image
@@ -105,7 +104,7 @@ const Form8 = ({ navigation, setActiveTab}: Form8Props) => {
             <View style={styles.buttonGroup}>
                <Button
                   mode="contained"
-                  onPress={() => submitForm8(6)}
+                  onPress={() => submitForm5(6)}
                   style={styles.button}>
                   <MaterialCommunityIcons
                      name="chevron-double-left"
@@ -124,7 +123,7 @@ const Form8 = ({ navigation, setActiveTab}: Form8Props) => {
    );
 };
 
-export default Form8;
+export default Form5;
 
 const styles = StyleSheet.create({
    form: {

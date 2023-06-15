@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
-import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, StyleSheet, Text, View,KeyboardAvoidingView,Platform, ScrollView } from "react-native";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import {useDispatch,useSelector} from "react-redux"
 import { setPersonalInfoForm } from "../../redux/action";
@@ -22,8 +22,10 @@ const Form1 = ({ navigation, setActiveTab }: Form1Props) => {
       setActiveTab(n);
    };
 
+     
+
    return (
-      <View>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
          <Image
             resizeMode="stretch"
             style={{
@@ -75,7 +77,7 @@ const Form1 = ({ navigation, setActiveTab }: Form1Props) => {
                </Button>
             </View>
          </View>
-      </View>
+      </KeyboardAvoidingView>
    );
 };
 
