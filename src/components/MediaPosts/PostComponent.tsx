@@ -40,7 +40,9 @@ import config from "../.././aws-config";
 import AWS from "aws-sdk";
 import { Skeleton } from "@rneui/themed";
 import { useWindowDimensions } from 'react-native';
-import RenderHtml from 'react-native-render-html';
+import HTML from 'react-native-render-html';
+
+
 
 const s3 = new AWS.S3({
    accessKeyId: config.accessKeyId,
@@ -100,6 +102,7 @@ const PostComponent = (props: NPostComponentProps) => {
    const theme = useTheme();
    const [reloadCLS,setRelaodCLS] = useState<number>(0)
    const { width } = useWindowDimensions();
+  
 
    const source = {
       html: `
@@ -383,20 +386,8 @@ const PostComponent = (props: NPostComponentProps) => {
          {props.title && <Text style={styles.title}>{props?.title}</Text>}
 
          {props?.text && (
-            <View>
-                <RenderHtml
-                     contentWidth={width}
-                     source={source}
-                  />
-               <TextShortener
-               style={{ marginHorizontal: 8, fontFamily: "Poppins_300Light" }}
-               text={props.text}
-               onPressViewMore={() =>
-                  props.navigation.navigate("FullPostViewScreen", { ...props })
-               }
-               showViewMore={true}
-               textLength={100}></TextShortener>
-
+            <View style={{paddingHorizontal:8}}>
+               <HTML contentWidth={width} baseStyle={{fontFamily:"Poppins_300Light"}} systemFonts={["Poppins_300Light",'sans-serif']} source={{html:props.text}}/>
             </View>
             
          )}

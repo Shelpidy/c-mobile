@@ -10,6 +10,7 @@ import {
    Pressable,
    KeyboardAvoidingView,
    TextInput,
+   useWindowDimensions,
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../components/ImagesViewer";
@@ -17,7 +18,7 @@ import VideoPlayer from "../components/VideoPlayer";
 import TextViewer from "../components/TextViewer";
 import Comments from "../components/MediaPosts/Comments";
 import { postComments, postLikes, users } from "../data";
-import { useTheme, Button, IconButton, Divider } from "react-native-paper";
+import { useTheme, Button, IconButton, Divider, Avatar } from "react-native-paper";
 import EmojiSelector, { Categories } from "react-native-emoji-selector";
 import {
    AntDesign,
@@ -33,12 +34,12 @@ import axios from "axios";
 import { useCurrentUser } from "../utils/CustomHooks";
 import LikesComponent from "../components/LikesComponent";
 import moment from "moment";
+import HTML from "react-native-render-html"
+
 
 type FullPostComponentpost = { navigation: any; route: any };
 type PostComment = Omit<CommentProps, "posterId">;
 const initialState: PostComment = {};
-
-const { width } = Dimensions.get("window");
 
 const postCommentReducer = (
    state: PostComment = initialState,
@@ -89,6 +90,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
    const [openShareModal, setOpenShareModal] = useState<boolean>(false);
    const theme = useTheme();
    const [reloadCLS,setRelaodCLS] = useState<number>(0)
+   const {width} = useWindowDimensions()
 
    useEffect(() => {
       setPost(route.params);
@@ -168,6 +170,15 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
 
    const handleEmojiSelect = (emoji: any) => {
       setTextValue(textValue + emoji);
+   };
+
+   
+   const gotoUserProfile = () => {
+      if (currentUser?.id === poster.id) {
+         navigation.navigate("ProfileScreen", { userId: poster.id });
+      } else {
+         navigation.navigate("UserProfileScreen", { userId: poster.id });
+      }
    };
 
    const handleComment = async () => {
@@ -332,10 +343,16 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                      alignItems: "center",
                      padding: 8,
                   }}>
-                  <Image
-                     style={styles.profileImage}
+                 <Pressable onPress={gotoUserProfile}>
+                  <Avatar.Image
+                     size={45}
                      source={{ uri: poster.profileImage }}
                   />
+                  {/* <Image
+                     style={styles.profileImage}
+                     
+                  /> */}
+               </Pressable>
                   <Text
                      style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
                      {poster.firstName} {poster.middleName} {poster.lastName}
@@ -387,7 +404,10 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
             </View>
             {post?.title && <Text style={styles.title}>{post?.title}</Text>}
 
-            {post?.text && <TextViewer text={post.text} />}
+            {post?.text &&  
+             <View style={{paddingHorizontal:8}}>
+               <HTML contentWidth={width} baseStyle={{fontFamily:"Poppins_300Light"}} systemFonts={["Poppins_300Light",'sans-serif']} source={{html:post.text}}/>
+            </View>}
             <View>
                <View style={{ paddingHorizontal: 8,marginVertical:4 }}>
                <Text>

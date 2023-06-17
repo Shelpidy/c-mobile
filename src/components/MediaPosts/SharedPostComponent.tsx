@@ -6,6 +6,7 @@ import {
    Dimensions,
    Image,
    Alert,
+   useWindowDimensions,
 } from "react-native";
 import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../ImagesViewer";
@@ -40,6 +41,9 @@ import moment from "moment";
 import config from "../.././aws-config";
 import AWS from "aws-sdk";
 import UserComponent from "../UserComponent";
+import HTML from "react-native-render-html"
+import LoadingPostComponent from "./LoadingPostComponent";
+
 
 const s3 = new AWS.S3({
    accessKeyId: config.accessKeyId,
@@ -51,7 +55,7 @@ type NSharedPostComponentProps = PostComponentProps & { navigation: any };
 type PostComment = Omit<CommentProps, "posterId">;
 const initialState: PostComment = {};
 
-const { width } = Dimensions.get("window");
+
 
 const postCommentReducer = (
    state: PostComment = initialState,
@@ -99,8 +103,8 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
    const [loadingShare, setLoadingShare] = useState<boolean>(false);
    const theme = useTheme();
    const [reloadCLS,setRelaodCLS] = useState<number>(0)
+   const {width} = useWindowDimensions()
 
-   
    useEffect(function () {
       console.log("Fetching user");
       setLoading(true);
@@ -250,10 +254,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
    
 
    if (!likes) {
-      return (
-         <View>
-            <Text>Loading post</Text>
-         </View>
+      return (<LoadingPostComponent/>
       );
    }
 
@@ -322,14 +323,10 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
          {props.title && <Text style={styles.title}>{props?.title}</Text>}
 
          {props?.text && (
-            <TextShortener
-               style={{ marginHorizontal: 8, fontFamily: "Poppins_300Light" }}
-               text={props.text}
-               onPressViewMore={() =>
-                  props.navigation.navigate("FullPostViewScreen", { ...props })
-               }
-               showViewMore={true}
-               textLength={100}></TextShortener>
+            <View style={{paddingHorizontal:8}}>
+            <HTML contentWidth={width} baseStyle={{fontFamily:"Poppins_300Light"}} systemFonts={["Poppins_300Light",'sans-serif']} source={{html:props.text}}/>
+         </View>
+            
          )}
          <Divider style={{marginVertical:10}} />
           <View style={{ marginBottom:1}}>

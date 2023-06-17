@@ -20,6 +20,7 @@ const RegistrationScreen = (props: RegistrationScreenProps) => {
    const [activeFormPosition, setActiveFormPosition] = React.useState(0);
    return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
+
          <View>
             <PositionIndicator
                position={activeFormPosition}
@@ -65,6 +66,7 @@ const RegistrationScreen = (props: RegistrationScreenProps) => {
          {activeFormPosition === 5 && (
             <Form5 setActiveTab={setActiveFormPosition} {...props} />
          )}
+         
       </KeyboardAvoidingView>
    );
 };

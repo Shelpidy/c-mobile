@@ -14,7 +14,7 @@ const SearchForm = ({ setSearchValue }: SearchProps) => {
    return (
       <View
          style={{
-            paddingHorizontal: 15,
+            paddingHorizontal: 10,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
@@ -28,6 +28,8 @@ const SearchForm = ({ setSearchValue }: SearchProps) => {
                borderBottomLeftRadius: 20,
                height: 50,
                paddingHorizontal: 25,
+               borderColor:"#f6f6f6",
+               borderWidth:1
             }}
          />
          <Pressable
@@ -40,6 +42,8 @@ const SearchForm = ({ setSearchValue }: SearchProps) => {
                borderTopRightRadius: 20,
                borderBottomRightRadius: 20,
                backgroundColor: "#ffffff",
+               borderColor:"#f6f6f6",
+               borderWidth:1
             }}>
             <EvilIcons name="search" size={30} />
          </Pressable>

@@ -77,7 +77,7 @@ const PostForm = () => {
       // Update product with uploaded image URLs
       // postObj.images = uploadedImageURLs;
       
-      let finalPostObj = {postObj,sharedPostId:null};
+      let finalPostObj = {postObj:{...postObj,fromId:activeUserId},sharedPostId:null};
       console.log(postObj)
       try {
          let response = await axios.post(

@@ -20,6 +20,7 @@ import PostComponent from "../components/MediaPosts/PostComponent";
 import ProfileNavComponent from "../components/ProfileNavComponent";
 import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import SearchForm from "../components/SearchForm";
+import SharedPostComponent from "../components/MediaPosts/SharedPostComponent";
 
 const { width, height } = Dimensions.get("window");
 
@@ -298,6 +299,11 @@ const ProfileScreen = ({ navigation, route }: any) => {
          )}
          {posts &&
             posts.map((post) => {
+               if(post.fromId){
+                  return <SharedPostComponent key={String(post.id)}
+                  {...post}
+                  navigation={navigation} />
+               }
                return (
                   <PostComponent
                      key={String(post.id)}
