@@ -42,7 +42,7 @@ import config from "../.././aws-config";
 import AWS from "aws-sdk";
 import UserComponent from "../UserComponent";
 import HTML from "react-native-render-html"
-import LoadingPostComponent from "./LoadingPostComponent";
+import {LoadingPostComponent} from "./LoadingComponents";
 
 
 const s3 = new AWS.S3({

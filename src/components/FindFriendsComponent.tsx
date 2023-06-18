@@ -13,6 +13,7 @@ import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { ActivityIndicator } from "react-native-paper";
 import { useCurrentUser } from "../utils/CustomHooks";
+import { LoadingFindFriendComponent } from "./MediaPosts/LoadingComponents";
 
 const FindFriendsComponent = ({ navigation }: any) => {
    const [users, setUsers] = useState<User[] | null>(null);
@@ -54,17 +55,15 @@ const FindFriendsComponent = ({ navigation }: any) => {
 
    if (!users)
       return (
-         <View
-            style={{
-               flex: 1,
-               justifyContent: "center",
-               alignItems: "center",
-               padding: 15,
-            }}>
-            <Text>
-               <ActivityIndicator />
-            </Text>
-         </View>
+         <FlatList
+         data={["1","2","3","4"]}
+         horizontal
+         keyExtractor={(item) => item}
+         indicatorStyle="white"
+         renderItem={({ item, index, separators }) => (
+            <LoadingFindFriendComponent   key={item} />
+             )}
+ />
       );
    return (
       <FlatList

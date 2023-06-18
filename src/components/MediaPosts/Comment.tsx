@@ -15,6 +15,7 @@ import { Avatar, Button, useTheme } from "react-native-paper";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { useCurrentUser } from "../../utils/CustomHooks";
+import TextShortener from "../TextShortener";
 
 const Comment = (props: CommentProps) => {
    const currentUser = useCurrentUser();
@@ -61,7 +62,7 @@ const Comment = (props: CommentProps) => {
          };
          fetchData();
       },
-      [props]
+      []
    );
 
    const handleUpdateComment = () => {
@@ -185,7 +186,7 @@ const Comment = (props: CommentProps) => {
                         flex: 1,
                         borderRadius: 30,
                         paddingHorizontal: 15,
-                        paddingVertical: 6,
+                        paddingVertical: 2,
                      }}>
                      <View
                         style={{
@@ -194,15 +195,11 @@ const Comment = (props: CommentProps) => {
                            alignItems: "center",
                            justifyContent: "space-between",
                         }}>
-                        <Text style={styles.userFullName}>
-                           {commentor.firstName} {commentor.middleName}{" "}
-                           {commentor.lastName}
-                        </Text>
+                        <TextShortener style={styles.userFullName} textLength={22} text={commentor.firstName+""+commentor.middleName+" "+commentor.lastName} />
                         {(currentUser?.id == props?.userId ||
                            currentUser?.id == props?.posterId) && (
                            <View style={{ flexDirection: "row" }}>
                               <Button
-                                 style={{ backgroundColor: "#fff" }}
                                  onPress={() => setOpenModal(true)}>
                                  <SimpleLineIcons name="options-vertical" />
                               </Button>
@@ -251,6 +248,6 @@ const styles = StyleSheet.create({
       gap: 8,
    },
    userFullName: {
-      fontFamily: "Poppins_600SemiBold",
+      fontFamily: "Poppins_400Regular",
    },
 });

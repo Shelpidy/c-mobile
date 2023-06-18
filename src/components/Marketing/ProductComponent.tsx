@@ -24,6 +24,7 @@ import { Ionicons, Feather, SimpleLineIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import UpdateProductForm from "./UpdateProduct";
+import { LoadingProductComponent } from "../MediaPosts/LoadingComponents";
 
 // type ProductComment = Omit<CommentProps, "posterId">;
 const initialState: ProductComment = {};
@@ -185,11 +186,9 @@ const ProductComponent = (props: ProductComponentProps) => {
       }
    };
 
-   if (!likes) {
+   if (!poster) {
       return (
-         <View>
-            <Text>Loading products</Text>
-         </View>
+        <LoadingProductComponent/>
       );
    }
 
@@ -328,7 +327,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                      size={20}
                      icon={liked ? "heart" : "heart-outline"}
                   /> */}
-                  <Text style={styles.commentAmountText}>{likes.length}</Text>
+                  <Text style={styles.commentAmountText}>{likes?.length}</Text>
                </View>
                <View
                   style={{

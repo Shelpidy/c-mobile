@@ -12,6 +12,8 @@ import SearchForm from "../components/SearchForm";
 import PostProductFormNav from "../components/PostProductFormNav";
 import { useCurrentUser } from "../utils/CustomHooks";
 import { ActivityIndicator } from "react-native-paper";
+import { LoadingPostComponent, LoadingProductComponent } from "../components/MediaPosts/LoadingComponents";
+import { Skeleton } from "@rneui/themed";
 
 // import { Products as _fetchedPost } from "../../data";
 
@@ -20,7 +22,7 @@ type ProductsComponentProps = {
 };
 
 const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
-   const [products, setProducts] = useState<ProductComponentProps[]>([]);
+   const [products, setProducts] = useState<ProductComponentProps[]|null|[]>(null);
    const [allProducts, setAllProducts] = useState<ProductComponentProps[]>([]);
    const [pageNumber, setPageNumber] = useState<number>(1);
    const [numberOfProductsPerPage, setNumberOfProductsPerPage] =
@@ -65,17 +67,8 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
    useEffect(() => {
       const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
       const lastIndex = currentIndex + numberOfProductsPerPage;
-      setProducts(products.slice(currentIndex, lastIndex));
+      setProducts(products?.slice(currentIndex, lastIndex)??[]);
    }, [pageNumber]);
-
-   if (products.length === 0 || loading) {
-      return (
-         <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <ActivityIndicator size={30} />
-         </View>
-      );
-   }
 
    const searchProducts = (_token: string) => {
       console.log("From product", _token);
@@ -92,9 +85,24 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
    return (
       <ScrollView style={{ backgroundColor: "#f6f6f6" }}>
          <PostProductFormNav page="product" navigation={navigation} />
-         <SearchForm setSearchValue={searchProducts} />
-
-         <FlatList
+         {
+            !products && <View style={{justifyContent:"center",alignItems:"center"}}><Skeleton width={300} height={50} style={{borderRadius:2,margin:2}} /></View>
+         }
+         {
+            !products &&  <FlatList
+            data={["1","2","3","4"]}
+            keyExtractor={(item) => item}
+            indicatorStyle="white"
+            renderItem={({ item, index, separators }) => (
+               <LoadingProductComponent key={item} />
+            )}
+         />
+         }
+          {
+             <SearchForm setSearchValue={searchProducts}/>
+         }
+         {
+            products && <FlatList
             data={products}
             keyExtractor={(item) => String(item.id)}
             indicatorStyle="white"
@@ -106,6 +114,8 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
                />
             )}
          />
+         }
+         
       </ScrollView>
    );
 };

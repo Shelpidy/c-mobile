@@ -8,10 +8,13 @@ import {
    View,
 } from "react-native";
 import React, { useState } from "react";
-import { Button, IconButton, useTheme } from "react-native-paper";
+import { Button, Card, IconButton, useTheme } from "react-native-paper";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { useCurrentUser } from "../utils/CustomHooks";
+import TextShortener from "./TextShortener";
+
+
 
 const { width, height } = Dimensions.get("window");
 
@@ -55,15 +58,13 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
 
    return (
       <Pressable onPress={gotoUserProfile}>
-         <View style={styles.container}>
+         <Card mode="elevated" style={styles.container}>
             <Image
                resizeMode="cover"
                style={styles.profileImage}
                source={{ uri: user.profileImage }}
             />
-            <Text style={styles.nameText}>
-               {user.firstName} {user.lastName}
-            </Text>
+            <TextShortener style={styles.nameText} text={user.firstName +" "+ user.middleName +" "+user.lastName} textLength={15} />
             {/* <Text style={styles.nameText}>{user.lastName}</Text> */}
             <View style={styles.followerContainer}>
                <Button
@@ -83,7 +84,7 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
                   </Text>
                </Button>
             </View>
-         </View>
+         </Card>
       </Pressable>
    );
 };
@@ -100,13 +101,13 @@ const styles = StyleSheet.create({
       width: width / 1.5,
       borderRadius: 5,
       backgroundColor: "#fff",
-      margin: 5,
+      margin: 3,
    },
    followerContainer: {
       padding: 5,
    },
    nameText: {
-      fontFamily: "Poppins_600SemiBold",
+      fontFamily: "Poppins_400Regular",
       margin: 5,
    },
 });

@@ -35,6 +35,8 @@ import { useCurrentUser } from "../utils/CustomHooks";
 import LikesComponent from "../components/LikesComponent";
 import moment from "moment";
 import HTML from "react-native-render-html"
+import {LoadingPostComponent} from "../components/MediaPosts/LoadingComponents";
+import TextShortener from "../components/TextShortener";
 
 
 type FullPostComponentpost = { navigation: any; route: any };
@@ -161,7 +163,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
          };
          fetchData();
       },
-      [route]
+      []
    );
 
    const toggleEmojiPicker = () => {
@@ -186,7 +188,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
 
       let activeUserId = currentUser?.id;
       let commentObj = {
-         ...postCommentState,
+         text:textValue,
          postId: post?.id,
          userId: activeUserId,
       };
@@ -200,6 +202,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
             // console.log(data.data);
             setComments([...comments, data.data]);
             dispatchPostComment({ type: "TEXT", payload: "" });
+            setTextValue("")
             // Alert.alert("Success",data.message)
          } else {
             Alert.alert("Failed", data.message);
@@ -282,10 +285,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
 
    if ((likes.length === 0 && comments.length === 0) || !post) {
       return (
-         <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <Text>Loading...</Text>
-         </View>
+        <LoadingPostComponent/>
       );
    }
 
@@ -353,10 +353,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                      
                   /> */}
                </Pressable>
-                  <Text
-                     style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
-                     {poster.firstName} {poster.middleName} {poster.lastName}
-                  </Text>
+                   <TextShortener style={{ fontFamily: "Poppins_400Regular", margin: 5 }} textLength={25} text={poster.firstName+"  "+poster.middleName+" "+poster.lastName} />
                   <View
                      style={{
                         flex: 1,
@@ -369,7 +366,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                      {currentUser?.id == post?.userId && (
                         <View>
                            <Button
-                              style={{ backgroundColor: "#f9f9f9" }}
+                             
                               onPress={() => setOpenModal(true)}>
                               <SimpleLineIcons name="options-vertical" />
                            </Button>
@@ -454,29 +451,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentpost) => {
                   </Button>
           
             </View>
-            {/* <Divider/> */}
-
-               {/* <Modal visible={showEmojiPicker}>
-                  <View style={{flex:1,backgroundColor:"#000000ff"}}>  
-                     <View>
-
-                     </View>
-                     <View style={{height:300,backgroundColor:"#f9f9f9",margin:10}}>
-                         <EmojiSelector
-                          onEmojiSelected={handleEmojiSelect}
-                           showHistory={true}
-                           showSearchBar={true}
-                           
-                           showTabs={true}
-                           showSectionTitles={false}
-                           category={Categories.all}
-                           columns={8}
-                        />
-
-                     </View>
-                  
-                  </View>
-            </Modal> */}
+        
                <View
                   style={{
                      marginTop:5,

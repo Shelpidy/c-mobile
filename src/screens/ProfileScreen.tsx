@@ -21,6 +21,8 @@ import ProfileNavComponent from "../components/ProfileNavComponent";
 import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import SearchForm from "../components/SearchForm";
 import SharedPostComponent from "../components/MediaPosts/SharedPostComponent";
+import { LoadingPostComponent, LoadingProfileComponent } from "../components/MediaPosts/LoadingComponents";
+
 
 const { width, height } = Dimensions.get("window");
 
@@ -119,15 +121,14 @@ const ProfileScreen = ({ navigation, route }: any) => {
       setPosts(allPosts?.slice(currentIndex, lastIndex));
    }, [pageNumber]);
 
+   if(!user){
+      return (<LoadingProfileComponent/>)
+   }
+
    return (
       <ScrollView
          style={{ flex: 1, backgroundColor: "#ffffff", paddingTop: 10 }}>
-         {!user && (
-            <View>
-               <ActivityIndicator />
-            </View>
-         )}
-         {user && (
+      
             <>
                <View style={{ justifyContent: "center", alignItems: "center" }}>
                   <Avatar.Image
@@ -280,7 +281,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                   </View>
                </ScrollView>
             </>
-         )}
+        
 
          <View style={{ alignItems: "center", marginBottom: 5 }}>
             <ProfileNavComponent
@@ -290,9 +291,11 @@ const ProfileScreen = ({ navigation, route }: any) => {
          </View>
 
          {!posts && (
-            <View>
-               <ActivityIndicator />
-            </View>
+            <ScrollView>
+                  <LoadingPostComponent/>
+                  <LoadingPostComponent/>
+            </ScrollView>
+        
          )}
          {posts && posts.length > 1 && (
             <SearchForm setSearchValue={(v) => searchPosts(v)} />

@@ -12,8 +12,8 @@ import axios from "axios";
 import { posts as _fetchedPost } from "../../data";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import SharedPostComponent from "./SharedPostComponent";
-import { ActivityIndicator } from "react-native-paper";
-import LoadingPostComponent from "./LoadingPostComponent";
+import { ActivityIndicator, Divider } from "react-native-paper";
+import {LoadingPostComponent} from "./LoadingComponents";
 
 type PostsComponentProps = {
    navigation?: any;
@@ -81,7 +81,9 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
       return (
          <View style={{padding:2}}>
            <LoadingPostComponent/>
+           <Divider/>
            <LoadingPostComponent/>
+           <Divider/>
            <LoadingPostComponent/>
          </View>
       );
