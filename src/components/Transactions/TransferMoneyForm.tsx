@@ -60,6 +60,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
          <View style={styles.form}>
             <TextInput
                mode="outlined"
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                style={styles.input}
                label="To"
                value={transfereeAccountNumber}
@@ -70,6 +71,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
                }></TextInput>
             <TextInput
                mode="outlined"
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                value={amount}
                style={styles.input}
                onChangeText={(value) => setAmount(value)}
@@ -80,6 +82,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
                }></TextInput>
             <TextInput
                mode="outlined"
+               outlineStyle={{ borderColor: "#f6f6f6" }}
                style={styles.input}
                label="Password"
                // inputMode="text"
@@ -97,7 +100,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
                onPress={handleTransferMoney}
                mode="contained"
                style={{ marginTop: 15 }}>
-               TransferMoney
+               Send
             </Button>
          </View>
       </View>
@@ -111,8 +114,9 @@ const styles = StyleSheet.create({
       padding: 0,
    },
    input: {
-      width: width - 60,
+      width: width - 40,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
+      backgroundColor: "#f6f6f6",
    },
 });

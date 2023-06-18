@@ -374,6 +374,7 @@ const PostComponent = (props: NPostComponentProps) => {
                      textAlignVertical: "center",
                      color: theme.colors.secondary,
                      fontFamily: "Poppins_300Light",
+                     fontSize:13
                   }}>
                   posted {moment(props.createdAt).fromNow()}
                </Text>

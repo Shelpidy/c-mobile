@@ -23,7 +23,8 @@ const TransferMoneyScreen = (props: TransferMoneyProps) => {
 
    return (
       <KeyboardAvoidingView style={styles.container}>
-         <Image
+         <View style={{paddingHorizontal:10,marginVertical:5}}><Text style={{fontFamily:"Poppins_300Light",color:theme.colors.secondary}}>Safely transfer commodity to another user</Text></View>
+         {/* <Image
             resizeMode="stretch"
             style={{
                width: width - 10,
@@ -31,7 +32,7 @@ const TransferMoneyScreen = (props: TransferMoneyProps) => {
                marginBottom: 0,
                paddingBottom: 0,
             }}
-            source={require("../../assets/Illustrators/signin.png")}></Image>
+            source={require("../../assets/Illustrators/signin.png")}></Image> */}
          <TransferMoneyForm navigation={props.navigation} />
       </KeyboardAvoidingView>
    );
@@ -44,8 +45,8 @@ const styles = StyleSheet.create({
       flex: 1,
       backgroundColor: "#fff",
       alignItems: "center",
-      justifyContent: "center",
       fontFamily: "Poppins_300Light",
+      paddingTop:45
    },
    form: {
       padding: 0,

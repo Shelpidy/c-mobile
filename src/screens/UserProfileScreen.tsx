@@ -20,6 +20,7 @@ import axios from "axios";
 import { AntDesign } from "@expo/vector-icons";
 import { useCurrentUser } from "../utils/CustomHooks";
 import { LoadingPostComponent, LoadingProfileComponent } from "../components/MediaPosts/LoadingComponents";
+import SharedPostComponent from "../components/MediaPosts/SharedPostComponent";
 
 const { width, height } = Dimensions.get("window");
 
@@ -348,12 +349,10 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                   <LoadingPostComponent/>
                   <LoadingPostComponent/>
             </ScrollView>
-        
          )}
-         {posts && posts.map((post) => {
-            return (
-               <View key={String(post.id)}>
-                   <View style={{backgroundColor:"#ffffff",borderRadius:10,width:200,paddingHorizontal:8}}>
+         {posts &&
+           <View>
+             <View style={{backgroundColor:"#ffffff",borderRadius:10,width:200,paddingHorizontal:8}}>
                      <Text
                         style={{
                            fontFamily: "Poppins_500Medium",
@@ -361,15 +360,22 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                     Posts {posts.length}
                      </Text>
                </View>
-               <PostComponent
-                  
+               {posts.map((post) => {
+               if(post.fromId){
+                  return <SharedPostComponent key={String(post.id)}
                   {...post}
-                  navigation={navigation}
-               />
-               </View>
-               
-            );
-         })}
+                  navigation={navigation} />
+               }
+               return (
+                  <PostComponent
+                     key={String(post.id)}
+                     {...post}
+                     navigation={navigation}
+                  />
+               );
+            })}
+           </View>
+           }
       </ScrollView>
    );
 };

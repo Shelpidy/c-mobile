@@ -98,9 +98,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
    const [liked, setLiked] = useState<boolean>(false);
    const [shares, setShares] = useState<ShareData[]|null>(null);
    const [poster, SetPoster] = useState<any>();
-   const [shared, setShared] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
-   const [loadingShare, setLoadingShare] = useState<boolean>(false);
    const theme = useTheme();
    const [reloadCLS,setRelaodCLS] = useState<number>(0)
    const {width} = useWindowDimensions()
@@ -253,7 +251,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
 
    
 
-   if (!likes) {
+   if (!poster) {
       return (<LoadingPostComponent/>
       );
    }
@@ -282,6 +280,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                      textAlignVertical: "center",
                      color: theme.colors.secondary,
                      fontFamily: "Poppins_300Light",
+                     fontSize:13
                   }}>
                  {moment(props.createdAt).fromNow()}
                </Text>
@@ -292,6 +291,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
          <Divider />
          {secondUser && (
             <View
+              
                style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -302,24 +302,19 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                      size={45}
                      source={{ uri: secondUser.profileImage }}
                   />
-                  {/* <Image
-                     style={styles.profileImage}
-                     
-                  /> */}
                </Pressable>
 
-               <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
+               <Text style={{ fontFamily: "Poppins_400Regular", margin: 5 }}>
                   {secondUser.firstName} {secondUser.middleName} {secondUser.lastName}
                </Text>
             </View>
          )}
          <View>
-        
-
             {props.images && <ImagesViewer images={props.images} />}
+
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>
-        
+         <View style={{flex:1,flexDirection:"row",justifyContent:"flex-end",paddingHorizontal:4}}><Button labelStyle={{color:theme.colors.secondary,fontFamily:"Poppins_300Light",fontSize:13}} style={{borderColor:theme.colors.secondary,minWidth:100,borderRadius:4}} mode='outlined' onPress = {()=>props.navigation.navigate("FullPostViewScreen", { ...props})} >View Post</Button></View>
          {props.title && <Text style={styles.title}>{props?.title}</Text>}
 
          {props?.text && (
@@ -334,7 +329,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                <Text>
                   <LikesComponent
                      postId={props.id}
-                     numberOfLikes={likes.length}
+                     numberOfLikes={likes?.length ?? 0} 
                   />
                </Text>
             </View>
@@ -347,12 +342,12 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                         color={theme.colors.secondary}
                         name={liked ? "heart-sharp" : "heart-outline"}
                      />
-                      <Text style={styles.commentAmountText}>{likes.length}</Text>
+                      <Text style={styles.commentAmountText}>{likes?.length}</Text>
                   </Button>
               
                   <Button contentStyle={{
                      backgroundColor:"#f6f6f6",flex:1,alignItems:"center",flexDirection:"row"
-                  }} onPress = {()=>props.navigation.navigate("FullPostViewScreen", { ...props })} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1,alignItems:"center"}}>
+                  }} onPress = {()=>props.navigation.navigate("FullSharedPostViewScreen", { ...props })} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1,alignItems:"center"}}>
                    <Ionicons
                         size={18}
                        

@@ -31,6 +31,7 @@ import { useCurrentUser, useNetworkStatus } from "../utils/CustomHooks";
 import {io,Socket} from "socket.io-client"
 import { Alert } from "react-native";
 import BuyCommodityScreen from "../screens/BuyCommodityScreen";
+import FullSharedPostComponent from "../screens/FullSharedPostViewScreen";
 
 
 // import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -131,6 +132,9 @@ const HomeStack = (props: HomeStackProps) => {
          <Stack.Screen
             name="FullPostViewScreen"
             component={FullPostComponent}></Stack.Screen>
+         <Stack.Screen
+            name="FullSharedPostViewScreen"
+            component={FullSharedPostComponent}></Stack.Screen>
          <Stack.Screen
             name="MarketingScreen"
             component={MarketingScreen}></Stack.Screen>

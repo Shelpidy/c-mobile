@@ -9,7 +9,7 @@ import {
    Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { EvilIcons, Fontisto } from "@expo/vector-icons";
+import { AntDesign, EvilIcons, Fontisto } from "@expo/vector-icons";
 import { Skeleton } from "@rneui/base";
 import { Avatar, Button, useTheme } from "react-native-paper";
 import TextShortener from "./TextShortener";
@@ -96,11 +96,11 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
             style={{
                flexDirection: "row",
                alignItems: "center",
-               paddingHorizontal: 20,
+               paddingHorizontal: 5,
                paddingVertical: 5,
             }}>
             <Pressable onPress={gotoUserProfile}>
-               <Avatar.Image size={40} source={{ uri: user.profileImage }} />
+               <Avatar.Image size={45} source={{ uri: user.profileImage }} />
                {/* <Image
                      style={styles.profileImage}
                      source={{ uri: user.profileImage }}
@@ -129,7 +129,7 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
                         fontFamily: "Poppins_400Regular",
                         marginHorizontal: 3,
                      }}
-                     textLength={16}
+                     textLength={18}
                   />
                </View>
                {/* <Pressable style={{marginHorizontal:5}}><Text><EvilIcons name='external-link' size={26} /></Text></Pressable> */}
@@ -143,12 +143,7 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
                )}
 
                {user.id === currentUser?.id && (
-                  <Button
-                     onPress={gotoUserProfile}
-                     style={{ marginVertical: 5, alignSelf: "flex-end" }}
-                     mode="text">
-                     profile
-                  </Button>
+                  <AntDesign style={{marginHorizontal:4}} color={theme.colors.primary} onPress={gotoUserProfile} size={23} name='profile'/>
                )}
             </View>
          </View>

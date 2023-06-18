@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
       alignItems: "center",
    },
    input: {
-      width: width - 60,
+      width: width - 40,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
    },

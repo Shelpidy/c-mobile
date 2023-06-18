@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
       padding: 0,
    },
    input: {
-      width: width - 60,
+      width: width - 40,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
       backgroundColor: "#f6f6f6",
