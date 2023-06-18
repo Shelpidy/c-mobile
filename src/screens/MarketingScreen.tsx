@@ -82,14 +82,12 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       setProducts(newProducts);
    };
 
-   return (
-      <ScrollView style={{ backgroundColor: "#f6f6f6" }}>
-         <PostProductFormNav page="product" navigation={navigation} />
-         {
-            !products && <View style={{justifyContent:"center",alignItems:"center"}}><Skeleton width={300} height={50} style={{borderRadius:2,margin:2}} /></View>
-         }
-         {
-            !products &&  <FlatList
+    if(!products)
+      return (
+         <ScrollView>
+            <PostProductFormNav page="product" navigation={navigation} />
+            <View style={{justifyContent:"center",alignItems:"center"}}><Skeleton width={345} height={50} style={{borderRadius:25,margin:1}} /></View>
+            <FlatList
             data={["1","2","3","4"]}
             keyExtractor={(item) => item}
             indicatorStyle="white"
@@ -97,12 +95,14 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
                <LoadingProductComponent key={item} />
             )}
          />
-         }
-          {
-             <SearchForm setSearchValue={searchProducts}/>
-         }
-         {
-            products && <FlatList
+         </ScrollView>
+      )
+   
+   return (
+      <ScrollView style={{ backgroundColor: "#f6f6f6" }}>
+         <PostProductFormNav page="product" navigation={navigation} />
+         <SearchForm setSearchValue={searchProducts}/>
+          <FlatList
             data={products}
             keyExtractor={(item) => String(item.id)}
             indicatorStyle="white"
@@ -111,10 +111,7 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
                   key={String(item.id)}
                   {...item}
                   navigation={navigation}
-               />
-            )}
-         />
-         }
+               />)}/>
          
       </ScrollView>
    );

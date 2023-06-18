@@ -16,6 +16,7 @@ import NotificationComponent from "../components/TransactionNotificationComponen
 import ProductNotificationComponent from "../components/ProductNotificationComponent";
 import TransactionNotificationComponent from "../components/TransactionNotificationComponent";
 import { useCurrentUser } from "../utils/CustomHooks";
+import { LoadingNotificationComponent } from "../components/MediaPosts/LoadingComponents";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -30,7 +31,7 @@ const NotificationScreen = ({ navigation }: any) => {
    useEffect(
       function () {
          console.log("Fetching user");
-         setLoading(true);
+        
          let fetchData = async () => {
             let activeUserId = currentUser?.id;
             try {
@@ -42,16 +43,15 @@ const NotificationScreen = ({ navigation }: any) => {
                if (data.status == "success") {
                   // console.log("User Notifications-----", data.data);
                   setNotifications(data.data);
-                  // Alert.alert("Success",data.message)
-                  setLoading(false);
+                
                } else {
                   Alert.alert("Failed", data.message);
                }
-               setLoading(false);
+           
             } catch (err) {
                console.log(err);
                Alert.alert("Failed", String(err));
-               setLoading(false);
+
             }
          };
          fetchData();
@@ -59,13 +59,19 @@ const NotificationScreen = ({ navigation }: any) => {
       [currentUser]
    );
 
-   if (!notifications) {
+   if(!notifications)
       return (
-         <View style={styles.notContainer}>
-            <ActivityIndicator></ActivityIndicator>
-         </View>
+         <ScrollView style={styles.container}>
+           <LoadingNotificationComponent/>
+           <LoadingNotificationComponent/>
+           <LoadingNotificationComponent/>
+           <LoadingNotificationComponent/>
+           <LoadingNotificationComponent/>
+           <LoadingNotificationComponent/>
+           <LoadingNotificationComponent/>
+         </ScrollView>
       );
-   }
+   
    return (
       <ScrollView style={styles.container}>
          {notifications.map((notification) => {
@@ -102,6 +108,7 @@ export default NotificationScreen;
 const styles = StyleSheet.create({
    container: {
       backgroundColor: "#f5f5f5",
+      paddingBottom:10
    },
    notContainer: {
       backgroundColor: "#ffffff",

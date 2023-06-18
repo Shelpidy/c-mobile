@@ -127,24 +127,13 @@ const ProfileScreen = ({ navigation, route }: any) => {
 
    return (
       <ScrollView
-         style={{ flex: 1, backgroundColor: "#ffffff", paddingTop: 10 }}>
-      
-            <>
+         style={{ flex: 1, backgroundColor: "#f6f6f6", paddingTop: 10 }}>
                <View style={{ justifyContent: "center", alignItems: "center" }}>
                   <Avatar.Image
                      style={{ borderColor: theme.colors.primary }}
                      size={120}
                      source={{ uri: user?.personal?.profileImage }}
                   />
-
-                  {/* <Image
-                     source={{
-                        uri: user?.personal?.profileImage,
-                     }}
-                     style={[
-                        styles.profileImage,
-                        { borderColor: theme.colors.primary },
-                     ]}></Image> */}
                   <Text
                      style={{
                         textAlign: "center",
@@ -166,7 +155,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         {user?.followers?.count}
                      </Text>
                      <Button
-                        style={{ backgroundColor: "#f6f6f6" }}
+                        style={{ backgroundColor: "#fff" }}
                         onPress={() =>
                            navigation.navigate("FollowersScreen", {
                               user: user?.personal,
@@ -196,7 +185,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         {user?.followings?.count}
                      </Text>
                      <Button
-                        style={{ backgroundColor: "#f6f6f6" }}
+                        style={{ backgroundColor: "#fff" }}
                         onPress={() =>
                            navigation.navigate("FollowingsScreen", {
                               user: user?.personal,
@@ -214,26 +203,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         </Text>
                      </Button>
                   </View>
-                  {/* <View style={{ alignItems: "center",margin:4}}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_400Regular",
-                  }}>
-                  200
-               </Text>
-               <Button>
-                  <Text
-                     style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        fontFamily: "Poppins_400Regular",
-                     }}>
-                     Posts
-                  </Text>
-               </Button>
-               
-            </View> */}
+           
                   <View style={{ alignItems: "center", margin: 4 }}>
                      <Text
                         style={{
@@ -244,7 +214,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         }}>
                         {user?.sales?.count}
                      </Text>
-                     <Button style={{ backgroundColor: "#f6f6f6" }}>
+                     <Button style={{ backgroundColor: "#fff" }}>
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -267,7 +237,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         }}>
                         {user?.affiliates?.count}
                      </Text>
-                     <Button style={{ backgroundColor: "#f6f6f6" }}>
+                     <Button style={{ backgroundColor: "#fff" }}>
                         <Text
                            style={{
                               // fontWeight: "bold",
@@ -280,7 +250,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                      </Button>
                   </View>
                </ScrollView>
-            </>
+
         
 
          <View style={{ alignItems: "center", marginBottom: 5 }}>

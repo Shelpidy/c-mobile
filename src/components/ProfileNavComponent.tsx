@@ -7,7 +7,7 @@ import {
    MaterialCommunityIcons,
    MaterialIcons,
 } from "@expo/vector-icons";
-import { Button, useTheme } from "react-native-paper";
+import { Button, useTheme,Card} from "react-native-paper";
 import { useCurrentUser } from "../utils/CustomHooks";
 
 const { width } = Dimensions.get("window");
@@ -17,7 +17,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
    const theme = useTheme();
 
    return (
-      <View style={styles.navs}>
+      <Card mode="contained" style={styles.navs}>
          {currentUser?.id === user?.id && (
             <View style={styles.navLink}>
                <AntDesign
@@ -139,7 +139,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                </Button>
             </View>
          )}
-      </View>
+      </Card>
    );
 };
 
@@ -149,14 +149,12 @@ const styles = StyleSheet.create({
    navs: {
       backgroundColor: "#fff",
       // flex:1,
-      width: width - 40,
+      width: width - 30,
       borderRadius: 30,
       // marginBottom:120,
       paddingVertical: 15,
       paddingHorizontal: 10,
-      borderWidth: 1,
-      borderColor: "#f6f6f6",
-      // alignItems:'center'
+   
    },
    navLink: {
       flexDirection: "row",

@@ -7,7 +7,7 @@ import { ActivityIndicator } from "react-native-paper";
 import UserComponent from "../components/UserComponent";
 
 const FollowersScreen = ({ navigation, route }: any) => {
-   const [users, setUsers] = useState<User[]>([]);
+   const [users, setUsers] = useState<User[]|null>(null);
    const [loading, setLoading] = useState<boolean>(false);
 
    useEffect(function () {
@@ -23,7 +23,7 @@ const FollowersScreen = ({ navigation, route }: any) => {
             );
             let data = await response.json();
             if (data.status == "success") {
-               console.log("Users-----", data.data);
+               console.log("Followers-----", data.data);
                setUsers(data.data?.sort(() => 0.5 - Math.random()));
                // Alert.alert("Success",data.message)
                setLoading(false);
@@ -40,7 +40,7 @@ const FollowersScreen = ({ navigation, route }: any) => {
       fetchData();
    }, []);
 
-   if (loading)
+   if (!users)
       return (
          <View
             style={{
@@ -55,15 +55,12 @@ const FollowersScreen = ({ navigation, route }: any) => {
          </View>
       );
    return (
-      <View style={{ backgroundColor: "#f6f6f6" }}>
          <ScrollView style={styles.container}>
-            {users.length < 1 && (
-               <View>
-                  <Text>No Follower</Text>
+               <View style={{flex:1,flexDirection:'row',alignItems:"center"}}>
+                 <Text style={{fontFamily:"Poppins_400Regular",marginHorizontal:5,fontSize:18}}>Followers</Text>
+                  <Text style={{fontFamily:"Poppins_400Regular",fontSize:18}}>{users.length}</Text>
                </View>
-            )}
-            {users.length > 1 &&
-               users.map((user) => {
+              {users.map((user) => {
                   return (
                      <UserComponent
                         key={String(user.id)}
@@ -73,7 +70,7 @@ const FollowersScreen = ({ navigation, route }: any) => {
                   );
                })}
          </ScrollView>
-      </View>
+
    );
 };
 

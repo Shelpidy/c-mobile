@@ -19,6 +19,7 @@ import ProfileNavComponent from "../components/ProfileNavComponent";
 import axios from "axios";
 import { AntDesign } from "@expo/vector-icons";
 import { useCurrentUser } from "../utils/CustomHooks";
+import { LoadingPostComponent, LoadingProfileComponent } from "../components/MediaPosts/LoadingComponents";
 
 const { width, height } = Dimensions.get("window");
 
@@ -83,9 +84,10 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                if (data.status == "success") {
                   // console.log("Users-----", data.data);
                   setUser(data.data);
+                  console.log(currentUser?.followingIds)
 
                   if (
-                     currentUser?.followingIds?.includes(data.data?.personal)
+                     currentUser?.followingIds?.includes(data.data?.personal?.id)
                   ) {
                      setFollowed(true);
                   }
@@ -173,30 +175,22 @@ const UserProfileScreen = ({ navigation, route }: any) => {
       }
    };
 
+   if(!user){
+      return (<LoadingProfileComponent/>)
+   }
+
+
    return (
       <ScrollView
          style={{ flex: 1, backgroundColor: "#ffffff", paddingTop: 5 }}>
-         {!user && (
-            <View>
-               <ActivityIndicator />
-            </View>
-         )}
-         {user && (
-            <>
+   
                <View style={{ justifyContent: "center", alignItems: "center" }}>
                   <Avatar.Image
                      style={{ borderColor: theme.colors.primary }}
                      size={120}
                      source={{ uri: user?.personal?.profileImage }}
                   />
-                  {/* <Image
-                     source={{
-                        uri: user?.personal?.profileImage,
-                     }}
-                     style={[
-                        styles.profileImage,
-                        { borderColor: theme.colors.primary },
-                     ]}></Image> */}
+                 
                   <Text
                      style={{
                         textAlign: "center",
@@ -266,26 +260,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                         </Text>
                      </Button>
                   </View>
-                  {/* <View style={{ alignItems: "center",margin:4}}>
-               <Text
-                  style={{
-                     textAlign: "center",
-                     fontFamily: "Poppins_400Regular",
-                  }}>
-                  200
-               </Text>
-               <Button mode="elevated">
-                  <Text
-                     style={{
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        fontFamily: "Poppins_400Regular",
-                     }}>
-                     Posts
-                  </Text>
-               </Button>
                
-            </View> */}
                   <View style={{ alignItems: "center", margin: 4 }}>
                      <Text
                         style={{
@@ -361,9 +336,6 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                      <AntDesign name="message1" /> message
                   </Button>
                </View>
-            </>
-         )}
-
          <View style={{ alignItems: "center", marginBottom: 5 }}>
             <ProfileNavComponent
                navigation={navigation}
@@ -371,19 +343,22 @@ const UserProfileScreen = ({ navigation, route }: any) => {
             />
          </View>
          {!posts && (
-            <View>
-               <ActivityIndicator />
-            </View>
+            <ScrollView>
+                  <LoadingPostComponent/>
+                  <LoadingPostComponent/>
+                  <LoadingPostComponent/>
+            </ScrollView>
+        
          )}
-         {/* {posts && posts.map((post) => {
+         {posts && posts.map((post) => {
             return (
                <View key={String(post.id)}>
-                   <View style={{ alignItems: "center",backgroundColor:"#ffffff",borderRadius:10,width:200,justifyContent:"center",flexDirection:'row'}}>
+                   <View style={{backgroundColor:"#ffffff",borderRadius:10,width:200,paddingHorizontal:8}}>
                      <Text
                         style={{
                            fontFamily: "Poppins_500Medium",
                         }}>
-                     Posts 200
+                    Posts {posts.length}
                      </Text>
                </View>
                <PostComponent
@@ -394,7 +369,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
                </View>
                
             );
-         })} */}
+         })}
       </ScrollView>
    );
 };

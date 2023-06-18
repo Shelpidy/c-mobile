@@ -1,21 +1,19 @@
 import {
    StyleSheet,
-   Text,
    View,
    Alert,
    ScrollView,
    FlatList,
+   Dimensions
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { ActivityIndicator } from "react-native-paper";
 import { useCurrentUser } from "../utils/CustomHooks";
 import ConversationComponent from "../components/ConversationComponent";
+import { LoadingConversationComponent } from "../components/MediaPosts/LoadingComponents";
+import { Skeleton } from "@rneui/themed";
 
-const generateRoomId = (secUserId: any, activeUserId: any) => {
-   let maxId = Math.max(secUserId, activeUserId);
-   let minId = Math.min(secUserId, activeUserId);
-   return Number(`${maxId}${minId}`);
-};
+const {width} = Dimensions.get("window")
+
 
 const NewConversationsScreen = () => {
    const [conversations, setConversations] = useState<Conversation[] | null>(
@@ -57,14 +55,30 @@ const NewConversationsScreen = () => {
       }
    }, [currentUser, currentPage,convId]);
 
-   if (!conversations) {
+     if(!conversations)
       return (
-         <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <ActivityIndicator />
-         </View>
+         <ScrollView style={{marginBottom:10}}>
+            <View style={{flex:1,alignItems:'center',justifyContent:"center",marginVertical:4}}>
+                <Skeleton style={{borderRadius:4,marginTop:4}} animation='wave' width={width-14} height={53} />
+            </View>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+           <LoadingConversationComponent/>
+       </ScrollView>
       );
-   }
 
    return (
       <FlatList

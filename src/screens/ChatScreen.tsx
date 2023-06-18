@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
 import {
+   ActivityIndicator,
    Button,
    Divider,
    IconButton,
@@ -235,7 +236,7 @@ const ChatScreen = ({ route,navigation }: any) => {
    const currentUser = useCurrentUser();
    const [secondUser, setSecondUser] = useState<User>();
    const [sound, setSound] = useState<Audio.Sound | null>(null);
-   const {socket} = useSelector((state:any)=> state.rootReducer)
+   const [socket,setSocket] = useState<Socket | null>(null)
    const isOnline = useNetworkStatus();
    const [lastSeen, setLastSeen] = useState<any>();
    const [typing, setTyping] = useState<boolean | null>(false);
@@ -271,13 +272,30 @@ const ChatScreen = ({ route,navigation }: any) => {
       return Number(`${maxId}${minId}`);
    };
 
+   ////// RECONNECT TO SOCKET FOR CHAT ////////////////////////////
+
+   
+   React.useEffect(() => {
+      if(currentUser){
+         let newSocket = io(
+            `http://192.168.144.183:8080/?userId=${currentUser.id}&roomId=${route.params?.roomId}&roomType=c`
+         );
+         setSocket(newSocket)
+    
+         // cleanup function to close the socket connection when the component unmounts
+         return () => {
+            newSocket.close();
+         }
+      }
+   }, [currentUser]);
+
    
 
    //////////////////// ADD USER STATUS TO AS BEING IN THIS ROOM/////////////////
 
    useEffect(()=>{
       if(socket && currentUser){
-         console.log("Activating room...")
+         console.log("Activating room for ",currentUser.id)
          let roomId = route.params?.roomId;
          socket.emit("activeRoom",{userId:currentUser.id,activeRoom:`c-${roomId}`})
       }
@@ -372,6 +390,7 @@ const ChatScreen = ({ route,navigation }: any) => {
       // console.log("Socket connecting");
 
       if (socket) {
+         
          socket.on("message", (msg: any) => {
             // console.log("Message from the server", msg);
          });
@@ -577,7 +596,7 @@ const ChatScreen = ({ route,navigation }: any) => {
    }
 
    const onSend = async (_audio?: any, _video?: any, _image?: any) => {
-      // console.log("Onsend loading");
+      console.log("Onsend loading");
       let secUser = route.params.user.id;
       let activeUser = currentUser?.id;
       let roomId = route.params.roomId;
@@ -590,7 +609,7 @@ const ChatScreen = ({ route,navigation }: any) => {
          video: _video,
          audio: _audio,
       };
-      // console.log(sendData, roomId);
+      console.log(sendData, roomId);
       socket?.emit(`c-${roomId}`, sendData);
       setTextValue("");
       setSent(true);
@@ -619,7 +638,7 @@ const ChatScreen = ({ route,navigation }: any) => {
       return (
          <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <Text>Loading...</Text>
+           <ActivityIndicator size={42} />
          </View>
       );
    }
@@ -658,27 +677,27 @@ const ChatScreen = ({ route,navigation }: any) => {
                      <TextShortener
                         style={{
                            fontFamily: "Poppins_500Medium",
-                           marginHorizontal: 5,
+                           marginLeft: 5,
                            color: theme.colors.inverseOnSurface,
                         }}
                         text={secondUser.fullName}
-                        textLength={15}
+                        textLength={10}
                      />
                   </View>
                   <View
                      style={{
                         flex: 1,
                         flexDirection: "row",
-                        justifyContent: "space-between",
+                        justifyContent: "flex-end",
                         alignItems: "center",
-                        marginRight: 5,
+                        marginRight: 2,
                      }}>
                      {!socketRecording && (
                         <Text
                            style={{
                               fontFamily: "Poppins_300Light",
                               color: theme.colors.inversePrimary,
-                              marginLeft: 10,
+                              marginRight: 15,
                            }}>
                            {typing ? "typing..." : ""}
                         </Text>
@@ -688,7 +707,7 @@ const ChatScreen = ({ route,navigation }: any) => {
                            style={{
                               fontFamily: "Poppins_300Light",
                               color: theme.colors.inversePrimary,
-                              marginLeft: 10,
+                              marginRight: 15,
                            }}>
                            {socketRecording ? "recording..." : ""}
                         </Text>
@@ -697,7 +716,9 @@ const ChatScreen = ({ route,navigation }: any) => {
                         style={{
                            fontFamily: "Poppins_300Light",
                            color: theme.colors.inversePrimary,
-                           marginRight: 5,
+                           marginRight: 1,
+                           fontSize:12,
+                           alignSelf:"flex-end"
                         }}>
                         {lastSeen}
                      </Text>
