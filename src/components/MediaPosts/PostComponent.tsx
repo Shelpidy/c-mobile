@@ -19,6 +19,7 @@ import {
    Button,
    IconButton,
    Avatar,
+   Divider,
 } from "react-native-paper";
 import {
    AntDesign,
@@ -39,10 +40,9 @@ import moment from "moment";
 import config from "../.././aws-config";
 import AWS from "aws-sdk";
 import { Skeleton } from "@rneui/themed";
-import { useWindowDimensions } from 'react-native';
-import HTML from 'react-native-render-html';
-
-
+import { useWindowDimensions } from "react-native";
+import HTML from "react-native-render-html";
+import { useNavigation } from "@react-navigation/native";
 
 const s3 = new AWS.S3({
    accessKeyId: config.accessKeyId,
@@ -50,11 +50,16 @@ const s3 = new AWS.S3({
    region: config.region,
 });
 
-type NPostComponentProps = PostComponentProps & { navigation: any };
-type PostComment = Omit<CommentProps, "posterId">;
-const initialState: PostComment = {};
+type PostComponentProps = {
+   post: Post;
+   commentsCount: number;
+   likesCount: number;
+   sharesCount: number;
+   user: User;
+   liked: boolean;
+};
 
-const { width } = Dimensions.get("window");
+const initialState: PostComment = {};
 
 const postCommentReducer = (
    state: PostComment = initialState,
@@ -64,7 +69,7 @@ const postCommentReducer = (
       case "POSTID":
          return {
             ...state,
-            posterId: action.payload,
+            userId: action.payload,
          };
       case "USERID":
          return {
@@ -81,7 +86,7 @@ const postCommentReducer = (
    }
 };
 
-const PostComponent = (props: NPostComponentProps) => {
+const PostComponent = (props: PostComponentProps) => {
    const [postCommentState, dispatchPostComment] = useReducer(
       postCommentReducer,
       initialState
@@ -89,130 +94,56 @@ const PostComponent = (props: NPostComponentProps) => {
    const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [openShareModal, setOpenShareModal] = useState<boolean>(false);
-   const [comments, setComments] = useState<Omit<CommentProps, "posterId">[]>(
-      []
-   );
-   const [likes, setLikes] = useState<Like[] | null>(null);
-   const [shares, setShares] = useState<ShareData[] | null>(null);
+   const [commentsCount, setCommentsCount] = useState<number>(0);
+   const [comments, setComments] = useState<PostComment[]>([]);
+   const [likesCount, setLikesCount] = useState<number>(0);
+   const [sharesCount, setSharesCount] = useState<number>(0);
    const [liked, setLiked] = useState<boolean>(false);
-   const [poster, SetPoster] = useState<any>();
+   const [user, SetUser] = useState<User | null>(null);
    const [shared, setShared] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
    const [loadingShare, setLoadingShare] = useState<boolean>(false);
    const theme = useTheme();
-   const [reloadCLS,setRelaodCLS] = useState<number>(0)
+   const [reloadCLS, setRelaodCLS] = useState<number>(0);
    const { width } = useWindowDimensions();
-  
+   const navigation = useNavigation<any>();
 
    const source = {
       html: `
     <p style='text-align:center;'>
       Hello World!
-    </p>`
-    };
+    </p>`,
+   };
 
-   useEffect(
-      function () {
-         let fetchData = async () => {
-            let activeUserId = currentUser?.id;
-            try {
-               if (props) {
-                  let { data } = await axios.get(
-                     `http://192.168.144.183:5000/api/media/posts/cls/${props?.id}`
-                  );
-                  if (data.status == "success") {
-                     // console.log(data.data);
-                     let ls: any[] = data.data.likes.rows;
-                     let cs = data.data.comments.rows;
-                     let sh = data.data.shares.rows
-                     setComments(cs);
-                     setLikes(ls);
-                     setShares(sh)
-                     if (ls.map((like) => like.userId).includes(activeUserId)) {
-                        setLiked(true);
-                     }
-                     // Alert.alert("Success",data.message)
-                  } else {
-                     Alert.alert("Failed", data.message);
-                  }
-               }
-
-               setLoading(false);
-            } catch (err) {
-               Alert.alert("Failed", String(err));
-               setLoading(false);
-            }
-         };
-         fetchData();
-      },
-      [currentUser, props,reloadCLS]
-   );
-
-   useEffect(
-      function () {
-         console.log("Fetching user");
-         setLoading(true);
-         let fetchData = async () => {
-            // console.log("Fetching user")
-            //  let activeUserId = 1
-            try {
-               if (props) {
-                  let response = await fetch(
-                     `http://192.168.144.183:5000/api/auth/users/${props?.userId}`,
-                     { method: "GET" }
-                  );
-                  let data = await response.json();
-                  if (data.status == "success") {
-                     // console.log("Users-----", data.data);
-                     SetPoster(data.data.personal);
-                     // Alert.alert("Success",data.message)
-                     setLoading(false);
-                  } else {
-                     Alert.alert("Failed", data.message);
-                  }
-               }
-
-               setLoading(false);
-            } catch (err) {
-               console.log(err);
-               Alert.alert("Failed", String(err));
-               setLoading(false);
-            }
-         };
-         fetchData();
-      },
-      []
-   );
+   useEffect(() => {
+      setLiked(props.liked);
+      setSharesCount(props.sharesCount);
+      setLikesCount(props.likesCount);
+      setCommentsCount(props.commentsCount);
+      SetUser(props.user);
+   }, []);
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === poster.id) {
-         props.navigation.navigate("ProfileScreen", { userId: poster.id });
+      if (currentUser?.id === user?.id) {
+         navigation.navigate("ProfileScreen", { userId: user?.id });
       } else {
-         props.navigation.navigate("UserProfileScreen", { userId: poster.id });
+         navigation.navigate("UserProfileScreen", { userId: user?.id });
       }
    };
 
    const handleLike = async (postId: number) => {
       console.log(postId);
       try {
+         setLoading(true);
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.144.183:5000/api/media/posts/likes/`,
+            `http://192.168.182.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
-            console.log(data.data);
-            if (liked) {
-               if (likes) {
-                  setLikes(likes.slice(0, likes.length - 1));
-                  setLiked(!liked);
-               }
-            } else {
-               if (likes) {
-                  setLikes([...likes, data.data]);
-                  setLiked(!liked);
-               }
-            }
+            let { liked, numberOfLikes } = data.data;
+            setLiked(liked);
+            setLikesCount(numberOfLikes);
 
             Alert.alert("Success", data.message);
          } else {
@@ -226,24 +157,34 @@ const PostComponent = (props: NPostComponentProps) => {
       }
    };
 
-   
    const handleSharedPost = async () => {
       let activeUserId = currentUser?.id;
-      setLoadingShare(true)
-      setShared(false)
-      // let images = props.images?.map(image => image?.trimEnd())
-      let postObj = {postObj:{userId:activeUserId,title:props.title,images:JSON.parse(String(props.images)),video:props.video,text:props.text,fromId:props.userId,shared:true},sharedPostId:props.id};
-      console.log(postObj)
+      setLoadingShare(true);
+      setShared(false);
+      // let images = props.post.images?.map(image => image?.trimEnd())
+      let postObj = {
+         postObj: {
+            userId: activeUserId,
+            title: props.post.title,
+            images: JSON.parse(String(props.post.images)),
+            video: props.post.video,
+            text: props.post.text,
+            fromId: props.post.userId,
+            shared: true,
+         },
+         sharedPostId: props.post.id,
+      };
+      console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.144.183:5000/api/media/posts/",
+            "http://192.168.182.183:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {
             console.log(response.data);
             setLoadingShare(false);
-            setShared(true)
-            setRelaodCLS(reloadCLS + 1)
+            setShared(true);
+            setRelaodCLS(reloadCLS + 1);
             // Alert.alert("Successful", "Post successfully");
          } else {
             setLoadingShare(false);
@@ -260,11 +201,12 @@ const PostComponent = (props: NPostComponentProps) => {
    if (!props) {
       return (
          <View>
-            <View style={{flexDirection:"row",gap:4,alignItems:"center"}}>
+            <View
+               style={{ flexDirection: "row", gap: 4, alignItems: "center" }}>
                <Skeleton circle width={40} height={40} />
             </View>
             <View>
-                <Skeleton width={350} height={400} />
+               <Skeleton width={350} height={400} />
             </View>
          </View>
       );
@@ -281,23 +223,44 @@ const PostComponent = (props: NPostComponentProps) => {
                   alignItems: "center",
                   paddingVertical: 4,
                }}>
-               <View style={{ backgroundColor: "#ffffff", padding: 10,width:width - 20,borderRadius:5,gap:20}}>
+               <View
+                  style={{
+                     backgroundColor: "#ffffff",
+                     padding: 10,
+                     width: width - 20,
+                     borderRadius: 5,
+                     gap: 20,
+                  }}>
                   {/* <IconButton name='plus'/> */}
-                  <Button mode="text"  onPress={() => setOpenShareModal(false)}>
+                  <Button mode="text" onPress={() => setOpenShareModal(false)}>
                      <Feather size={26} name="x" />
                   </Button>
-                  <Button style={{backgroundColor:shared?"green":theme.colors.primary}} disabled={loadingShare} loading={loadingShare} onPress={handleSharedPost} mode="contained"><Ionicons/>
-                  <Ionicons
-                  style={{marginHorizontal:4}}
+                  <Button
+                     style={{
+                        backgroundColor: shared
+                           ? "green"
+                           : theme.colors.primary,
+                     }}
+                     disabled={loadingShare}
+                     loading={loadingShare}
+                     onPress={handleSharedPost}
+                     mode="contained">
+                     <Ionicons />
+                     <Ionicons
+                        style={{ marginHorizontal: 4 }}
                         size={18}
-                        name={shared?"checkmark":"share-social-outline"}
+                        name={shared ? "checkmark" : "share-social-outline"}
                      />
-                     <Text>{shared?"Shared Post Successfully":"Continue to share as a post"}</Text>
+                     <Text>
+                        {shared
+                           ? "Shared Post Successfully"
+                           : "Continue to share as a post"}
+                     </Text>
                   </Button>
                </View>
             </View>
          </Modal>
-          <Modal visible={openModal}>
+         <Modal visible={openModal}>
             <View
                style={{
                   flex: 1,
@@ -306,7 +269,7 @@ const PostComponent = (props: NPostComponentProps) => {
                   alignItems: "center",
                   paddingVertical: 4,
                }}>
-               <View style={{ backgroundColor: "#ffffff", paddingTop: 10}}>
+               <View style={{ backgroundColor: "#ffffff", paddingTop: 10 }}>
                   {/* <IconButton name='plus'/> */}
                   <Button mode="text" onPress={() => setOpenShareModal(false)}>
                      <Feather size={26} name="x" />
@@ -315,7 +278,7 @@ const PostComponent = (props: NPostComponentProps) => {
                </View>
             </View>
          </Modal>
-         {poster && (
+         {user && (
             <View
                style={{
                   flexDirection: "row",
@@ -323,19 +286,23 @@ const PostComponent = (props: NPostComponentProps) => {
                   padding: 8,
                }}>
                <Pressable onPress={gotoUserProfile}>
-                  <Avatar.Image
-                     size={45}
-                     source={{ uri: poster.profileImage }}
-                  />
+                  <Avatar.Image size={45} source={{ uri: user.profileImage }} />
                   {/* <Image
                      style={styles.profileImage}
                      
                   /> */}
                </Pressable>
-
-               <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
-                  {poster.firstName} {poster.middleName} {poster.lastName}
-               </Text>
+               <TextShortener
+                  style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}
+                  textLength={23}
+                  text={
+                     user.firstName +
+                     " " +
+                     user.middleName +
+                     " " +
+                     user.lastName
+                  }
+               />
                <View
                   style={{
                      flex: 1,
@@ -345,11 +312,9 @@ const PostComponent = (props: NPostComponentProps) => {
                      paddingHorizontal: 1,
                      borderRadius: 3,
                   }}>
-                  {currentUser?.id == props?.userId && (
+                  {currentUser?.id == props.post?.userId && (
                      <View>
-                        <Button
-                           style={{ backgroundColor: "#f9f9f9" }}
-                           onPress={() => setOpenModal(true)}>
+                        <Button onPress={() => setOpenModal(true)}>
                            <SimpleLineIcons name="options-vertical" />
                         </Button>
                      </View>
@@ -374,82 +339,166 @@ const PostComponent = (props: NPostComponentProps) => {
                      textAlignVertical: "center",
                      color: theme.colors.secondary,
                      fontFamily: "Poppins_300Light",
-                     fontSize:13
+                     fontSize: 13,
                   }}>
-                  posted {moment(props.createdAt).fromNow()}
+                  posted {moment(props.post.createdAt).fromNow()}
                </Text>
             </View>
 
-            {props.images && <ImagesViewer images={props.images} />}
+            {props.post.images && <ImagesViewer images={props.post.images} />}
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>
-        
-         {props.title && <Text style={styles.title}>{props?.title}</Text>}
 
-         {props?.text && (
-            <View style={{paddingHorizontal:8}}>
-               <HTML contentWidth={width} baseStyle={{fontFamily:"Poppins_300Light"}} systemFonts={["Poppins_300Light",'sans-serif']} source={{html:props.text}}/>
-            </View>
-            
+         {props.post.title && (
+            <Text style={styles.title}>{props.post?.title}</Text>
          )}
-          <View style={{ marginBottom:1}}>
-             <View style={{ paddingHorizontal: 8,marginVertical:4 }}>
+
+         {props.post?.text && (
+            <View style={{ paddingHorizontal: 8 }}>
+               <HTML
+                  contentWidth={width}
+                  baseStyle={{ fontFamily: "Poppins_300Light" }}
+                  systemFonts={["Poppins_300Light", "sans-serif"]}
+                  source={{ html: props.post.text }}
+               />
+            </View>
+         )}
+         <View style={{ marginBottom: 1 }}>
+            <View style={{ paddingHorizontal: 8, marginVertical: 4 }}>
                <Text>
                   <LikesComponent
-                     postId={props.id}
-                     numberOfLikes={likes?likes.length:0}
+                     postId={props.post.id}
+                     numberOfLikes={likesCount}
                   />
                </Text>
             </View>
             <View
-               style={styles.likeCommentAmountCon}>
-                  <Button disabled={loading}
-                     onPress={() => handleLike(props.id)} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1,alignItems:"center"}}>
-                      <Ionicons
-                        size={18}
-                        color={theme.colors.secondary}
-                        name={liked ? "heart-sharp" : "heart-outline"}
-                     />
-                      <Text style={styles.commentAmountText}>{likes?likes.length:0}</Text>
-                  </Button>
-              
-                  <Button contentStyle={{
-                     backgroundColor:"#f6f6f6",flex:1,alignItems:"center",flexDirection:"row"
-                  }} onPress = {()=>props.navigation.navigate("FullPostViewScreen", { ...props })} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1,alignItems:"center"}}>
-                   <Ionicons
-                        size={18}
-                       
-                        color={theme.colors.secondary}
-                        name="chatbox-outline"
-                     />
-                      <Text style={styles.commentAmountText}>
-                     {comments.length}
+               style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+               }}>
+               <View
+                  style={{
+                     flex: 1,
+                     flexDirection: "row",
+                     alignItems: "center",
+                     justifyContent: "center",
+                  }}>
+                  <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        fontSize: 12,
+                        marginHorizontal: 1,
+                     }}>
+                     {likesCount}
                   </Text>
-                  </Button>
-                  <Button onPress={()=>setOpenShareModal(true)} textColor={theme.colors.secondary} style={{backgroundColor:"#f6f6f6",flex:1}}>
-                     <Ionicons
-                        size={18}
-                        color={theme.colors.secondary}
-                        name="share-social-outline"
-                     />
-                     <Text style={styles.commentAmountText}>
-                     {shares?.length}
+                  <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        fontSize: 12,
+                        marginHorizontal: 2,
+                     }}>
+                     Likes
                   </Text>
-                  </Button>
-          
-            </View>
-           
-         </View>
-         <View>
-            <View style={{ padding: 5 }}>
-               <Comments
-                  posterId={props.userId}
-                  navigation={props?.navigation}
-                  comments={comments}
-               />
-            </View>
-         </View>
+               </View>
 
+               <View
+                  style={{
+                     flex: 1,
+                     flexDirection: "row",
+                     alignItems: "center",
+                     justifyContent: "center",
+                  }}>
+                  <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        fontSize: 12,
+                        marginHorizontal: 1,
+                     }}>
+                     {commentsCount}
+                  </Text>
+                  <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        fontSize: 12,
+                        marginHorizontal: 2,
+                     }}>
+                     Comments
+                  </Text>
+               </View>
+               <View
+                  style={{
+                     flex: 1,
+                     flexDirection: "row",
+                     alignItems: "center",
+                     justifyContent: "center",
+                  }}>
+                  <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        fontSize: 12,
+                        marginHorizontal: 1,
+                     }}>
+                     {sharesCount}
+                  </Text>
+                  <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        fontSize: 12,
+                        marginHorizontal: 2,
+                     }}>
+                     Shares
+                  </Text>
+               </View>
+            </View>
+            <Divider style={{ width: width - 40, alignSelf: "center" }} />
+            <View style={styles.likeCommentAmountCon}>
+               <Button
+                  disabled={loading}
+                  onPress={() => handleLike(props.post.id)}
+                  textColor={theme.colors.secondary}
+                  style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
+                  <Ionicons
+                     size={20}
+                     color={theme.colors.secondary}
+                     name={liked ? "heart-sharp" : "heart-outline"}
+                  />
+               </Button>
+
+               <Button
+                  contentStyle={{
+                     flex: 1,
+                     alignItems: "center",
+                     flexDirection: "row",
+                  }}
+                  onPress={() =>
+                     navigation.navigate("FullPostViewScreen", {
+                        ...props.post,
+                     })
+                  }
+                  textColor={theme.colors.secondary}
+                  style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
+                     <MaterialCommunityIcons
+                     name='comment-outline'
+                     size={20}
+                     color={theme.colors.secondary}
+                     />
+                  {/* <Ionicons
+                     size={20}
+                     color={theme.colors.secondary}
+                     name="chatbox-outline"
+                  /> */}
+               </Button>
+               <Button
+                  onPress={() => setOpenShareModal(true)}
+                  textColor={theme.colors.secondary}
+                  style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
+                  <MaterialCommunityIcons size={25} name="share-outline" />
+               </Button>
+            </View>
+         </View>
       </View>
    );
 };
@@ -483,18 +532,17 @@ const styles = StyleSheet.create({
       marginHorizontal: 5,
    },
    likeCommentAmountCon: {
-      flex:1,
+      flex: 1,
       flexDirection: "row",
       gap: 14,
       paddingVertical: 5,
-      paddingHorizontal:8,
-
+      paddingHorizontal: 8,
 
       // justifyContent:'center',
    },
    commentAmountText: {
       fontFamily: "Poppins_200ExtraLight",
-      fontSize: 16,
+      fontSize: 12,
    },
    profileImage: {
       width: 35,

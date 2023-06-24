@@ -1,28 +1,23 @@
-import { StyleSheet, Text, View,Dimensions } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, View, Dimensions } from "react-native";
+import React, { useState } from "react";
 import PhoneInput from "react-native-phone-number-input";
 import { Button, TextInput, useTheme } from "react-native-paper";
 
 const { width, height } = Dimensions.get("window");
 
+const BuyCommodityScreen = ({ navigation }: any) => {
+   const [loading, setLoading] = useState<boolean>(false);
+   const [phoneNumber, setPhoneNumber] = React.useState<string>("");
+   const [showPassword, setShowPassword] = React.useState<boolean>(false);
+   const [showPincode, setShowPincode] = React.useState<boolean>(false);
 
+   const handleBuyCommodity = async () => {};
 
-const BuyCommodityScreen = ({navigation}:any) => {
-
-  const [loading,setLoading] = useState<boolean>(false)
-  const [phoneNumber, setPhoneNumber] = React.useState<string>("");
-  const [showPassword, setShowPassword] = React.useState<boolean>(false);
-  const [showPincode, setShowPincode] = React.useState<boolean>(false);
- 
-  const handleBuyCommodity = async()=>{
-    
-  }
-
-  return (
-    <View>
-      <Text>BuyCommodityScreen</Text>
-          <View style={styles.form}>
-             <PhoneInput
+   return (
+      <View>
+         <Text>BuyCommodityScreen</Text>
+         <View style={styles.form}>
+            <PhoneInput
                containerStyle={styles.input}
                onChangeFormattedText={(text) => setPhoneNumber(text)}
                defaultCode="SL"
@@ -32,13 +27,15 @@ const BuyCommodityScreen = ({navigation}:any) => {
             <TextInput
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
-                keyboardType='numeric'
+               keyboardType="numeric"
                style={styles.input}
                label="Amount in commodity"
                right={
-                  <TextInput.Affix text='c' textStyle={{fontFamily:"Poppins_300Medium"}} />
-               }
-               ></TextInput>
+                  <TextInput.Affix
+                     text="c"
+                     textStyle={{ fontFamily: "Poppins_300Medium" }}
+                  />
+               }></TextInput>
             <TextInput
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
@@ -56,7 +53,7 @@ const BuyCommodityScreen = ({navigation}:any) => {
             <TextInput
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
-               keyboardType='numeric'
+               keyboardType="numeric"
                style={styles.input}
                label="TeleCom Pincode"
                // inputMode="text"
@@ -77,12 +74,11 @@ const BuyCommodityScreen = ({navigation}:any) => {
                </Button>
             </View>
          </View>
-    </View>
-  )
-}
+      </View>
+   );
+};
 
-export default BuyCommodityScreen
-
+export default BuyCommodityScreen;
 
 const styles = StyleSheet.create({
    form: {
@@ -100,5 +96,4 @@ const styles = StyleSheet.create({
       marginTop: 10,
       fontFamily: "Poppins_300Light",
    },
-
 });

@@ -18,7 +18,7 @@ const ProductNotificationScreen = ({ navigation, route }: any) => {
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.144.183:5000/api/notifications/product/${route.params.productId}`,
+                  `http://192.168.182.183:5000/api/notifications/product/${route.params.productId}`,
                   { method: "GET" }
                );
                let data = await response.json();

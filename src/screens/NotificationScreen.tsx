@@ -31,27 +31,24 @@ const NotificationScreen = ({ navigation }: any) => {
    useEffect(
       function () {
          console.log("Fetching user");
-        
+
          let fetchData = async () => {
             let activeUserId = currentUser?.id;
             try {
                let response = await fetch(
-                  `http://192.168.144.183:5000/api/notifications/${activeUserId}`,
+                  `http://192.168.182.183:5000/api/notifications/${activeUserId}`,
                   { method: "GET" }
                );
                let data = await response.json();
                if (data.status == "success") {
                   // console.log("User Notifications-----", data.data);
                   setNotifications(data.data);
-                
                } else {
                   Alert.alert("Failed", data.message);
                }
-           
             } catch (err) {
                console.log(err);
                Alert.alert("Failed", String(err));
-
             }
          };
          fetchData();
@@ -59,19 +56,19 @@ const NotificationScreen = ({ navigation }: any) => {
       [currentUser]
    );
 
-   if(!notifications)
+   if (!notifications)
       return (
          <ScrollView style={styles.container}>
-           <LoadingNotificationComponent/>
-           <LoadingNotificationComponent/>
-           <LoadingNotificationComponent/>
-           <LoadingNotificationComponent/>
-           <LoadingNotificationComponent/>
-           <LoadingNotificationComponent/>
-           <LoadingNotificationComponent/>
+            <LoadingNotificationComponent />
+            <LoadingNotificationComponent />
+            <LoadingNotificationComponent />
+            <LoadingNotificationComponent />
+            <LoadingNotificationComponent />
+            <LoadingNotificationComponent />
+            <LoadingNotificationComponent />
          </ScrollView>
       );
-   
+
    return (
       <ScrollView style={styles.container}>
          {notifications.map((notification) => {
@@ -108,7 +105,7 @@ export default NotificationScreen;
 const styles = StyleSheet.create({
    container: {
       backgroundColor: "#f5f5f5",
-      paddingBottom:10
+      paddingBottom: 10,
    },
    notContainer: {
       backgroundColor: "#ffffff",

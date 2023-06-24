@@ -7,7 +7,7 @@ import { ActivityIndicator } from "react-native-paper";
 import UserComponent from "../components/UserComponent";
 
 const FollowersScreen = ({ navigation, route }: any) => {
-   const [users, setUsers] = useState<User[]|null>(null);
+   const [users, setUsers] = useState<User[] | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
 
    useEffect(function () {
@@ -18,7 +18,7 @@ const FollowersScreen = ({ navigation, route }: any) => {
          let userId = route.params.user.id;
          try {
             let response = await fetch(
-               `http://192.168.144.183:5000/api/media/followers/${userId}`,
+               `http://192.168.182.183:5000/api/media/followers/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -55,22 +55,30 @@ const FollowersScreen = ({ navigation, route }: any) => {
          </View>
       );
    return (
-         <ScrollView style={styles.container}>
-               <View style={{flex:1,flexDirection:'row',alignItems:"center"}}>
-                 <Text style={{fontFamily:"Poppins_400Regular",marginHorizontal:5,fontSize:18}}>Followers</Text>
-                  <Text style={{fontFamily:"Poppins_400Regular",fontSize:18}}>{users.length}</Text>
-               </View>
-              {users.map((user) => {
-                  return (
-                     <UserComponent
-                        key={String(user.id)}
-                        navigation={navigation}
-                        _user={user}
-                     />
-                  );
-               })}
-         </ScrollView>
-
+      <ScrollView style={styles.container}>
+         <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+            <Text
+               style={{
+                  fontFamily: "Poppins_400Regular",
+                  marginHorizontal: 5,
+                  fontSize: 18,
+               }}>
+               Followers
+            </Text>
+            <Text style={{ fontFamily: "Poppins_400Regular", fontSize: 18 }}>
+               {users.length}
+            </Text>
+         </View>
+         {users.map((user) => {
+            return (
+               <UserComponent
+                  key={String(user.id)}
+                  navigation={navigation}
+                  _user={user}
+               />
+            );
+         })}
+      </ScrollView>
    );
 };
 

@@ -6,17 +6,25 @@ declare type CurrentUser = {
    followingIds: number[];
 };
 
-declare type CommentProps = {
+declare type PostComment = {
    id?: number;
    postId?: number;
-   posterId?: number;
    userId?: number;
    text?: string;
    createdAt?: Date;
    updatedAt?: Date;
 };
 
-declare type ProductCommentProps = {
+declare type CommentReply = {
+   id: number;
+   commentId: number;
+   userId: number;
+   text: string;
+   createdAt: Date;
+   updatedAt: Date;
+};
+
+declare type Product = {
    id?: number;
    productId?: number;
    posterId?: number;
@@ -29,12 +37,12 @@ declare type ProductCommentProps = {
 };
 
 declare type ProductComment = {
-   id?: number;
-   productId?: number;
-   userId?: number;
-   text?: string;
-   createdAt?: Date;
-   updatedAt?: Date;
+   id: number;
+   productId: number;
+   userId: number;
+   text: string;
+   createdAt: Date;
+   updatedAt: Date;
 };
 
 declare type Action = {
@@ -42,7 +50,7 @@ declare type Action = {
    payload?: any;
 };
 
-declare type Like = {
+declare type PostLike = {
    id?: number;
    postId?: number;
    userId?: number;
@@ -58,7 +66,6 @@ declare type PostShare = {
    updatedAt?: Date;
 };
 
-
 declare type ProductReview = {
    id?: number;
    productId?: number;
@@ -66,8 +73,6 @@ declare type ProductReview = {
    createdAt?: Date;
    updatedAt?: Date;
 };
-
-
 
 declare type ProductLike = {
    id?: number;
@@ -77,39 +82,40 @@ declare type ProductLike = {
    updatedAt?: Date;
 };
 
-declare type PostComponentProps = {
+declare type Post = {
    id: number;
    text: string;
    title: string | null;
    images: string[] | null;
    video: string | null;
    userId: number;
-   fromId?:number |null;
-   shared?:number|null;
+   fromId?: number | null;
+   fromPostId?: number | null;
+   shared?: number | null;
    createdAt: Date;
    updatedAt: Date;
 };
 
-declare type ProductComponentProps = {
-   id: number;
-   productName: string;
-   category: string;
-   description: string;
-   images: string[];
-   price: string;
-   affiliateId?: number[] | null;
-   initialPrice: string | null;
-   affiliatePrice: string | null;
-   sizes: string[] | null;
-   numberAvailable: string | null;
-   rating: number | null;
-   availability: string | null;
-   userId: number;
-   createdAt: Date;
-   updatedAt: Date;
-   navigation?: any;
-   route?: any;
-};
+// declare type ProductComponentProps = {
+//    id: number;
+//    productName: string;
+//    category: string;
+//    description: string;
+//    images: string[];
+//    price: string;
+//    affiliateId?: number[] | null;
+//    initialPrice: string | null;
+//    affiliatePrice: string | null;
+//    sizes: string[] | null;
+//    numberAvailable: string | null;
+//    rating: number | null;
+//    availability: string | null;
+//    userId: number;
+//    createdAt: Date;
+//    updatedAt: Date;
+//    navigation?: any;
+//    route?: any;
+// };
 
 declare type User = {
    id: number;

@@ -14,12 +14,19 @@ import { useCurrentUser } from "../../utils/CustomHooks";
 import SharedPostComponent from "./SharedPostComponent";
 import { ActivityIndicator, Divider } from "react-native-paper";
 import {LoadingPostComponent} from "./LoadingComponents";
+import { useNavigation } from "@react-navigation/native";
 
-type PostsComponentProps = {
-   navigation?: any;
-};
+type PostComponentProps = {
+   post:Post
+   user:User
+   secondUser:User
+   commentsCount:number
+   likesCount:number
+   sharesCount:number
+   liked:boolean
+}
 
-const PostsComponent = ({ navigation }: PostsComponentProps) => {
+const PostsComponent = () => {
    const [posts, setPosts] = useState<PostComponentProps[]>([]);
    const [allPosts, setAllPosts] = useState<PostComponentProps[]>([]);
    const [pageNumber, setPageNumber] = useState<number>(1);
@@ -28,6 +35,7 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const [refreshing, setRefreshing] = useState<boolean>(false);
    const currentUser = useCurrentUser();
+   const navigation = useNavigation()
 
    useEffect(
       function () {
@@ -37,7 +45,7 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
                if (currentUser) {
                   let activeUserId = currentUser?.id;
                   let response = await fetch(
-                     `http://192.168.144.183:5000/api/media/posts/${activeUserId}`
+                     `http://192.168.182.183:5000/api/media/posts/session/${activeUserId}`
                   );
                   let data = await response.json();
                   if (data.status == "success") {
@@ -93,20 +101,18 @@ const PostsComponent = ({ navigation }: PostsComponentProps) => {
       <FlatList
          refreshing={refreshing}
          onRefresh={()=> setRefreshing(true)}
-         keyExtractor={(item) => String(item.id)}
+         keyExtractor={(item) => String(item.post.id)}
          data={posts}
-         renderItem={({ item, index, separators }) => {if(item?.fromId) { return (
+         renderItem={({ item, index, separators }) => {if(item.post?.fromId) { return (
             <SharedPostComponent
-               key={String(item.id)}
+               key={String(item.post.id)}
                {...item}
-               navigation={navigation}
             />
          )}else{
              return (
             <PostComponent
-               key={String(item.id)}
+               key={String(item.post.id)}
                {...item}
-               navigation={navigation}
             />
          )
 

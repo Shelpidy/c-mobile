@@ -63,7 +63,7 @@ const BankCardForm = () => {
 
       try {
          const response = await axios.post(
-            "http://192.168.144.183:5000/api/auth/bcards/",
+            "http://192.168.182.183:5000/api/auth/bcards/",
             { ...state }
          );
          // Handle success

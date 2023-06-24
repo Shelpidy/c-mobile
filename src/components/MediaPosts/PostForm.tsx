@@ -1,4 +1,12 @@
-import { StyleSheet, Text, View, Alert, Modal, KeyboardAvoidingView,Platform} from "react-native";
+import {
+   StyleSheet,
+   Text,
+   View,
+   Alert,
+   Modal,
+   KeyboardAvoidingView,
+   Platform,
+} from "react-native";
 import React, { useState, useEffect, useReducer, useMemo } from "react";
 import { Button, TextInput, useTheme } from "react-native-paper";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
@@ -7,18 +15,22 @@ import { ImagePicker } from "expo-image-multiple-picker";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import config from "../.././aws-config";
 import AWS from "aws-sdk";
-import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
+import {
+   actions,
+   RichEditor,
+   RichToolbar,
+} from "react-native-pell-rich-editor";
 const s3 = new AWS.S3({
    accessKeyId: config.accessKeyId,
    secretAccessKey: config.secretAccessKey,
    region: config.region,
 });
 
-type Post = Partial<Omit<PostComponentProps, "id" | "updatedAt" | "createdAt">>;
+type NPost = Partial<Omit<Post, "id" | "updatedAt" | "createdAt">>;
 
 const initialState = {};
 
-const postReducer = (state: Post = initialState, action: Action) => {
+const postReducer = (state: NPost = initialState, action: Action) => {
    switch (action.type) {
       case "TEXT":
          return { ...state, text: action.payload };
@@ -49,10 +61,10 @@ const PostForm = () => {
 
    const handlePost = async () => {
       let activeUserId = currentUser?.id;
-      setLoading(true)
+      setLoading(true);
       let postObj = { ...postState, userId: activeUserId };
       // let images = props.images?.map(image => image?.trimEnd())
-       // Upload images to S3
+      // Upload images to S3
       // const uploadedImageURLs = [];
       // for (const imageUri of postObj.images) {
       //    const imageName = imageUri.substring(imageUri.lastIndexOf("/") + 1);
@@ -76,19 +88,19 @@ const PostForm = () => {
 
       // Update product with uploaded image URLs
       // postObj.images = uploadedImageURLs;
-      
-      let finalPostObj = {postObj:{...postObj,fromId:activeUserId},sharedPostId:null};
-      console.log(postObj)
+
+      let finalPostObj = { postObj, sharedPostId: null };
+      console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.144.183:5000/api/media/posts/",
+            "http://192.168.182.183:5000/api/media/posts/",
             finalPostObj
          );
          if (response.status === 201) {
             console.log(response.data);
             setLoading(false);
             Alert.alert("Successful", "Post successfully");
-          
+
             // Alert.alert("Successful", "Post successfully");
          } else {
             setLoading(false);
@@ -101,7 +113,6 @@ const PostForm = () => {
 
       // console.log(postState);
    };
-
 
    const chooseImage = (assets: any[]) => {
       let imageSrcs = assets.map((asset) => asset.uri);
@@ -140,7 +151,7 @@ const PostForm = () => {
    return (
       <View
          style={{
-            marginVertical:4,
+            marginVertical: 4,
          }}>
          <Modal visible={imageOpen}>
             <ImagePicker
@@ -159,30 +170,47 @@ const PostForm = () => {
                image={false}
             />
          </Modal>
-         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.formContainer}>
+         <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.formContainer}>
             <TextInput
-              contentStyle={{backgroundColor:"#f6f6f6"}}
+               contentStyle={{ backgroundColor: "#f6f6f6" }}
                outlineStyle={{ borderColor: "#f0f0f0" }}
                onChangeText={onValueChangeTitle}
                mode="outlined"
                label="Title"
             />
-             <Text style={{marginTop:5,fontFamily:"Poppins_300Light"}}>Content</Text>
-             <RichToolbar
-             
-            editor={richText}
-            actions={[ actions.setBold, actions.setItalic, actions.setUnderline,actions.setStrikethrough,actions.blockquote,actions.alignCenter,actions.alignFull,actions.alignLeft,
-                actions.alignRight,actions.insertBulletsList,
-                actions.insertOrderedList,actions.undo,actions.redo,actions.indent,actions.setSuperscript,actions.setSubscript]}
+            <Text style={{ marginTop: 5, fontFamily: "Poppins_300Light" }}>
+               Content
+            </Text>
+            <RichToolbar
+               editor={richText}
+               actions={[
+                  actions.setBold,
+                  actions.setItalic,
+                  actions.setUnderline,
+                  actions.setStrikethrough,
+                  actions.blockquote,
+                  actions.alignCenter,
+                  actions.alignFull,
+                  actions.alignLeft,
+                  actions.alignRight,
+                  actions.insertBulletsList,
+                  actions.insertOrderedList,
+                  actions.undo,
+                  actions.redo,
+                  actions.indent,
+                  actions.setSuperscript,
+                  actions.setSubscript,
+               ]}
             />
-             <RichEditor
-             editorStyle={{backgroundColor:"#f6f6f6"}}
-             initialHeight={200}
-             initialContentHTML="<b>Write your content here</b>"
-   
-              ref={richText}
-              onChange={onValueChangeContent}
-          />
+            <RichEditor
+               editorStyle={{ backgroundColor: "#f6f6f6" }}
+               initialHeight={200}
+               initialContentHTML="<b>Write your content here</b>"
+               ref={richText}
+               onChange={onValueChangeContent}
+            />
             <Text
                style={{
                   textAlign: "center",
@@ -196,7 +224,7 @@ const PostForm = () => {
                   style={styles.button}
                   mode="contained"
                   onPress={() => setImageOpen(true)}>
-                  <AntDesign size={20} name="picture"/>
+                  <AntDesign size={20} name="picture" />
                </Button>
                <Button
                   style={styles.button}
@@ -235,9 +263,3 @@ const styles = StyleSheet.create({
       marginHorizontal: 3,
    },
 });
-
-
-
-
-
-

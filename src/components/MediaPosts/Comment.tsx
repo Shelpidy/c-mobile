@@ -7,75 +7,182 @@ import {
    Alert,
    Pressable,
    TextInput,
+   TouchableHighlight,
+   KeyboardAvoidingView,
+   ScrollView,
+   Dimensions,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { users } from "../../data";
-import { Feather, SimpleLineIcons, FontAwesome } from "@expo/vector-icons";
-import { Avatar, Button, useTheme } from "react-native-paper";
+import {
+   MaterialCommunityIcons,
+   SimpleLineIcons,
+   FontAwesome,
+   AntDesign,
+   EvilIcons,
+   Ionicons
+} from "@expo/vector-icons";
+import { Avatar, Button, Divider, useTheme } from "react-native-paper";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import TextShortener from "../TextShortener";
 
+type CommentProps = {
+   comment: PostComment;
+   repliesCount: number;
+   likesCount: number;
+   liked: boolean;
+   user: User;
+   posterId?: number;
+};
+
+type FetchReply = {
+   reply: PostComment;
+   likesCount: number;
+   liked: boolean;
+   user: User;
+};
+
+const {height} =Dimensions.get("window")
+
 const Comment = (props: CommentProps) => {
    const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
-   const [commentor, setCommentor] = useState<any>(null);
-   const [loading, setLoading] = useState<any>(false);
-   const [comment, setComment] = useState<string>("");
+   const [openRepliesModal, setOpenRepliesModal] = useState<boolean>(false);
+   const [commentor, setCommentor] = useState<User | null>(null);
+   const [loading, setLoading] = useState<boolean>(false);
+   const [commentText, setCommentText] = useState<string>("");
+   const [replyText, setReplyText] = useState<string>("");
+   const [comment, setComment] = useState<PostComment>(props.comment);
+   const [replies, setReplies] = useState<FetchReply[]>([]);
+   const [likesCount, setLikesCount] = useState<number>(0);
+   const [liked, setLiked] = useState<boolean>(false);
+   const [repliesCount, setRepliesCount] = useState<number>(0);
 
    const theme = useTheme();
-
+   const inputRef = useRef<TextInput>(null)
    const navigation = useNavigation<any>();
 
+   useEffect(() => {
+      setComment(props.comment);
+      setCommentor(props.user);
+      setLiked(props.liked);
+      setLikesCount(props.likesCount);
+      setRepliesCount(props.repliesCount);
+   }, []);
+
+
+   
    useEffect(
       function () {
-         console.log("Fetching user");
-         setLoading(true);
          let fetchData = async () => {
-            // console.log("Fetching user")
-            //  let activeUserId = 1
             try {
-               if (props) {
-                  let response = await fetch(
-                     `http://192.168.144.183:5000/api/auth/users/${props?.userId}`,
-                     { method: "GET" }
-                  );
-                  let data = await response.json();
-                  if (data.status == "success") {
-                     // console.log("Users-----",data.data)
-                     setCommentor(data.data.personal);
-                     setComment(props?.text || "");
-                     // Alert.alert("Success",data.message)
-                     setLoading(false);
-                  } else {
-                     Alert.alert("Failed", data.message);
-                  }
-               }
-
-               setLoading(false);
+               if(currentUser){
+               let commentId = props.comment?.id
+               console.log(commentId,currentUser)
+               let response = await fetch(
+                  `http://192.168.182.183:5000/api/media/posts/comments/${commentId}/replies/${currentUser?.id}`
+               );
+               let { data } = await response.json();
+               if (response.ok) {
+                  setReplies(data?.data ?? []);
+                  console.log("Replies=>", data.data);
+               } else {
+                  Alert.alert("Failed", data.message);
+               }}
             } catch (err) {
-               console.log(err);
-               Alert.alert("Failed", String(err));
-               setLoading(false);
+               console.log("From Comment",String(err))
+               Alert.alert("Failed Comment", String(err));
             }
          };
          fetchData();
       },
-      []
+      [currentUser,repliesCount]
    );
+
+
+   const handleReplyModal = ()=>{
+      setOpenRepliesModal(true)
+      inputRef.current?.focus()
+   }
+
+
+
+   const handleReply = async () => {
+      setLoading(true);
+
+      let activeUserId = currentUser?.id;
+      let replyObj = {
+         text: replyText,
+         commentId: comment?.id,
+         userId: activeUserId,
+      };
+      console.log("CommentObj", replyObj);
+      try {
+         let { data } = await axios.post(
+            `http://192.168.182.183:5000/api/media/posts/comments/replies/`,
+            replyObj
+         );
+         if (data.status == "success") {
+            // console.log(data.data);
+            // setComments([...comments, data.data]);
+            setReplyText("");
+            setRepliesCount((prev) => prev + 1);
+
+            // setComment(comment);
+
+            Alert.alert("Success", data.message);
+         } else {
+            Alert.alert("Failed", data.message);
+         }
+         setLoading(false);
+      } catch (err) {
+         Alert.alert("Failed", String(err));
+         setLoading(false);
+      }
+   };
+
+
+   const handleLike = async (commentId?: number) => {
+      console.log(commentId);
+      if (commentId) {
+         try {
+            setLoading(true);
+            let activeUserId = currentUser?.id;
+            let { data } = await axios.put(
+               `http://192.168.182.183:5000/api/media/posts/comments/likes/`,
+               { userId: activeUserId, commentId: commentId }
+            );
+            if (data.status == "success") {
+               let { liked, numberOfLikes } = data.data;
+               setLiked(liked);
+               setLikesCount(numberOfLikes);
+
+               Alert.alert("Success", data.message);
+            } else {
+               Alert.alert("Failed", data.message);
+            }
+            setLoading(false);
+         } catch (err) {
+            console.log(err);
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      }
+   };
 
    const handleUpdateComment = () => {
       setLoading(true);
       async function UpdateComment() {
          try {
-            let putObj = { text: comment, id: props.id };
+            let putObj = { text: commentText, id: comment?.id };
             let response = await axios.put(
-               "`http://192.168.144.183:5000/media/posts/comments",
+               "`http://192.168.182.183:5000/media/posts/comments",
                putObj
             );
             if (response.status == 202) {
-               props.text = comment;
+               setComment({ ...comment, text: commentText });
                Alert.alert("Success", "Comment Updated");
             } else {
                Alert.alert("Failed", response.data.message);
@@ -91,15 +198,103 @@ const Comment = (props: CommentProps) => {
    };
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === commentor.id) {
-         navigation.navigate("ProfileScreen", { userId: commentor.id });
+      if (currentUser?.id === commentor?.id) {
+         navigation.navigate("ProfileScreen", { userId: commentor?.id });
       } else {
-         navigation.navigate("UserProfileScreen", { userId: commentor.id });
+         navigation.navigate("UserProfileScreen", { userId: commentor?.id });
       }
    };
 
    return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container}>
+          <Modal visible={openRepliesModal}>
+          
+            <View 
+             style={{
+               borderTopEndRadius:10,
+               backgroundColor: "#00000099",
+              }}
+           >
+            <ScrollView style={{
+               top:height/7,
+               borderTopEndRadius:10,
+               backgroundColor: "#fff",
+              }}>
+             <View style={{width:"100%",alignItems:"flex-end",justifyContent:"flex-end"}}>
+               <Button onPress={() => setOpenRepliesModal(false)}>
+               <AntDesign size={18} name="close"/>
+            </Button>
+              
+               </View>
+               {replies.length < 1 && 
+              <View style={{width:"100%",alignItems:"center"}}>
+               <MaterialCommunityIcons
+                     
+                     name='comment-outline'
+                     style={{fontWeight:"normal",opacity:0.6}}
+                     size={200}
+                     color={theme.colors.secondary}
+                     />
+                  <Text style={{fontFamily:"Poppins_300Light",textAlign:"center",margin:10}}>Be the first to comment</Text>
+                  <KeyboardAvoidingView
+                  style={{
+                     marginTop: 5,
+                     paddingHorizontal:20,
+                     flexDirection: "row",
+                     alignItems: "center",
+                     justifyContent: "center",
+                  }}>
+                  <TextInput
+                      multiline
+                     ref={inputRef}
+                     value={replyText}
+                     placeholder="Comment here..."
+                     onChangeText={(v) => setReplyText(v)}
+                     style={{
+                        flex: 1,
+                        borderTopLeftRadius: 20,
+                        borderBottomLeftRadius: 20,
+                        height: 50,
+                        paddingHorizontal: 25,
+                     }}
+                  />
+                  <Button
+                    loading={loading}
+                    disabled={loading}
+                      mode='text'
+                     onPress={handleReply}
+                     style={{
+                        paddingHorizontal: 20,
+                        height: 50,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderTopRightRadius: 20,
+                        borderBottomRightRadius: 20,
+                     }}>
+                     <FontAwesome
+                        color={theme.colors.secondary}
+                        name="send"
+                        size={20}
+                     />
+                  </Button>
+                      </KeyboardAvoidingView>
+               </View>}
+           
+               {
+                  <View>
+                   
+                  </View>
+               }
+            </ScrollView>
+          
+          
+             
+             
+               </View>
+      
+           
+           
+         </Modal>
          <Modal visible={openModal}>
             <View
                style={{
@@ -133,9 +328,9 @@ const Comment = (props: CommentProps) => {
                         justifyContent: "center",
                      }}>
                      <TextInput
-                        value={comment}
+                        value={commentText}
                         placeholder="Comment here..."
-                        onChangeText={(v) => setComment(v)}
+                        onChangeText={(v) => setCommentText(v)}
                         style={{
                            flex: 1,
                            backgroundColor: "#f6f6f6",
@@ -158,7 +353,7 @@ const Comment = (props: CommentProps) => {
                         }}>
                         <FontAwesome
                            color={theme.colors.primary}
-                           name="comment-o"
+                           name="send"
                            size={23}
                         />
                      </Pressable>
@@ -172,7 +367,7 @@ const Comment = (props: CommentProps) => {
                   <Pressable onPress={gotoUserProfile}>
                      <Avatar.Image
                         source={{ uri: commentor.profileImage }}
-                        size={30}
+                        size={35}
                      />
                      {/* <Image
                         style={styles.profileImage}
@@ -182,28 +377,38 @@ const Comment = (props: CommentProps) => {
 
                   <View
                      style={{
-                        backgroundColor: "#f5f5f5",
+                        // backgroundColor: "#f5f5f5",
                         flex: 1,
                         borderRadius: 30,
-                        paddingHorizontal: 15,
+                        paddingLeft: 2,
+                        paddingRight:15,
                         paddingVertical: 2,
                      }}>
                      <View
                         style={{
                            flex: 1,
                            flexDirection: "row",
-                           alignItems: "center",
+                           alignItems: "flex-start",
                            justifyContent: "space-between",
                         }}>
-                        <TextShortener style={styles.userFullName} textLength={22} text={commentor.firstName+""+commentor.middleName+" "+commentor.lastName} />
-                        {(currentUser?.id == props?.userId ||
+                        <TextShortener
+                           style={styles.userFullName}
+                           textLength={24}
+                           text={
+                              commentor.firstName +
+                              "" +
+                              commentor.middleName +
+                              " " +
+                              commentor.lastName
+                           }
+                        />
+                        {(currentUser?.id == commentor.id ||
                            currentUser?.id == props?.posterId) && (
-                           <View style={{ flexDirection: "row" }}>
-                              <Button
-                                 onPress={() => setOpenModal(true)}>
-                                 <SimpleLineIcons name="options-vertical" />
-                              </Button>
-                           </View>
+                           <SimpleLineIcons
+                              style={{ marginTop: 6 }}
+                              onPress={() => setOpenModal(true)}
+                              name="options"
+                           />
                         )}
                      </View>
 
@@ -211,23 +416,64 @@ const Comment = (props: CommentProps) => {
                         style={{
                            fontFamily: "Poppins_300Light",
                            paddingHorizontal: 5,
+                           fontSize: 13,
+                           color:theme.colors.secondary
                         }}>
-                        {props.text}
+                        {comment?.text}
                      </Text>
                      {/* <Text>Comment Likes</Text>  */}
                      <View
                         style={{
-                           justifyContent: "flex-end",
-                           alignItems: "flex-end",
+                           flex: 1,
+                           justifyContent: "flex-start",
+                           flexDirection: "row",
+                           alignItems: "center",
                            marginTop: 2,
                            paddingHorizontal: 5,
                            borderRadius: 3,
-                        }}></View>
+                           gap: 1,
+                        }}>
+                        <Divider style={{ width: 70 }} />
+                        <Button labelStyle ={{
+                                    fontFamily: "Poppins_300Light",
+                                    paddingHorizontal: 3,
+                                    fontSize: 13,
+                                    color:theme.colors.secondary
+                                 }} onPress={handleReplyModal} mode="text">Reply</Button>
+                        <Button labelStyle ={{
+                                    fontFamily: "Poppins_300Light",
+                                    paddingHorizontal: 3,
+                                    fontSize: 13,
+                                    color:theme.colors.secondary
+
+                                 }} onPress={() => console.log("Comment Pressed")}>
+                            <Ionicons
+                        size={17}
+                        color={theme.colors.secondary}
+                        name="chatbox-outline"
+                     />
+                              {repliesCount}
+                        </Button>
+                        <Button labelStyle ={{
+                                    fontFamily: "Poppins_300Light",
+                                    paddingHorizontal: 3,
+                                    fontSize: 13,
+                                    color:theme.colors.secondary
+                                 }} onPress={() => handleLike(comment.id)}>
+                             <AntDesign
+                                 size={18}
+                                 name={liked ? "like1" : "like2"}
+                                 color={theme.colors.secondary}
+                              />
+                             {likesCount}
+                        </Button>
+                     </View>
+                     
                   </View>
                </View>
             </View>
          )}
-      </View>
+      </KeyboardAvoidingView>
    );
 };
 

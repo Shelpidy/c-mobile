@@ -90,7 +90,7 @@ const UpdatePostForm = (post: NPostComponentProps) => {
       postObj.images = uploadedImageURLs;
       try {
          let response = await axios.put(
-            "http://192.168.144.183:5000/api/media/posts/",
+            "http://192.168.182.183:5000/api/media/posts/",
             postObj
          );
          if (response.status === 202) {

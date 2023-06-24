@@ -73,38 +73,35 @@ const NotificationProductReviewComponent = ({
    const [buyer, setBuyer] = useState<User>();
    const theme = useTheme();
    const navigation = useNavigation<any>();
-      const [roomId, setRoomId] = useState<number|null>(null);
-
+   const [roomId, setRoomId] = useState<number | null>(null);
 
    //////////////////// GET ROOM ID /////////////////
 
    useEffect(
       function () {
-         
          let fetchData = async () => {
             // console.log("Fetching user")
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.144.183:8080/api/room/${buyer?.id}/${currentUser?.id}`,
+                  `http://192.168.182.183:8080/api/room/${buyer?.id}/${currentUser?.id}`,
                   { method: "GET" }
                );
                let data = await response.json();
                if (data.status == "success") {
                   console.log("RoomId", data.data.roomId);
                   setRoomId(data.data.roomId);
-
-            }} catch (err) {
+               }
+            } catch (err) {
                console.log(err);
                Alert.alert("Failed", String(err));
             }
          };
-         if(currentUser && buyer){
-             fetchData();
+         if (currentUser && buyer) {
+            fetchData();
          }
-       
       },
-      [currentUser,buyer]
+      [currentUser, buyer]
    );
 
    useEffect(function () {
@@ -116,7 +113,7 @@ const NotificationProductReviewComponent = ({
          try {
             if (props) {
                let response = await fetch(
-                  `http://192.168.144.183:5000/api/auth/users/${props.userId}`,
+                  `http://192.168.182.183:5000/api/auth/users/${props.userId}`,
                   { method: "GET" }
                );
 
@@ -151,7 +148,7 @@ const NotificationProductReviewComponent = ({
          try {
             if (props) {
                let response = await fetch(
-                  `http://192.168.144.183:5000/api/auth/users/${buyerId}`,
+                  `http://192.168.182.183:5000/api/auth/users/${buyerId}`,
                   { method: "GET" }
                );
 
@@ -262,7 +259,7 @@ const NotificationProductReviewComponent = ({
                      onPress={() =>
                         navigation.navigate("ChatScreen", {
                            user: buyer,
-                           roomId
+                           roomId,
                         })
                      }
                      mode="contained">

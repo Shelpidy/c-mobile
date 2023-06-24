@@ -32,11 +32,11 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
          let fetchData = async () => {
             // console.log("Fetching user")
             //  let activeUserId = 1
-            console.log(user?.id)
+            console.log(user?.id);
             try {
                if (currentUser) {
                   let response = await fetch(
-                     `http://192.168.144.183:5000/api/auth/users/${user?.id}`,
+                     `http://192.168.182.183:5000/api/auth/users/${user?.id}`,
                      { method: "GET" }
                   );
 
@@ -44,13 +44,11 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
                      let data = await response.json();
                      console.log("User Top-----", data.data);
                      setUser(data.data.personal);
-                    
                   } else {
                      let data = await response.json();
                      Alert.alert("Failed", data.message);
                   }
                }
-
             } catch (err) {
                console.log(err);
                Alert.alert("Failed", String(err));
@@ -110,10 +108,7 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
                   paddingVertical: 5,
                }}>
                <Pressable onPress={gotoUserProfile}>
-                  <Avatar.Image
-                     source={{ uri: user.profileImage }}
-                     size={40}
-                  />
+                  <Avatar.Image source={{ uri: user.profileImage }} size={40} />
                </Pressable>
                <View
                   style={{

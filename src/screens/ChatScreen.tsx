@@ -48,8 +48,6 @@ import {
 import * as FileSystem from "expo-file-system";
 import { useSelector } from "react-redux";
 
-
-
 type ChatBoxProps = {
    onSend: () => void;
    onTextInput: (v: string) => void;
@@ -221,7 +219,7 @@ const ChatBox = ({
    );
 };
 
-const ChatScreen = ({ route,navigation }: any) => {
+const ChatScreen = ({ route, navigation }: any) => {
    const [messages, setMessages] = useState<IMessage[] | null>(null);
    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
    const theme = useTheme();
@@ -236,7 +234,7 @@ const ChatScreen = ({ route,navigation }: any) => {
    const currentUser = useCurrentUser();
    const [secondUser, setSecondUser] = useState<User>();
    const [sound, setSound] = useState<Audio.Sound | null>(null);
-   const [socket,setSocket] = useState<Socket | null>(null)
+   const [socket, setSocket] = useState<Socket | null>(null);
    const isOnline = useNetworkStatus();
    const [lastSeen, setLastSeen] = useState<any>();
    const [typing, setTyping] = useState<boolean | null>(false);
@@ -274,32 +272,32 @@ const ChatScreen = ({ route,navigation }: any) => {
 
    ////// RECONNECT TO SOCKET FOR CHAT ////////////////////////////
 
-   
    React.useEffect(() => {
-      if(currentUser){
+      if (currentUser) {
          let newSocket = io(
-            `http://192.168.144.183:8080/?userId=${currentUser.id}&roomId=${route.params?.roomId}&roomType=c`
+            `http://192.168.182.183:8080/?userId=${currentUser.id}&roomId=${route.params?.roomId}&roomType=c`
          );
-         setSocket(newSocket)
-    
+         setSocket(newSocket);
+
          // cleanup function to close the socket connection when the component unmounts
          return () => {
             newSocket.close();
-         }
+         };
       }
    }, [currentUser]);
 
-   
-
    //////////////////// ADD USER STATUS TO AS BEING IN THIS ROOM/////////////////
 
-   useEffect(()=>{
-      if(socket && currentUser){
-         console.log("Activating room for ",currentUser.id)
+   useEffect(() => {
+      if (socket && currentUser) {
+         console.log("Activating room for ", currentUser.id);
          let roomId = route.params?.roomId;
-         socket.emit("activeRoom",{userId:currentUser.id,activeRoom:`c-${roomId}`})
+         socket.emit("activeRoom", {
+            userId: currentUser.id,
+            activeRoom: `c-${roomId}`,
+         });
       }
-   },[socket,currentUser])
+   }, [socket, currentUser]);
 
    //////////////////////////////// GET SECOND USER STATUS ///////////////////////////
 
@@ -311,7 +309,7 @@ const ChatScreen = ({ route,navigation }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.144.183:8080/api/userstatus/${secUserId}`,
+                  `http://192.168.182.183:8080/api/userstatus/${secUserId}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -320,8 +318,7 @@ const ChatScreen = ({ route,navigation }: any) => {
                   if (data.data.online) {
                      setLastSeen("online");
                   } else {
-                     let lastSeenDate = moment(
-                        data.data.updatedAt).fromNow();
+                     let lastSeenDate = moment(data.data.updatedAt).fromNow();
                      setLastSeen(lastSeenDate);
                   }
                } else {
@@ -347,7 +344,7 @@ const ChatScreen = ({ route,navigation }: any) => {
          if (socket && currentUser) {
             socket.emit("activeRoom", {
                userId: currentUser.id,
-               activeRoom:null,
+               activeRoom: null,
             });
          }
       });
@@ -385,12 +382,11 @@ const ChatScreen = ({ route,navigation }: any) => {
    useEffect(() => {
       let secUserId = route.params.user.id;
       let activeUser = currentUser?.id;
-      let roomId = route.params.roomId
+      let roomId = route.params.roomId;
       // console.log(roomId);
       // console.log("Socket connecting");
 
       if (socket) {
-         
          socket.on("message", (msg: any) => {
             // console.log("Message from the server", msg);
          });
@@ -409,24 +405,23 @@ const ChatScreen = ({ route,navigation }: any) => {
 
          ///////////// Online Status listener ///////////
 
-         socket.on("online", (data:any) => {
+         socket.on("online", (data: any) => {
             // console.log("From Online", { online: data.online });
             if (data.userId == secondUser?.id) {
-                console.log("From Online",data);
-                 if (data.online) {
-                     setLastSeen("online");
-                  } else {
-                     let lastSeenDate = moment(
-                        data.updatedAt).fromNow();
-                     setLastSeen(lastSeenDate);
-                  }
+               console.log("From Online", data);
+               if (data.online) {
+                  setLastSeen("online");
+               } else {
+                  let lastSeenDate = moment(data.updatedAt).fromNow();
+                  setLastSeen(lastSeenDate);
+               }
                setResetLastSeen(resetLastSeen + 1);
             }
          });
 
          //////// Check or listen for typing status //////////
 
-         socket.on("typing", (data:any) => {
+         socket.on("typing", (data: any) => {
             // console.log("From Typing", { typing: data.typing });
             if (data.userId == secUserId) {
                setTyping(data.typing);
@@ -435,7 +430,7 @@ const ChatScreen = ({ route,navigation }: any) => {
 
          ///////// check or listen for recording ///////////////
 
-         socket.on("recording", (data:any) => {
+         socket.on("recording", (data: any) => {
             console.log("From Recording", { recording: data.recording });
             if (data.userId == secUserId) {
                setSocketRecording(data.recording);
@@ -454,7 +449,7 @@ const ChatScreen = ({ route,navigation }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.144.183:8080/api/messages/${roomId}/${currentPage}/${numberOfChatsRecord}`,
+                  `http://192.168.182.183:8080/api/messages/${roomId}/${currentPage}/${numberOfChatsRecord}`,
                   { method: "GET" }
                );
                let { messages: chatMessages, count } = await resp.json();
@@ -638,7 +633,7 @@ const ChatScreen = ({ route,navigation }: any) => {
       return (
          <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-           <ActivityIndicator size={42} />
+            <ActivityIndicator size={42} />
          </View>
       );
    }
@@ -717,8 +712,8 @@ const ChatScreen = ({ route,navigation }: any) => {
                            fontFamily: "Poppins_300Light",
                            color: theme.colors.inversePrimary,
                            marginRight: 1,
-                           fontSize:12,
-                           alignSelf:"flex-end"
+                           fontSize: 12,
+                           alignSelf: "flex-end",
                         }}>
                         {lastSeen}
                      </Text>

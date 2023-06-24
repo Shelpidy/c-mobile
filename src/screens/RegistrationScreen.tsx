@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, ScrollView, KeyboardAvoidingView,Platform} from "react-native";
+import {
+   StyleSheet,
+   Text,
+   View,
+   ScrollView,
+   KeyboardAvoidingView,
+   Platform,
+} from "react-native";
 import React from "react";
 import PersonalInfoRegistrationForm from "../components/MediaPosts/RegistrationFormPersonal";
 import { Button } from "react-native-paper";
@@ -19,8 +26,9 @@ type RegistrationScreenProps = {
 const RegistrationScreen = (props: RegistrationScreenProps) => {
    const [activeFormPosition, setActiveFormPosition] = React.useState(0);
    return (
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-
+      <KeyboardAvoidingView
+         behavior={Platform.OS === "ios" ? "padding" : "height"}
+         style={styles.container}>
          <View>
             <PositionIndicator
                position={activeFormPosition}
@@ -36,7 +44,7 @@ const RegistrationScreen = (props: RegistrationScreenProps) => {
          {activeFormPosition === 2 && (
             <Form3 setActiveTab={setActiveFormPosition} {...props} />
          )}
-          {activeFormPosition === 3 && (
+         {activeFormPosition === 3 && (
             <Form4 setActiveTab={setActiveFormPosition} {...props} />
          )}
          {activeFormPosition === 4 && (
@@ -66,7 +74,6 @@ const RegistrationScreen = (props: RegistrationScreenProps) => {
          {activeFormPosition === 5 && (
             <Form5 setActiveTab={setActiveFormPosition} {...props} />
          )}
-         
       </KeyboardAvoidingView>
    );
 };

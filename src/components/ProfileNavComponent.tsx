@@ -7,7 +7,7 @@ import {
    MaterialCommunityIcons,
    MaterialIcons,
 } from "@expo/vector-icons";
-import { Button, useTheme,Card} from "react-native-paper";
+import { Button, useTheme, Card } from "react-native-paper";
 import { useCurrentUser } from "../utils/CustomHooks";
 
 const { width } = Dimensions.get("window");
@@ -78,7 +78,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                </Button>
             </View>
          )}
-          {currentUser?.id === user?.id && (
+         {currentUser?.id === user?.id && (
             <View style={styles.navLink}>
                <MaterialCommunityIcons
                   name="transfer"
@@ -94,7 +94,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
                </Text>
                <Button
                   onPress={() => navigation.navigate("BuyCommodityScreen")}>
-                  <Entypo name="chevron-thin-right"/>
+                  <Entypo name="chevron-thin-right" />
                </Button>
             </View>
          )}
@@ -154,7 +154,6 @@ const styles = StyleSheet.create({
       // marginBottom:120,
       paddingVertical: 15,
       paddingHorizontal: 10,
-   
    },
    navLink: {
       flexDirection: "row",

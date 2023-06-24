@@ -25,14 +25,13 @@ import ProductNotificationScreen from "../screens/ProductNotificationScreen";
 import ProductPostScreen from "../screens/ProductPostScreen";
 import ConversationsScreen from "../screens/ConversationsScreen";
 import { useNavigationState, useRoute } from "@react-navigation/native";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setPersonalInfoForm, setSocket } from "../redux/action";
 import { useCurrentUser, useNetworkStatus } from "../utils/CustomHooks";
-import {io,Socket} from "socket.io-client"
+import { io, Socket } from "socket.io-client";
 import { Alert } from "react-native";
 import BuyCommodityScreen from "../screens/BuyCommodityScreen";
 import FullSharedPostComponent from "../screens/FullSharedPostViewScreen";
-
 
 // import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -69,37 +68,39 @@ const RenderHeader = () => {
    //    ]?.name === "ChatScreen" && chatScreenIndex === screenNames.length - 1;
    // console.log(isOnChatScreen);
    // if (isOnChatScreen) return null;
-   
-   if (router.name === "ChatScreen" || router.name === 'ProductCommentsViewerScreen' || router.name === "CommentsViewerScreen") return null;
+
+   if (
+      router.name === "ChatScreen" ||
+      router.name === "ProductCommentsViewerScreen" ||
+      router.name === "CommentsViewerScreen"
+   )
+      return null;
    return <CustomHeader />;
 };
 
 const HomeStack = (props: HomeStackProps) => {
    const [socket, _setSocket] = React.useState<Socket | null>(null);
-   const isConnectedToInternet = useNetworkStatus()
-   const currentUser = useCurrentUser()
-   const dispatch = useDispatch()
-
+   const isConnectedToInternet = useNetworkStatus();
+   const currentUser = useCurrentUser();
+   const dispatch = useDispatch();
 
    React.useEffect(() => {
-      if(currentUser){
+      if (currentUser) {
          let newSocket = io(
-            `http://192.168.144.183:8080/?userId=${currentUser.id}`
+            `http://192.168.182.183:8080/?userId=${currentUser.id}`
          );
-         _setSocket(newSocket)
-         dispatch(setSocket(newSocket))
+         _setSocket(newSocket);
+         dispatch(setSocket(newSocket));
 
          // cleanup function to close the socket connection when the component unmounts
          return () => {
             newSocket.close();
-         }
+         };
       }
    }, [currentUser]);
 
-
-
    return (
-      <Stack.Navigator screenOptions={{ header:RenderHeader}}>
+      <Stack.Navigator screenOptions={{ header: RenderHeader }}>
          <Stack.Screen name="HomeScreen" component={HomeScreen}></Stack.Screen>
          <Stack.Screen
             name="ProfileScreen"
@@ -160,7 +161,7 @@ const HomeStack = (props: HomeStackProps) => {
          <Stack.Screen
             name="ProductPostScreen"
             component={ProductPostScreen}></Stack.Screen>
-          <Stack.Screen
+         <Stack.Screen
             name="BuyCommodityScreen"
             component={BuyCommodityScreen}></Stack.Screen>
          <Stack.Screen

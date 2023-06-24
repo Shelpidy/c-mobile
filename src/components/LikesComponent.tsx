@@ -19,7 +19,7 @@ const LikesComponent = ({ postId, numberOfLikes }: LikesComponentProps) => {
             try {
                if (currentUser) {
                   let { data, status } = await axios.get(
-                     `http://192.168.144.183:5000/api/media/posts/likes/${postId}/${currentUser.id}`
+                     `http://192.168.182.183:5000/api/media/posts/likes/${postId}/${currentUser.id}`
                   );
                   if (status == 200) {
                      setUsers(data.data.sessionUsers);
@@ -44,14 +44,16 @@ const LikesComponent = ({ postId, numberOfLikes }: LikesComponentProps) => {
    }
 
    if (users.length < 1) {
-      return (
-         <View>
-            <Text>likes {numberOfLikes}</Text>
-         </View>
-      );
+      return <View></View>;
    }
    return (
-      <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+      <View
+         style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            marginVertical: 8,
+         }}>
          <View style={{ marginRight: 4 }}>
             {users.map((user) => (
                <Avatar.Image
@@ -68,7 +70,11 @@ const LikesComponent = ({ postId, numberOfLikes }: LikesComponentProps) => {
             </Text>
             <Text>
                <TextShortener
-                  style={{ fontWeight: "bold", marginHorizontal: 2 }}
+                  style={{
+                     fontWeight: "bold",
+                     marginHorizontal: 2,
+                     fontFamily: "Poppins_400Regular",
+                  }}
                   text={
                      users[0]?.firstName +
                      " " +
@@ -76,7 +82,7 @@ const LikesComponent = ({ postId, numberOfLikes }: LikesComponentProps) => {
                      " " +
                      users[0]?.lastName
                   }
-                  textLength={12}
+                  textLength={10}
                />
             </Text>
             <Text>

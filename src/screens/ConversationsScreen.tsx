@@ -4,7 +4,7 @@ import {
    Alert,
    ScrollView,
    FlatList,
-   Dimensions
+   Dimensions,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useCurrentUser } from "../utils/CustomHooks";
@@ -12,8 +12,7 @@ import ConversationComponent from "../components/ConversationComponent";
 import { LoadingConversationComponent } from "../components/MediaPosts/LoadingComponents";
 import { Skeleton } from "@rneui/themed";
 
-const {width} = Dimensions.get("window")
-
+const { width } = Dimensions.get("window");
 
 const NewConversationsScreen = () => {
    const [conversations, setConversations] = useState<Conversation[] | null>(
@@ -34,11 +33,10 @@ const NewConversationsScreen = () => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.144.183:8080/api/messages/chats/${userId}/${currentPage}/${numberOfConversationsRecord}`,
+                  `http://192.168.182.183:8080/api/messages/chats/${userId}/${currentPage}/${numberOfConversationsRecord}`,
                   { method: "GET" }
                );
-               let { chats: newConversations, count } =
-                  await resp.json();
+               let { chats: newConversations, count } = await resp.json();
                // console.log("conversations Messages", chatMessages);
                setTotalConversations(count);
                if (conversations && currentPage > 1) {
@@ -53,31 +51,42 @@ const NewConversationsScreen = () => {
          };
          fetchData();
       }
-   }, [currentUser, currentPage,convId]);
+   }, [currentUser, currentPage, convId]);
 
-     if(!conversations)
+   if (!conversations)
       return (
-         <ScrollView style={{marginBottom:10}}>
-            <View style={{flex:1,alignItems:'center',justifyContent:"center",marginVertical:4}}>
-                <Skeleton style={{borderRadius:4,marginTop:4}} animation='wave' width={width-14} height={53} />
+         <ScrollView style={{ marginBottom: 10 }}>
+            <View
+               style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginVertical: 4,
+               }}>
+               <Skeleton
+                  style={{ borderRadius: 4, marginTop: 4 }}
+                  animation="wave"
+                  width={width - 14}
+                  height={53}
+               />
             </View>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-           <LoadingConversationComponent/>
-       </ScrollView>
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+            <LoadingConversationComponent />
+         </ScrollView>
       );
 
    return (
@@ -86,7 +95,10 @@ const NewConversationsScreen = () => {
          keyExtractor={(item) => String(item.id)}
          renderItem={({ item, index, separators }) => (
             <View key={String(item.id)}>
-               <ConversationComponent setTopConvId={(id)=>setConvId(id)} conversation={item} />
+               <ConversationComponent
+                  setTopConvId={(id) => setConvId(id)}
+                  conversation={item}
+               />
             </View>
          )}
       />

@@ -8,33 +8,40 @@ import {
    View,
    Alert,
 } from "react-native";
-import { ActivityIndicator, Button, IconButton, TextInput, useTheme } from "react-native-paper";
+import {
+   ActivityIndicator,
+   Button,
+   IconButton,
+   TextInput,
+   useTheme,
+} from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CountDown from "react-native-countdown-component";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import OTPTextInput from "../OTPTextInput";
 import { TouchableHighlight } from "react-native-gesture-handler";
-import {useDispatch,useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 type Form5Props = {
    navigation: any;
    setActiveTab: (index: number) => void;
-
 };
 
 const { width, height } = Dimensions.get("window");
 
-const Form5 = ({ navigation, setActiveTab}: Form5Props) => {
+const Form5 = ({ navigation, setActiveTab }: Form5Props) => {
    const [resetTimer, setResetTimer] = React.useState<any>("0");
    const [timer, setTimer] = React.useState<any>(60 * 3 + 1);
-   let state = useSelector((state:any)=> state.rootReducer)
+   let state = useSelector((state: any) => state.rootReducer);
    let theme = useTheme();
-   const [verificationCode,setVerificationCode] = React.useState<string|number|null>(null)
-   React.useEffect(()=>{
+   const [verificationCode, setVerificationCode] = React.useState<
+      string | number | null
+   >(null);
+   React.useEffect(() => {
       /// send email for verification
-      console.log("Registration Data =>",state)
-      let email = state?.personalInfo?.email
-   },[])
+      console.log("Registration Data =>", state);
+      let email = state?.personalInfo?.email;
+   }, []);
 
    const verifyEmailCode = () => {
       Alert.alert("Email verified", "You have successfully verified");
@@ -42,14 +49,17 @@ const Form5 = ({ navigation, setActiveTab}: Form5Props) => {
    };
 
    const submitForm5 = (n: number) => {
-      console.log("Registraion Object =>",state);
+      console.log("Registraion Object =>", state);
       setActiveTab(n);
    };
 
-   if(!verificationCode){
-      return  <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
-              <ActivityIndicator/>
+   if (!verificationCode) {
+      return (
+         <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <ActivityIndicator />
          </View>
+      );
    }
    return (
       <View>
@@ -70,7 +80,8 @@ const Form5 = ({ navigation, setActiveTab}: Form5Props) => {
                      fontFamily: "Poppins_300Light",
                      marginVertical: 10,
                   }}>
-                  Enter the confirmation sent to the email {state?.personalInfo?.emal}
+                  Enter the confirmation sent to the email{" "}
+                  {state?.personalInfo?.emal}
                </Text>
                <TouchableHighlight>
                   <Text

@@ -21,8 +21,10 @@ import ProfileNavComponent from "../components/ProfileNavComponent";
 import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import SearchForm from "../components/SearchForm";
 import SharedPostComponent from "../components/MediaPosts/SharedPostComponent";
-import { LoadingPostComponent, LoadingProfileComponent } from "../components/MediaPosts/LoadingComponents";
-
+import {
+   LoadingPostComponent,
+   LoadingProfileComponent,
+} from "../components/MediaPosts/LoadingComponents";
 
 const { width, height } = Dimensions.get("window");
 
@@ -55,7 +57,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.144.183:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.182.183:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -84,7 +86,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
             let userId = route.params.userId;
             try {
                let response = await fetch(
-                  `http://192.168.144.183:5000/api/media/posts/user/${userId}`
+                  `http://192.168.182.183:5000/api/media/posts/user/${userId}`
                );
                let data = await response.json();
                if (data.status == "success") {
@@ -121,137 +123,135 @@ const ProfileScreen = ({ navigation, route }: any) => {
       setPosts(allPosts?.slice(currentIndex, lastIndex));
    }, [pageNumber]);
 
-   if(!user){
-      return (<LoadingProfileComponent/>)
+   if (!user) {
+      return <LoadingProfileComponent />;
    }
 
    return (
       <ScrollView
          style={{ flex: 1, backgroundColor: "#f6f6f6", paddingTop: 10 }}>
-               <View style={{ justifyContent: "center", alignItems: "center" }}>
-                  <Avatar.Image
-                     style={{ borderColor: theme.colors.primary }}
-                     size={120}
-                     source={{ uri: user?.personal?.profileImage }}
-                  />
+         <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <Avatar.Image
+               style={{ borderColor: theme.colors.primary }}
+               size={120}
+               source={{ uri: user?.personal?.profileImage }}
+            />
+            <Text
+               style={{
+                  textAlign: "center",
+                  marginTop: 10,
+                  fontFamily: "Poppins_500Medium",
+               }}>
+               {user?.personal?.fullName}
+            </Text>
+         </View>
+         <ScrollView horizontal style={styles.mediaContainer}>
+            <View style={{ alignItems: "center", margin: 4 }}>
+               <Text
+                  style={{
+                     textAlign: "center",
+                     fontFamily: "Poppins_400Regular",
+                     color: theme.colors.secondary,
+                     fontSize: 16,
+                  }}>
+                  {user?.followers?.count}
+               </Text>
+               <Button
+                  style={{ backgroundColor: "#fff" }}
+                  onPress={() =>
+                     navigation.navigate("FollowersScreen", {
+                        user: user?.personal,
+                     })
+                  }>
+                  <Text
+                     style={{
+                        // fontWeight: "bold",
+                        textAlign: "center",
+                        fontFamily: "Poppins_400Regular",
+                        color: theme.colors.secondary,
+                        fontSize: 15,
+                     }}>
+                     Followers
+                  </Text>
+               </Button>
+            </View>
+
+            <View style={{ alignItems: "center", margin: 4 }}>
+               <Text
+                  style={{
+                     textAlign: "center",
+                     fontFamily: "Poppins_400Regular",
+                     // color:theme.colors.secondary,
+                     fontSize: 16,
+                  }}>
+                  {user?.followings?.count}
+               </Text>
+               <Button
+                  style={{ backgroundColor: "#fff" }}
+                  onPress={() =>
+                     navigation.navigate("FollowingsScreen", {
+                        user: user?.personal,
+                     })
+                  }>
                   <Text
                      style={{
                         textAlign: "center",
-                        marginTop: 10,
-                        fontFamily: "Poppins_500Medium",
+                        fontFamily: "Poppins_400Regular",
+                        color: theme.colors.secondary,
+                        //  color:theme.colors.secondary,
+                        fontSize: 15,
                      }}>
-                     {user?.personal?.fullName}
+                     Following
                   </Text>
-               </View>
-               <ScrollView horizontal style={styles.mediaContainer}>
-                  <View style={{ alignItems: "center", margin: 4 }}>
-                     <Text
-                        style={{
-                           textAlign: "center",
-                           fontFamily: "Poppins_400Regular",
-                           color: theme.colors.secondary,
-                           fontSize: 16,
-                        }}>
-                        {user?.followers?.count}
-                     </Text>
-                     <Button
-                        style={{ backgroundColor: "#fff" }}
-                        onPress={() =>
-                           navigation.navigate("FollowersScreen", {
-                              user: user?.personal,
-                           })
-                        }>
-                        <Text
-                           style={{
-                              // fontWeight: "bold",
-                              textAlign: "center",
-                              fontFamily: "Poppins_400Regular",
-                              color: theme.colors.secondary,
-                              fontSize: 15,
-                           }}>
-                           Followers
-                        </Text>
-                     </Button>
-                  </View>
+               </Button>
+            </View>
 
-                  <View style={{ alignItems: "center", margin: 4 }}>
-                     <Text
-                        style={{
-                           textAlign: "center",
-                           fontFamily: "Poppins_400Regular",
-                           // color:theme.colors.secondary,
-                           fontSize: 16,
-                        }}>
-                        {user?.followings?.count}
-                     </Text>
-                     <Button
-                        style={{ backgroundColor: "#fff" }}
-                        onPress={() =>
-                           navigation.navigate("FollowingsScreen", {
-                              user: user?.personal,
-                           })
-                        }>
-                        <Text
-                           style={{
-                              textAlign: "center",
-                              fontFamily: "Poppins_400Regular",
-                              color: theme.colors.secondary,
-                              //  color:theme.colors.secondary,
-                              fontSize: 15,
-                           }}>
-                           Following
-                        </Text>
-                     </Button>
-                  </View>
-           
-                  <View style={{ alignItems: "center", margin: 4 }}>
-                     <Text
-                        style={{
-                           textAlign: "center",
-                           fontFamily: "Poppins_400Regular",
-                           //  color:theme.colors.secondary,
-                           fontSize: 15,
-                        }}>
-                        {user?.sales?.count}
-                     </Text>
-                     <Button style={{ backgroundColor: "#fff" }}>
-                        <Text
-                           style={{
-                              // fontWeight: "bold",
-                              textAlign: "center",
-                              fontFamily: "Poppins_400Regular",
-                              color: theme.colors.secondary,
-                              fontSize: 15,
-                           }}>
-                           Sales
-                        </Text>
-                     </Button>
-                  </View>
-                  <View style={{ alignItems: "center", margin: 4 }}>
-                     <Text
-                        style={{
-                           textAlign: "center",
-                           fontFamily: "Poppins_400Regular",
-                           // color:theme.colors.secondary,
-                           fontSize: 15,
-                        }}>
-                        {user?.affiliates?.count}
-                     </Text>
-                     <Button style={{ backgroundColor: "#fff" }}>
-                        <Text
-                           style={{
-                              // fontWeight: "bold",
-                              textAlign: "center",
-                              fontFamily: "Poppins_400Regular",
-                              color: theme.colors.secondary,
-                           }}>
-                           Affiliate Product
-                        </Text>
-                     </Button>
-                  </View>
-               </ScrollView>
-
-        
+            <View style={{ alignItems: "center", margin: 4 }}>
+               <Text
+                  style={{
+                     textAlign: "center",
+                     fontFamily: "Poppins_400Regular",
+                     //  color:theme.colors.secondary,
+                     fontSize: 15,
+                  }}>
+                  {user?.sales?.count}
+               </Text>
+               <Button style={{ backgroundColor: "#fff" }}>
+                  <Text
+                     style={{
+                        // fontWeight: "bold",
+                        textAlign: "center",
+                        fontFamily: "Poppins_400Regular",
+                        color: theme.colors.secondary,
+                        fontSize: 15,
+                     }}>
+                     Sales
+                  </Text>
+               </Button>
+            </View>
+            <View style={{ alignItems: "center", margin: 4 }}>
+               <Text
+                  style={{
+                     textAlign: "center",
+                     fontFamily: "Poppins_400Regular",
+                     // color:theme.colors.secondary,
+                     fontSize: 15,
+                  }}>
+                  {user?.affiliates?.count}
+               </Text>
+               <Button style={{ backgroundColor: "#fff" }}>
+                  <Text
+                     style={{
+                        // fontWeight: "bold",
+                        textAlign: "center",
+                        fontFamily: "Poppins_400Regular",
+                        color: theme.colors.secondary,
+                     }}>
+                     Affiliate Product
+                  </Text>
+               </Button>
+            </View>
+         </ScrollView>
 
          <View style={{ alignItems: "center", marginBottom: 5 }}>
             <ProfileNavComponent
@@ -262,20 +262,23 @@ const ProfileScreen = ({ navigation, route }: any) => {
 
          {!posts && (
             <ScrollView>
-                  <LoadingPostComponent/>
-                  <LoadingPostComponent/>
+               <LoadingPostComponent />
+               <LoadingPostComponent />
             </ScrollView>
-        
          )}
          {posts && posts.length > 1 && (
             <SearchForm setSearchValue={(v) => searchPosts(v)} />
          )}
          {posts &&
             posts.map((post) => {
-               if(post.fromId){
-                  return <SharedPostComponent key={String(post.id)}
-                  {...post}
-                  navigation={navigation} />
+               if (post.fromId) {
+                  return (
+                     <SharedPostComponent
+                        key={String(post.id)}
+                        {...post}
+                        navigation={navigation}
+                     />
+                  );
                }
                return (
                   <PostComponent

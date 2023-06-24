@@ -20,7 +20,7 @@ import { useSelector } from "react-redux";
 
 type ConversationComponentProps = {
    conversation: Conversation;
-   setTopConvId:(id:any)=> void
+   setTopConvId: (id: any) => void;
 };
 
 const { width, height } = Dimensions.get("window");
@@ -33,7 +33,7 @@ const generateRoomId = (secUserId: any, activeUserId: any) => {
 
 const ConversationComponent = ({
    conversation,
-   setTopConvId
+   setTopConvId,
 }: ConversationComponentProps) => {
    const [secondUser, setSecondUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
@@ -47,7 +47,7 @@ const ConversationComponent = ({
    const currentUser = useCurrentUser();
    const [newConversation, setNewConversation] =
       useState<Conversation>(conversation);
-   const {socket} = useSelector((state:any)=> state.rootReducer)
+   const { socket } = useSelector((state: any) => state.rootReducer);
 
    //////////////////  GET SECOND USER ///////////////
    useEffect(
@@ -57,13 +57,13 @@ const ConversationComponent = ({
             let fetchData = async () => {
                // console.log("Fetching user")
                //  let activeUserId = 1
-               let userIds = [conversation.senderId,conversation.recipientId];
+               let userIds = [conversation.senderId, conversation.recipientId];
                let secondUserId = Number(
                   userIds.filter((id) => Number(id) != currentUser.id)[0]
                );
                try {
                   let response = await fetch(
-                     `http://192.168.144.183:5000/api/auth/users/${secondUserId}`,
+                     `http://192.168.182.183:5000/api/auth/users/${secondUserId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -87,10 +87,13 @@ const ConversationComponent = ({
 
    ///////////////////////////////// Join a room //////////////////////////////
    useEffect(() => {
-      if(socket && conversation && currentUser){
-         socket.emit("joinRoom",{room:`c-${conversation.id}`,userId:currentUser.id})
+      if (socket && conversation && currentUser) {
+         socket.emit("joinRoom", {
+            room: `c-${conversation.id}`,
+            userId: currentUser.id,
+         });
       }
-   }, [conversation,socket,currentUser]);
+   }, [conversation, socket, currentUser]);
 
    //////////////////////////////// GET SECOND USER STATUS ///////////////////////////
 
@@ -101,7 +104,7 @@ const ConversationComponent = ({
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.144.183:8080/api/userstatus/${secondUser.id}`,
+                  `http://192.168.182.183:8080/api/userstatus/${secondUser.id}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -110,9 +113,7 @@ const ConversationComponent = ({
                   if (data.data.online) {
                      setLastSeen("online");
                   } else {
-                     let lastSeenDate = moment(
-                        data.data.updatedAt
-                       ).fromNow();
+                     let lastSeenDate = moment(data.data.updatedAt).fromNow();
                      setLastSeen(lastSeenDate);
                   }
                } else {
@@ -144,24 +145,22 @@ const ConversationComponent = ({
 
          /////// Online Status listener ///////////
 
-         socket.on("online", (data:any) => {
-            
+         socket.on("online", (data: any) => {
             if (data.userId == secondUser?.id) {
-               console.log("From Online",data);
-                 if (data.online) {
-                     setLastSeen("online");
-                  } else {
-                     let lastSeenDate = moment(
-                        data.updatedAt).fromNow();
-                     setLastSeen(lastSeenDate);
-                  }
+               console.log("From Online", data);
+               if (data.online) {
+                  setLastSeen("online");
+               } else {
+                  let lastSeenDate = moment(data.updatedAt).fromNow();
+                  setLastSeen(lastSeenDate);
+               }
                setResetLastSeen(resetLastSeen + 1);
             }
          });
 
          //////// Check or listen for typing status //////////
 
-         socket.on("typing", (data:any) => {
+         socket.on("typing", (data: any) => {
             console.log("From Typing", { typing: data.typing });
             if (data.userId == secUserId) {
                setTyping(data.typing);
@@ -170,7 +169,7 @@ const ConversationComponent = ({
 
          ///////// check or listen for recording ///////////////
 
-         socket.on("recording", (data:any) => {
+         socket.on("recording", (data: any) => {
             console.log("From Recording", { recording: data.recording });
             if (data.userId == secUserId) {
                setRecording(data.recording);
@@ -179,30 +178,46 @@ const ConversationComponent = ({
 
          ////////////// check for conversation /////////////////
 
-         socket.on("conversation", (data:any) => {
+         socket.on("conversation", (data: any) => {
             console.log("From Conversation", { conversation: data });
             setNewConversation(data);
-            setTopConvId(data.id)
+            setTopConvId(data.id);
          });
       }
    }, [socket, currentUser, secondUser]);
 
-   const gotoChatScreen = async() => {
-      if(conversation.recipientId === currentUser?.id && !conversation.recipientReadStatus){
-         try{
-            let {data,status} = await axios.put(`http://192.168.144.183:8080/api/messages/chats/read/${conversation.id}/${conversation.recipientId}`)
-            if(status === 202){
-               setNewConversation({...newConversation,numberOfUnreadText:null,recipientReadStatus:true})
-               navigation.navigate("ChatScreen", { user: secondUser,roomId:conversation.id});
-            }else{
-               console.log(data.messages)
-               navigation.navigate("ChatScreen", { user: secondUser,roomId:conversation.id});
+   const gotoChatScreen = async () => {
+      if (
+         conversation.recipientId === currentUser?.id &&
+         !conversation.recipientReadStatus
+      ) {
+         try {
+            let { data, status } = await axios.put(
+               `http://192.168.182.183:8080/api/messages/chats/read/${conversation.id}/${conversation.recipientId}`
+            );
+            if (status === 202) {
+               setNewConversation({
+                  ...newConversation,
+                  numberOfUnreadText: null,
+                  recipientReadStatus: true,
+               });
+               navigation.navigate("ChatScreen", {
+                  user: secondUser,
+                  roomId: conversation.id,
+               });
+            } else {
+               console.log(data.messages);
+               navigation.navigate("ChatScreen", {
+                  user: secondUser,
+                  roomId: conversation.id,
+               });
             }
-         }catch(error){
-
-         }
+         } catch (error) {}
       }
-      navigation.navigate("ChatScreen", { user: secondUser,roomId:conversation.id});
+      navigation.navigate("ChatScreen", {
+         user: secondUser,
+         roomId: conversation.id,
+      });
    };
    if (!newConversation) {
       return (

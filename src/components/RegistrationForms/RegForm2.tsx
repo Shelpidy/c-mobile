@@ -10,9 +10,8 @@ import {
 } from "react-native";
 import { Button, IconButton, TextInput, useTheme } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import {useDispatch,useSelector} from "react-redux"
+import { useDispatch, useSelector } from "react-redux";
 import { setPersonalInfoForm } from "../../redux/action";
-
 
 type Form2Props = {
    navigation: any;
@@ -23,8 +22,8 @@ const { width, height } = Dimensions.get("window");
 
 const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
    let theme = useTheme();
-   let {personalInfo} = useSelector((state:any)=> state.rootReducer)
-   let dispatch = useDispatch()
+   let { personalInfo } = useSelector((state: any) => state.rootReducer);
+   let dispatch = useDispatch();
    const [showPassword, setShowPassword] = React.useState<boolean>(false);
    const [showConPassword, setShowConPassword] = React.useState<boolean>(false);
    const [showPincode, setShowPincode] = React.useState<boolean>(false);
@@ -34,33 +33,32 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
    const [pinCode, setPinCode] = React.useState<string>("");
    const [conPinCode, setConPinCode] = React.useState<string>("");
 
-
    const submitForm2 = (n: number) => {
-      if(password.length < 5){
-         Alert.alert("Password Invalid","password must be greater than five characters")
-      }
-      else if(password !== conPassword){
-         Alert.alert("Password Invalid","passwords must match")
-      }
-      else if(pinCode.length < 5){
-         Alert.alert("Pincode Invalid","pincode must be greater than four characters")
-      }
-
-      else if(pinCode !== conPinCode){
-         Alert.alert("Pincode Invalid","pincodes must match")
-      }
-      else{
-         dispatch(setPersonalInfoForm({password}))
-         dispatch(setPersonalInfoForm({pinCode}))
-         console.log("Form 2 submitted",personalInfo);
+      if (password.length < 5) {
+         Alert.alert(
+            "Password Invalid",
+            "password must be greater than five characters"
+         );
+      } else if (password !== conPassword) {
+         Alert.alert("Password Invalid", "passwords must match");
+      } else if (pinCode.length < 5) {
+         Alert.alert(
+            "Pincode Invalid",
+            "pincode must be greater than four characters"
+         );
+      } else if (pinCode !== conPinCode) {
+         Alert.alert("Pincode Invalid", "pincodes must match");
+      } else {
+         dispatch(setPersonalInfoForm({ password }));
+         dispatch(setPersonalInfoForm({ pinCode }));
+         console.log("Form 2 submitted", personalInfo);
          setActiveTab(n);
       }
    };
-    
-   const goBack =(n:number)=>{
-      setActiveTab(n);
 
-   }
+   const goBack = (n: number) => {
+      setActiveTab(n);
+   };
    return (
       <KeyboardAvoidingView>
          <Image
@@ -75,7 +73,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
             source={require("../../../assets/Illustrators/ani-signup.gif")}></Image>
          <View style={styles.form}>
             <TextInput
-               onChangeText={(value)=> setPassword(value)}
+               onChangeText={(value) => setPassword(value)}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
@@ -90,7 +88,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                      }></TextInput.Icon>
                }></TextInput>
             <TextInput
-               onChangeText={(value)=> setConPassword(value)}
+               onChangeText={(value) => setConPassword(value)}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
@@ -105,7 +103,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                      }></TextInput.Icon>
                }></TextInput>
             <TextInput
-               onChangeText={(value)=> setPinCode(value)}
+               onChangeText={(value) => setPinCode(value)}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}
@@ -120,7 +118,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                      }></TextInput.Icon>
                }></TextInput>
             <TextInput
-               onChangeText={(value)=> setConPinCode(value)}
+               onChangeText={(value) => setConPinCode(value)}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}

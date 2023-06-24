@@ -12,7 +12,10 @@ import SearchForm from "../components/SearchForm";
 import PostProductFormNav from "../components/PostProductFormNav";
 import { useCurrentUser } from "../utils/CustomHooks";
 import { ActivityIndicator } from "react-native-paper";
-import { LoadingPostComponent, LoadingProductComponent } from "../components/MediaPosts/LoadingComponents";
+import {
+   LoadingPostComponent,
+   LoadingProductComponent,
+} from "../components/MediaPosts/LoadingComponents";
 import { Skeleton } from "@rneui/themed";
 
 // import { Products as _fetchedPost } from "../../data";
@@ -22,7 +25,9 @@ type ProductsComponentProps = {
 };
 
 const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
-   const [products, setProducts] = useState<ProductComponentProps[]|null|[]>(null);
+   const [products, setProducts] = useState<
+      ProductComponentProps[] | null | []
+   >(null);
    const [allProducts, setAllProducts] = useState<ProductComponentProps[]>([]);
    const [pageNumber, setPageNumber] = useState<number>(1);
    const [numberOfProductsPerPage, setNumberOfProductsPerPage] =
@@ -35,7 +40,7 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       let fetchData = async () => {
          try {
             let response = await fetch(
-               "http://192.168.144.183:5000/api/marketing/products"
+               "http://192.168.182.183:5000/api/marketing/products"
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -67,7 +72,7 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
    useEffect(() => {
       const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
       const lastIndex = currentIndex + numberOfProductsPerPage;
-      setProducts(products?.slice(currentIndex, lastIndex)??[]);
+      setProducts(products?.slice(currentIndex, lastIndex) ?? []);
    }, [pageNumber]);
 
    const searchProducts = (_token: string) => {
@@ -82,27 +87,33 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
       setProducts(newProducts);
    };
 
-    if(!products)
+   if (!products)
       return (
          <ScrollView>
             <PostProductFormNav page="product" navigation={navigation} />
-            <View style={{justifyContent:"center",alignItems:"center"}}><Skeleton width={345} height={50} style={{borderRadius:25,margin:1}} /></View>
+            <View style={{ justifyContent: "center", alignItems: "center" }}>
+               <Skeleton
+                  width={345}
+                  height={50}
+                  style={{ borderRadius: 25, margin: 1 }}
+               />
+            </View>
             <FlatList
-            data={["1","2","3","4"]}
-            keyExtractor={(item) => item}
-            indicatorStyle="white"
-            renderItem={({ item, index, separators }) => (
-               <LoadingProductComponent key={item} />
-            )}
-         />
+               data={["1", "2", "3", "4"]}
+               keyExtractor={(item) => item}
+               indicatorStyle="white"
+               renderItem={({ item, index, separators }) => (
+                  <LoadingProductComponent key={item} />
+               )}
+            />
          </ScrollView>
-      )
-   
+      );
+
    return (
       <ScrollView style={{ backgroundColor: "#f6f6f6" }}>
          <PostProductFormNav page="product" navigation={navigation} />
-         <SearchForm setSearchValue={searchProducts}/>
-          <FlatList
+         <SearchForm setSearchValue={searchProducts} />
+         <FlatList
             data={products}
             keyExtractor={(item) => String(item.id)}
             indicatorStyle="white"
@@ -111,8 +122,9 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
                   key={String(item.id)}
                   {...item}
                   navigation={navigation}
-               />)}/>
-         
+               />
+            )}
+         />
       </ScrollView>
    );
 };

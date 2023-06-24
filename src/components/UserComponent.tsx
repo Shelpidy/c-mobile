@@ -45,7 +45,7 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
    const handleFollow = async () => {
       try {
          let { data } = await axios.put(
-            `http://192.168.144.183:5000/api/media/follows/`,
+            `http://192.168.182.183:5000/api/media/follows/`,
             { followerId: currentUser?.id, followingId: user?.id },
             { headers: { Accept: "application/json" } }
          );
@@ -143,7 +143,13 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
                )}
 
                {user.id === currentUser?.id && (
-                  <AntDesign style={{marginHorizontal:4}} color={theme.colors.primary} onPress={gotoUserProfile} size={23} name='profile'/>
+                  <AntDesign
+                     style={{ marginHorizontal: 4 }}
+                     color={theme.colors.primary}
+                     onPress={gotoUserProfile}
+                     size={23}
+                     name="profile"
+                  />
                )}
             </View>
          </View>

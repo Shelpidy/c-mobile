@@ -5,7 +5,7 @@ import {
    View,
    Image,
    KeyboardAvoidingView,
-   Platform
+   Platform,
 } from "react-native";
 import React from "react";
 import { TextInput, Button, useTheme } from "react-native-paper";

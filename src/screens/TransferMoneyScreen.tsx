@@ -23,7 +23,15 @@ const TransferMoneyScreen = (props: TransferMoneyProps) => {
 
    return (
       <KeyboardAvoidingView style={styles.container}>
-         <View style={{paddingHorizontal:10,marginVertical:5}}><Text style={{fontFamily:"Poppins_300Light",color:theme.colors.secondary}}>Safely transfer commodity to another user</Text></View>
+         <View style={{ paddingHorizontal: 10, marginVertical: 5 }}>
+            <Text
+               style={{
+                  fontFamily: "Poppins_300Light",
+                  color: theme.colors.secondary,
+               }}>
+               Safely transfer commodity to another user
+            </Text>
+         </View>
          {/* <Image
             resizeMode="stretch"
             style={{
@@ -46,7 +54,7 @@ const styles = StyleSheet.create({
       backgroundColor: "#fff",
       alignItems: "center",
       fontFamily: "Poppins_300Light",
-      paddingTop:45
+      paddingTop: 45,
    },
    form: {
       padding: 0,

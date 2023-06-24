@@ -1,5 +1,5 @@
 import { Theme } from "@rneui/themed";
-import React,{useState} from "react";
+import React, { useState } from "react";
 import {
    Dimensions,
    KeyboardAvoidingView,
@@ -7,7 +7,7 @@ import {
    StyleSheet,
    Text,
    View,
-   Alert
+   Alert,
 } from "react-native";
 import {
    Button,
@@ -18,7 +18,7 @@ import {
 } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import {useDispatch,useSelector} from "react-redux"
+import { useDispatch, useSelector } from "react-redux";
 import { setPersonalInfoForm } from "../../redux/action";
 
 type Form3Props = {
@@ -30,11 +30,11 @@ const { width, height } = Dimensions.get("window");
 
 const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
    let theme = useTheme();
-   let {personalInfo} = useSelector((state:any)=> state.rootReducer)
-   let dispatch = useDispatch()
-   const [checkBoxValue,setCheckBoxValue] = useState<string>("male")
-   const [email,setEmail] = useState<string>("")
-   const [dob,setDOB] = useState<string>("")
+   let { personalInfo } = useSelector((state: any) => state.rootReducer);
+   let dispatch = useDispatch();
+   const [checkBoxValue, setCheckBoxValue] = useState<string>("male");
+   const [email, setEmail] = useState<string>("");
+   const [dob, setDOB] = useState<string>("");
    const [isDatePickerVisible, setDatePickerVisibility] =
       React.useState<boolean>(false);
 
@@ -49,26 +49,29 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
    const handleConfirm = (date: any) => {
       // let dob = date.split('T')[0]
       console.log("A date  of birth has been picked: ", date);
-      setDOB(date)
+      setDOB(date);
       hideDatePicker();
    };
 
    const submitForm3 = (n: number) => {
-      if(!email.includes("@") || !email.includes(".")){
-         Alert.alert("Invalid Email","please enter a valid email")
-         return
+      if (!email.includes("@") || !email.includes(".")) {
+         Alert.alert("Invalid Email", "please enter a valid email");
+         return;
       }
-      dispatch(setPersonalInfoForm({email}))
-      dispatch(setPersonalInfoForm({dob}))
-      dispatch(setPersonalInfoForm({gender:checkBoxValue}))
-      console.log("Form 3 submitted",{email,gender:checkBoxValue,dob},personalInfo);
+      dispatch(setPersonalInfoForm({ email }));
+      dispatch(setPersonalInfoForm({ dob }));
+      dispatch(setPersonalInfoForm({ gender: checkBoxValue }));
+      console.log(
+         "Form 3 submitted",
+         { email, gender: checkBoxValue, dob },
+         personalInfo
+      );
       setActiveTab(n);
    };
 
-   const goBack =(n:number)=>{
+   const goBack = (n: number) => {
       setActiveTab(n);
-
-   }
+   };
 
    return (
       <View>
@@ -96,11 +99,19 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
 
                <View style={styles.checkBoxGroupInner}>
                   <Text style={{ fontFamily: "Poppins_300Light" }}>Male</Text>
-                  <Checkbox onPress={()=> setCheckBoxValue("male")} status={checkBoxValue === 'male'?"checked":"unchecked"}></Checkbox>
+                  <Checkbox
+                     onPress={() => setCheckBoxValue("male")}
+                     status={
+                        checkBoxValue === "male" ? "checked" : "unchecked"
+                     }></Checkbox>
                </View>
                <View style={styles.checkBoxGroupInner}>
                   <Text style={{ fontFamily: "Poppins_300Light" }}>Female</Text>
-                  <Checkbox onPress={()=> setCheckBoxValue("female")} status={checkBoxValue !== 'male'?"checked":"unchecked"}></Checkbox>
+                  <Checkbox
+                     onPress={() => setCheckBoxValue("female")}
+                     status={
+                        checkBoxValue !== "male" ? "checked" : "unchecked"
+                     }></Checkbox>
                </View>
             </View>
             <View>
@@ -124,7 +135,7 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
             </View>
 
             <TextInput
-               onChangeText={(value)=> setEmail(value)}
+               onChangeText={(value) => setEmail(value)}
                outlineStyle={{ borderColor: "#f6f6f6" }}
                mode="outlined"
                style={styles.input}

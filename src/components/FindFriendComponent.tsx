@@ -14,8 +14,6 @@ import axios from "axios";
 import { useCurrentUser } from "../utils/CustomHooks";
 import TextShortener from "./TextShortener";
 
-
-
 const { width, height } = Dimensions.get("window");
 
 type FindFriendProps = {
@@ -38,7 +36,7 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
       setLoading(true);
       try {
          let { data } = await axios.put(
-            `http://192.168.144.183:5000/api/media/follows/`,
+            `http://192.168.182.183:5000/api/media/follows/`,
             { followerId: currentUser?.id, followingId: user?.id },
             { headers: { Accept: "application/json" } }
          );
@@ -64,7 +62,13 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
                style={styles.profileImage}
                source={{ uri: user.profileImage }}
             />
-            <TextShortener style={styles.nameText} text={user.firstName +" "+ user.middleName +" "+user.lastName} textLength={15} />
+            <TextShortener
+               style={styles.nameText}
+               text={
+                  user.firstName + " " + user.middleName + " " + user.lastName
+               }
+               textLength={15}
+            />
             {/* <Text style={styles.nameText}>{user.lastName}</Text> */}
             <View style={styles.followerContainer}>
                <Button
