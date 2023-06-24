@@ -11,6 +11,7 @@ import {
    KeyboardAvoidingView,
    ScrollView,
    Dimensions,
+   FlatList,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { users } from "../../data";
@@ -20,13 +21,21 @@ import {
    FontAwesome,
    AntDesign,
    EvilIcons,
-   Ionicons
+   Ionicons,
 } from "@expo/vector-icons";
-import { Avatar, Button, Divider, useTheme } from "react-native-paper";
+import {
+   Avatar,
+   Button,
+   Divider,
+   useTheme,
+   ActivityIndicator,
+} from "react-native-paper";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import TextShortener from "../TextShortener";
+import Reply from "./Reply";
+import { Skeleton } from "@rneui/themed";
 
 type CommentProps = {
    comment: PostComment;
@@ -38,13 +47,13 @@ type CommentProps = {
 };
 
 type FetchReply = {
-   reply: PostComment;
+   reply: CommentReply;
    likesCount: number;
    liked: boolean;
    user: User;
 };
 
-const {height} =Dimensions.get("window")
+const { height, width } = Dimensions.get("window");
 
 const Comment = (props: CommentProps) => {
    const currentUser = useCurrentUser();
@@ -59,11 +68,84 @@ const Comment = (props: CommentProps) => {
    const [likesCount, setLikesCount] = useState<number>(0);
    const [liked, setLiked] = useState<boolean>(false);
    const [repliesCount, setRepliesCount] = useState<number>(0);
+   const [page, setPage] = useState(0);
+   const [hasMore, setHasMore] = useState(true);
 
    const theme = useTheme();
-   const inputRef = useRef<TextInput>(null)
+   const inputRef = useRef<TextInput>(null);
    const navigation = useNavigation<any>();
 
+   let fetchData = async () => {
+      let pageNumber = page + 1
+   
+      try {
+         setLoading(true)
+         if (currentUser) {
+            let commentId = props.comment?.id;
+            console.log(commentId, currentUser);
+            let response = await fetch(
+               `http://192.168.182.183:5000/api/media/posts/comments/${commentId}/replies/${currentUser?.id}/${pageNumber}/5`
+            );
+            let { data } = await response.json();
+            if (response.ok) {
+               setReplies(data);
+               console.log("Replies=>", data);
+               setLoading(false)
+            } else {
+               Alert.alert("Failed", data.message);
+               setLoading(false)
+            }
+         }
+      } catch (err) {
+         console.log("From Comment", String(err));
+         Alert.alert("Failed Comment", String(err));
+         setLoading(false)
+      }
+   };
+
+   const handleLoadMore = () => {
+      console.log("Replies end reached")
+      fetchData();
+   };
+
+   const renderFooter = () => {
+      if (!loading) return null;
+      return (
+         <View style={{ padding: 10 }}>
+            <ActivityIndicator size="large" />
+         </View>
+      );
+   };
+
+   const renderItem = ({ item }: any) => (
+      <Reply
+         key={String(item.reply.id)}
+         posterId={props.posterId}
+         reply={item.reply}
+         user={item.user}
+         likesCount={item.likesCount}
+         liked={item.liked}
+      />
+   );
+
+   const renderSkeleton = () => (
+      <View
+         style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            gap: 4,
+            margin: 3,
+         }}>
+         <Skeleton animation="wave" circle width={50} height={50} />
+         <Skeleton
+            style={{ borderRadius: 5, marginTop: 4 }}
+            animation="wave"
+            width={width - 70}
+            height={80}
+         />
+      </View>
+   );
    useEffect(() => {
       setComment(props.comment);
       setCommentor(props.user);
@@ -72,42 +154,17 @@ const Comment = (props: CommentProps) => {
       setRepliesCount(props.repliesCount);
    }, []);
 
-
-   
    useEffect(
       function () {
-         let fetchData = async () => {
-            try {
-               if(currentUser){
-               let commentId = props.comment?.id
-               console.log(commentId,currentUser)
-               let response = await fetch(
-                  `http://192.168.182.183:5000/api/media/posts/comments/${commentId}/replies/${currentUser?.id}`
-               );
-               let { data } = await response.json();
-               if (response.ok) {
-                  setReplies(data?.data ?? []);
-                  console.log("Replies=>", data.data);
-               } else {
-                  Alert.alert("Failed", data.message);
-               }}
-            } catch (err) {
-               console.log("From Comment",String(err))
-               Alert.alert("Failed Comment", String(err));
-            }
-         };
          fetchData();
       },
-      [currentUser,repliesCount]
+      [currentUser, repliesCount]
    );
 
-
-   const handleReplyModal = ()=>{
-      setOpenRepliesModal(true)
-      inputRef.current?.focus()
-   }
-
-
+   const handleReplyModal = () => {
+      setOpenRepliesModal(true);
+      inputRef.current?.focus();
+   };
 
    const handleReply = async () => {
       setLoading(true);
@@ -126,7 +183,7 @@ const Comment = (props: CommentProps) => {
          );
          if (data.status == "success") {
             // console.log(data.data);
-            // setComments([...comments, data.data]);
+            setReplies(prev => [data.data,...prev]);
             setReplyText("");
             setRepliesCount((prev) => prev + 1);
 
@@ -142,7 +199,6 @@ const Comment = (props: CommentProps) => {
          setLoading(false);
       }
    };
-
 
    const handleLike = async (commentId?: number) => {
       console.log(commentId);
@@ -207,93 +263,101 @@ const Comment = (props: CommentProps) => {
 
    return (
       <KeyboardAvoidingView style={styles.container}>
-          <Modal visible={openRepliesModal}>
-          
-            <View 
-             style={{
-               borderTopEndRadius:10,
-               backgroundColor: "#00000099",
-              }}
-           >
-            <ScrollView style={{
-               top:height/7,
-               borderTopEndRadius:10,
-               backgroundColor: "#fff",
-              }}>
-             <View style={{width:"100%",alignItems:"flex-end",justifyContent:"flex-end"}}>
-               <Button onPress={() => setOpenRepliesModal(false)}>
-               <AntDesign size={18} name="close"/>
-            </Button>
-              
-               </View>
-               {replies.length < 1 && 
-              <View style={{width:"100%",alignItems:"center"}}>
-               <MaterialCommunityIcons
-                     
-                     name='comment-outline'
-                     style={{fontWeight:"normal",opacity:0.6}}
-                     size={200}
-                     color={theme.colors.secondary}
-                     />
-                  <Text style={{fontFamily:"Poppins_300Light",textAlign:"center",margin:10}}>Be the first to comment</Text>
-                  <KeyboardAvoidingView
+         <Modal visible={openRepliesModal}>
+            <View
+               style={{
+                  borderTopEndRadius: 10,
+                  backgroundColor: "#00000099",
+               }}>
+               <View
                   style={{
-                     marginTop: 5,
-                     paddingHorizontal:20,
-                     flexDirection: "row",
-                     alignItems: "center",
-                     justifyContent: "center",
+                     top: height / 7,
+                     borderTopEndRadius: 10,
+                     backgroundColor: "#fff",
+                    
                   }}>
-                  <TextInput
-                      multiline
-                     ref={inputRef}
-                     value={replyText}
-                     placeholder="Comment here..."
-                     onChangeText={(v) => setReplyText(v)}
+                  <View
                      style={{
-                        flex: 1,
-                        borderTopLeftRadius: 20,
-                        borderBottomLeftRadius: 20,
-                        height: 50,
-                        paddingHorizontal: 25,
-                     }}
+                        width: "100%",
+                        alignItems: "flex-end",
+                        justifyContent: "flex-end",
+                     }}>
+                     <Button onPress={() => setOpenRepliesModal(false)}>
+                        <AntDesign size={18} name="close" />
+                     </Button>
+                  </View>
+                  {replies.length < 1 && (
+                     <View style={{ width: "100%", alignItems: "center" }}>
+                        <MaterialCommunityIcons
+                           name="comment-outline"
+                           style={{ fontWeight: "normal", opacity: 0.6 }}
+                           size={200}
+                           color={theme.colors.secondary}
+                        />
+                        <Text
+                           style={{
+                              fontFamily: "Poppins_300Light",
+                              textAlign: "center",
+                              margin: 10,
+                           }}>
+                           Be the first to comment
+                        </Text>
+                     </View>
+                  )}
+                  <FlatList
+                  style={{ paddingHorizontal:10}}
+                     data={replies}
+                     renderItem={renderItem}
+                     keyExtractor={(item) => String(item?.reply?.id)}
+                     onEndReached={handleLoadMore}
+                     onEndReachedThreshold={0.5}
+                     ListFooterComponent={renderFooter}
+                     ListEmptyComponent={renderSkeleton}
                   />
-                  <Button
-                    loading={loading}
-                    disabled={loading}
-                      mode='text'
-                     onPress={handleReply}
+                  <KeyboardAvoidingView
                      style={{
+                        marginTop: 5,
                         paddingHorizontal: 20,
-                        height: 50,
+                        flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "center",
-                        borderTopRightRadius: 20,
-                        borderBottomRightRadius: 20,
                      }}>
-                     <FontAwesome
-                        color={theme.colors.secondary}
-                        name="send"
-                        size={20}
+                     <TextInput
+                        multiline
+                        ref={inputRef}
+                        value={replyText}
+                        placeholder="Comment here..."
+                        onChangeText={(v) => setReplyText(v)}
+                        style={{
+                           flex: 1,
+                           borderTopLeftRadius: 20,
+                           borderBottomLeftRadius: 20,
+                           height: 50,
+                           paddingHorizontal: 25,
+                        }}
                      />
-                  </Button>
-                      </KeyboardAvoidingView>
-               </View>}
-           
-               {
-                  <View>
-                   
-                  </View>
-               }
-            </ScrollView>
-          
-          
-             
-             
+                     <Button
+                        loading={loading}
+                        disabled={loading}
+                        mode="text"
+                        onPress={handleReply}
+                        style={{
+                           paddingHorizontal: 20,
+                           height: 50,
+                           alignItems: "center",
+                           justifyContent: "center",
+                           borderTopRightRadius: 20,
+                           borderBottomRightRadius: 20,
+                        }}>
+                        <FontAwesome
+                           color={theme.colors.secondary}
+                           name="send"
+                           size={20}
+                        />
+                     </Button>
+                  </KeyboardAvoidingView>
                </View>
-      
-           
-           
+            </View>
          </Modal>
          <Modal visible={openModal}>
             <View
@@ -381,7 +445,7 @@ const Comment = (props: CommentProps) => {
                         flex: 1,
                         borderRadius: 30,
                         paddingLeft: 2,
-                        paddingRight:15,
+                        paddingRight: 15,
                         paddingVertical: 2,
                      }}>
                      <View
@@ -417,7 +481,7 @@ const Comment = (props: CommentProps) => {
                            fontFamily: "Poppins_300Light",
                            paddingHorizontal: 5,
                            fontSize: 13,
-                           color:theme.colors.secondary
+                           color: theme.colors.secondary,
                         }}>
                         {comment?.text}
                      </Text>
@@ -434,41 +498,63 @@ const Comment = (props: CommentProps) => {
                            gap: 1,
                         }}>
                         <Divider style={{ width: 70 }} />
-                        <Button labelStyle ={{
-                                    fontFamily: "Poppins_300Light",
-                                    paddingHorizontal: 3,
-                                    fontSize: 13,
-                                    color:theme.colors.secondary
-                                 }} onPress={handleReplyModal} mode="text">Reply</Button>
-                        <Button labelStyle ={{
-                                    fontFamily: "Poppins_300Light",
-                                    paddingHorizontal: 3,
-                                    fontSize: 13,
-                                    color:theme.colors.secondary
-
-                                 }} onPress={() => console.log("Comment Pressed")}>
-                            <Ionicons
-                        size={17}
-                        color={theme.colors.secondary}
-                        name="chatbox-outline"
-                     />
-                              {repliesCount}
+                        <Button
+                           disabled={loading}
+                           labelStyle={{
+                              fontFamily: "Poppins_300Light",
+                              paddingHorizontal: 3,
+                              fontSize: 13,
+                              color: theme.colors.secondary,
+                           }}
+                           onPress={handleReplyModal}
+                           mode="text">
+                           Reply
                         </Button>
-                        <Button labelStyle ={{
-                                    fontFamily: "Poppins_300Light",
-                                    paddingHorizontal: 3,
-                                    fontSize: 13,
-                                    color:theme.colors.secondary
-                                 }} onPress={() => handleLike(comment.id)}>
-                             <AntDesign
-                                 size={18}
-                                 name={liked ? "like1" : "like2"}
-                                 color={theme.colors.secondary}
-                              />
-                             {likesCount}
+                        <Button
+                           disabled={loading}
+                           labelStyle={{
+                              fontFamily: "Poppins_300Light",
+                              paddingHorizontal: 3,
+                              fontSize: 13,
+                              color: theme.colors.secondary,
+                           }}
+                           onPress={() => console.log("Comment Pressed")}>
+                           <Ionicons
+                              size={17}
+                              color={theme.colors.secondary}
+                              name="chatbox-outline"
+                           />
+                           {repliesCount}
+                        </Button>
+                        <Button
+                           disabled={loading}
+                           labelStyle={{
+                              fontFamily: "Poppins_300Light",
+                              paddingHorizontal: 3,
+                              fontSize: 13,
+                              color: theme.colors.secondary,
+                           }}
+                           onPress={() => handleLike(comment.id)}>
+                           <AntDesign
+                              size={18}
+                              name={liked ? "like1" : "like2"}
+                              color={theme.colors.secondary}
+                           />
+                           {likesCount}
                         </Button>
                      </View>
-                     
+                     {replies.length > 0 && (
+                        <View>
+                           <Reply
+                              size="small"
+                              posterId={props.posterId}
+                              likesCount={replies[0].likesCount}
+                              liked={replies[0].liked}
+                              reply={replies[0].reply}
+                              user={replies[0].user}
+                           />
+                        </View>
+                     )}
                   </View>
                </View>
             </View>
@@ -482,7 +568,7 @@ export default Comment;
 const styles = StyleSheet.create({
    container: {
       backgroundColor: "#ffffff",
-      marginVertical: 6,
+      marginVertical: 3,
    },
    profileImage: {
       width: 28,

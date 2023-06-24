@@ -34,7 +34,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
       <ScrollView style={styles.container}>
          <PostProductFormNav page="post" navigation={navigation} />
          <FindFriendsComponent navigation={navigation} />
-         <PostsComponent navigation={navigation} />
+         <PostsComponent/>
       </ScrollView>
    );
 };

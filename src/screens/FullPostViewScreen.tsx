@@ -94,6 +94,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
    const [post, setPost] = useState<Post | null>(null);
    const [likesCount, setLikesCount] = useState<number>(0);
    const [sharesCount, setSharesCount] = useState<number>(0);
+   const [refetchId, setRefetchId] = useState<number>(0);
    const [liked, setLiked] = useState<boolean>(false);
    const [user, setUser] = useState<any>();
    const [shared, setShared] = useState<boolean>(false);
@@ -128,7 +129,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                   setLiked(liked);
                   setLikesCount(likesCount);
                   setSharesCount(sharesCount);
-                  setCommentsCount(commentsCount)
+                  setCommentsCount(commentsCount);
                   setPost(post);
 
                   // Alert.alert("Success",data.message)
@@ -181,7 +182,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
             setTextValue("");
             setCommentsCount((prev) => prev + 1);
 
-            setPost(post);
+           setRefetchId(refetchId + 1);
 
             Alert.alert("Success", data.message);
          } else {
@@ -614,7 +615,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                   />
                </KeyboardAvoidingView> */}
                <View style={{ padding: 5, marginBottom: 10 }}>
-                  <Comments userId={post?.userId} postId={post.id} />
+                  <Comments refetchId = {refetchId} userId={post?.userId} postId={post.id} />
                </View>
             </View>
          </ScrollView>

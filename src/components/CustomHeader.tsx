@@ -21,6 +21,7 @@ import {
 } from "@expo/vector-icons";
 import { Image } from "react-native";
 import { useCurrentUser } from "../utils/CustomHooks";
+import IconBadge from "./IconBadge";
 
 type CustomHeaderProps = {
    navigation?: any;
@@ -151,7 +152,40 @@ const CustomHeader = () => {
                onPress={() => gotoNextScreen("HomeScreen")}
             />
 
-            <Appbar.Action
+            <IconBadge value={20}>
+               <Ionicons
+                  style={{ position: "absolute", top: 15 }}
+                  color={
+                     router.name === "ConversationsScreen"
+                        ? theme.colors.primary
+                        : theme.colors.secondary
+                  }
+                  size={20}
+                  name={
+                     router.name === "ConversationsScreen"
+                        ? "md-chatbubbles"
+                        : "md-chatbubbles-outline"
+                  }
+               />
+            </IconBadge>
+            <IconBadge value={10}>
+               <Ionicons
+                  style={{ position: "absolute", top: 15 }}
+                  color={
+                     router.name === "NotificationScreen"
+                        ? theme.colors.primary
+                        : theme.colors.secondary
+                  }
+                  size={20}
+                  name={
+                     router.name === "NotificationScreen"
+                        ? "notifications-sharp"
+                        : "notifications-outline"
+                  }
+               />
+            </IconBadge>
+
+            {/* <Appbar.Action
                ref={chatRef}
                style={{ alignItems: "center", flexDirection: "row" }}
                icon={() => (
@@ -170,8 +204,8 @@ const CustomHeader = () => {
                   />
                )}
                onPress={() => gotoNextScreen("ConversationsScreen")}
-            />
-            <Appbar.Action
+            /> */}
+            {/* <Appbar.Action
                ref={notRef}
                style={{ alignItems: "center", flexDirection: "row" }}
                icon={() => (
@@ -190,8 +224,8 @@ const CustomHeader = () => {
                   />
                )}
                onPress={() => gotoNextScreen("NotificationScreen")}
-            />
-            <Badge
+            /> */}
+            {/* <Badge
                size={20}
                style={{
                   position: "absolute",
@@ -208,7 +242,7 @@ const CustomHeader = () => {
                   left: router.name === "HomeScreen" ? 120 : 170,
                }}>
                5
-            </Badge>
+            </Badge> */}
             <Appbar.Action
                style={{
                   alignItems: "center",

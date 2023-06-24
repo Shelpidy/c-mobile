@@ -107,6 +107,7 @@ const PostComponent = (props: PostComponentProps) => {
    const [reloadCLS, setRelaodCLS] = useState<number>(0);
    const { width } = useWindowDimensions();
    const navigation = useNavigation<any>();
+   
 
    const source = {
       html: `
@@ -480,11 +481,11 @@ const PostComponent = (props: PostComponentProps) => {
                   }
                   textColor={theme.colors.secondary}
                   style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
-                     <MaterialCommunityIcons
-                     name='comment-outline'
+                  <MaterialCommunityIcons
+                     name="comment-outline"
                      size={20}
                      color={theme.colors.secondary}
-                     />
+                  />
                   {/* <Ionicons
                      size={20}
                      color={theme.colors.secondary}
