@@ -12,13 +12,14 @@ const styles = StyleSheet.create({
 type IconBadgeProps = {
    children?: JSX.Element;
    value: number | string;
+   onPress:()=> void
 }; 
 
-const IconBadge = ({ children, value }: IconBadgeProps) => {
+const IconBadge = ({ children, value,onPress }: IconBadgeProps) => {
    return (
       <TouchableOpacity
          style={{ marginHorizontal: 25,paddingHorizontal:2 }}
-         onPress={() => console.log("Icon Button Pressed")}>
+         onPress={onPress}>
          <View style={{ position: "relative" }}>
             <Badge
                size={20}

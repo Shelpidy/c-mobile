@@ -134,7 +134,7 @@ const CustomHeader = () => {
                <Appbar.BackAction onPress={() => navigation.goBack()} />
             )}
             <Appbar.Action
-               style={{ alignItems: "center", flexDirection: "row" }}
+            
                icon={() => (
                   <Ionicons
                      color={
@@ -152,7 +152,9 @@ const CustomHeader = () => {
                onPress={() => gotoNextScreen("HomeScreen")}
             />
 
-            <IconBadge value={20}>
+            <IconBadge 
+             onPress={() => gotoNextScreen("ConversationsScreen")}
+            value={20}>
                <Ionicons
                   style={{ position: "absolute", top: 15 }}
                   color={
@@ -168,7 +170,9 @@ const CustomHeader = () => {
                   }
                />
             </IconBadge>
-            <IconBadge value={10}>
+            <IconBadge
+             onPress={() => gotoNextScreen("NotificationScreen")}
+            value={10}>
                <Ionicons
                   style={{ position: "absolute", top: 15 }}
                   color={
@@ -244,11 +248,6 @@ const CustomHeader = () => {
                5
             </Badge> */}
             <Appbar.Action
-               style={{
-                  alignItems: "center",
-                  flexDirection: "row",
-                  justifyContent: "center",
-               }}
                icon={() => (
                   <MaterialCommunityIcons
                      color={

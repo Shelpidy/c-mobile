@@ -61,6 +61,7 @@ const Comment = (props: CommentProps) => {
    const [openRepliesModal, setOpenRepliesModal] = useState<boolean>(false);
    const [commentor, setCommentor] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
+   const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
    const [commentText, setCommentText] = useState<string>("");
    const [replyText, setReplyText] = useState<string>("");
    const [comment, setComment] = useState<PostComment>(props.comment);
@@ -68,18 +69,19 @@ const Comment = (props: CommentProps) => {
    const [likesCount, setLikesCount] = useState<number>(0);
    const [liked, setLiked] = useState<boolean>(false);
    const [repliesCount, setRepliesCount] = useState<number>(0);
-   const [page, setPage] = useState(0);
+   const [page, setPage] = useState(1);
    const [hasMore, setHasMore] = useState(true);
 
    const theme = useTheme();
    const inputRef = useRef<TextInput>(null);
    const navigation = useNavigation<any>();
 
-   let fetchData = async () => {
-      let pageNumber = page + 1
-   
+   let fetchData = async (pageNum:number) => {
+      let pageNumber = pageNum
+      console.log("Replies PageNumber",pageNumber)
+      if(!hasMore) return;
       try {
-         setLoading(true)
+         setLoadingFetch(true)
          if (currentUser) {
             let commentId = props.comment?.id;
             console.log(commentId, currentUser);
@@ -88,31 +90,40 @@ const Comment = (props: CommentProps) => {
             );
             let { data } = await response.json();
             if (response.ok) {
-               setReplies(data);
+               setReplies(prev => prev?[...prev,...data]:data);
+               if(data.length > 0){
+                  setPage(pageNumber + 1)
+               }
                console.log("Replies=>", data);
-               setLoading(false)
+               setLoadingFetch(false)
+               if(data.length < 5){
+                  setHasMore(false)
+               }
             } else {
                Alert.alert("Failed", data.message);
-               setLoading(false)
+               setLoadingFetch(false)
             }
          }
       } catch (err) {
          console.log("From Comment", String(err));
          Alert.alert("Failed Comment", String(err));
-         setLoading(false)
+         setLoadingFetch(false)
       }
    };
 
    const handleLoadMore = () => {
+     
       console.log("Replies end reached")
-      fetchData();
+      if(loadingFetch) return;
+      fetchData(page);
    };
 
    const renderFooter = () => {
-      if (!loading) return null;
+      if(!loadingFetch) return null
       return (
-         <View style={{ padding: 10 }}>
-            <ActivityIndicator size="large" />
+         <View style={{ flexDirection:"row",padding: 10,justifyContent:"center",alignItems:"center",backgroundColor:"white"}}>
+            <ActivityIndicator color="#cecece" size="small" />
+            <Text style={{color:"#cecece",marginLeft:5}}>Loading</Text>
          </View>
       );
    };
@@ -129,6 +140,23 @@ const Comment = (props: CommentProps) => {
    );
 
    const renderSkeleton = () => (
+      <View>
+          <View
+         style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            gap: 4,
+            margin: 3,
+         }}>
+         <Skeleton animation="wave" circle width={50} height={50} />
+         <Skeleton
+            style={{ borderRadius: 5, marginTop: 4 }}
+            animation="wave"
+            width={width - 70}
+            height={80}
+         />
+      </View>
       <View
          style={{
             flex: 1,
@@ -145,6 +173,41 @@ const Comment = (props: CommentProps) => {
             height={80}
          />
       </View>
+      <View
+         style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            gap: 4,
+            margin: 3,
+         }}>
+         <Skeleton animation="wave" circle width={50} height={50} />
+         <Skeleton
+            style={{ borderRadius: 5, marginTop: 4 }}
+            animation="wave"
+            width={width - 70}
+            height={80}
+         />
+      </View>
+      <View
+         style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            gap: 4,
+            margin: 3,
+         }}>
+         <Skeleton animation="wave" circle width={50} height={50} />
+         <Skeleton
+            style={{ borderRadius: 5, marginTop: 4 }}
+            animation="wave"
+            width={width - 70}
+            height={80}
+         />
+      </View>
+
+      </View>
+     
    );
    useEffect(() => {
       setComment(props.comment);
@@ -156,7 +219,7 @@ const Comment = (props: CommentProps) => {
 
    useEffect(
       function () {
-         fetchData();
+         fetchData(1);
       },
       [currentUser, repliesCount]
    );
@@ -172,18 +235,18 @@ const Comment = (props: CommentProps) => {
       let activeUserId = currentUser?.id;
       let replyObj = {
          text: replyText,
-         commentId: comment?.id,
+         commentId: props.comment.id,
          userId: activeUserId,
       };
-      console.log("CommentObj", replyObj);
+      console.log("ReplyObj", replyObj);
       try {
          let { data } = await axios.post(
             `http://192.168.182.183:5000/api/media/posts/comments/replies/`,
             replyObj
          );
          if (data.status == "success") {
-            // console.log(data.data);
-            setReplies(prev => [data.data,...prev]);
+            console.log(data.data);
+            setReplies(prev =>prev?[data.data,...prev]:[data.data]);
             setReplyText("");
             setRepliesCount((prev) => prev + 1);
 
@@ -266,14 +329,17 @@ const Comment = (props: CommentProps) => {
          <Modal visible={openRepliesModal}>
             <View
                style={{
-                  borderTopEndRadius: 10,
+                 
                   backgroundColor: "#00000099",
                }}>
-               <View
+               <ScrollView
                   style={{
                      top: height / 7,
-                     borderTopEndRadius: 10,
+                     borderTopRightRadius:8,
+                     borderTopLeftRadius:8,
                      backgroundColor: "#fff",
+                     paddingBottom:100,
+
                     
                   }}>
                   <View
@@ -310,7 +376,7 @@ const Comment = (props: CommentProps) => {
                      renderItem={renderItem}
                      keyExtractor={(item) => String(item?.reply?.id)}
                      onEndReached={handleLoadMore}
-                     onEndReachedThreshold={0.5}
+                     onEndReachedThreshold={0.2}
                      ListFooterComponent={renderFooter}
                      ListEmptyComponent={renderSkeleton}
                   />
@@ -356,7 +422,10 @@ const Comment = (props: CommentProps) => {
                         />
                      </Button>
                   </KeyboardAvoidingView>
-               </View>
+                  <View style={{height:height/5}}>
+
+                  </View>
+               </ScrollView>
             </View>
          </Modal>
          <Modal visible={openModal}>
@@ -418,7 +487,7 @@ const Comment = (props: CommentProps) => {
                         <FontAwesome
                            color={theme.colors.primary}
                            name="send"
-                           size={23}
+                           size={21}
                         />
                      </Pressable>
                   </View>
@@ -520,7 +589,7 @@ const Comment = (props: CommentProps) => {
                            }}
                            onPress={() => console.log("Comment Pressed")}>
                            <Ionicons
-                              size={17}
+                              size={15}
                               color={theme.colors.secondary}
                               name="chatbox-outline"
                            />
@@ -536,7 +605,7 @@ const Comment = (props: CommentProps) => {
                            }}
                            onPress={() => handleLike(comment.id)}>
                            <AntDesign
-                              size={18}
+                              size={15}
                               name={liked ? "like1" : "like2"}
                               color={theme.colors.secondary}
                            />

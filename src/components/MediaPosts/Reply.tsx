@@ -260,16 +260,18 @@ const Reply = (props: ReplyProps) => {
                            gap: 15,
                         }}>
                         <Divider style={{ width: 100 }} />
-                        <TouchableHighlight
+                        <Button
+                          disabled={loading}
+                          labelStyle={{
+                          fontFamily: "Poppins_300Light",
+                          paddingHorizontal: 3,
+                          fontSize: 13,
+                          color: theme.colors.secondary,
+                       }}
                            onPress={() => handleLike(reply.id)}>
-                           <View
-                              style={{
-                                 flexDirection: "row",
-                                 justifyContent: "flex-start",
-                                 alignItems: "center",
-                              }}>
+                           
                               <AntDesign
-                                 size={18}
+                                 size={props.size==="small"?14:15}
                                  name={liked ? "like1" : "like2"}
                               />
                               <Text
@@ -280,8 +282,8 @@ const Reply = (props: ReplyProps) => {
                                  }}>
                                  {likesCount}
                               </Text>
-                           </View>
-                        </TouchableHighlight>
+                           
+                        </Button>
                      </View>
                   </View>
                </View>

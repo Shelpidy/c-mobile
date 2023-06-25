@@ -63,19 +63,19 @@ export const LoadingPostComponent = () => {
             <Skeleton
                style={{ borderRadius: 15 }}
                animation="wave"
-               width={width / 3}
+               width={width / 3.2}
                height={40}
             />
             <Skeleton
                style={{ borderRadius: 15 }}
                animation="wave"
-               width={width / 3}
+               width={width / 3.2}
                height={40}
             />
             <Skeleton
                style={{ borderRadius: 15 }}
                animation="wave"
-               width={width / 3}
+               width={width / 3.2}
                height={40}
             />
          </View>

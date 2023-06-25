@@ -32,16 +32,19 @@ const { width, height } = Dimensions.get("window");
 const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
    const [comments, setComments] = useState<FetchComment[] | null>(null);
    const [loading, setLoading] = useState(false);
-   const [page, setPage] = useState(0);
+   const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
+   const [page, setPage] = useState(1);
    const [hasMore, setHasMore] = useState(true);
    const navigation = useNavigation<any>();
    const currentUser = useCurrentUser();
 
-   const fetchComments = async () => {
-      let pageNumber = page + 1
+   const fetchComments = async (pageNum:number) => {
+      let pageNumber = pageNum
       console.log("Page number",pageNumber)
+      if(!hasMore) return;
+     
       try {
-         setLoading(true);
+         setLoadingFetch(true);
          if (currentUser && postId) {
             let response = await fetch(
                `http://192.168.182.183:5000/api/media/posts/${postId}/comments/${currentUser?.id}/${pageNumber}/5`
@@ -51,39 +54,49 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
                setComments((prevComments) =>
                   prevComments ? [...prevComments, ...data] : data
                );
+               if(data.length > 0){
+                  setPage(pageNumber + 1)
+               }
                console.log("Comments=>", data);
-               setLoading(false);
+               if(data.length < 5){
+                  setHasMore(false)
+               }
+               setLoadingFetch(false);
             } else {
                Alert.alert("Failed", data.message);
-               setLoading(false);
+               setLoadingFetch(false);
             }
          }
-         setLoading(false);
+         setLoadingFetch(false);
       } catch (err) {
          console.log("From Comments", String(err));
          Alert.alert("Failed", String(err));
-         setLoading(false);
+         setLoadingFetch(false);
       }
      
    };
 
    useEffect(() => {
-      fetchComments();
-   }, [currentUser, postId,refetchId]);
+      fetchComments(1);
+   }, [currentUser,refetchId]);
 
    const handleLoadMore = () => {
+    
       console.log("Comments reached end")
-      fetchComments();
+      if(loadingFetch) return;
+      fetchComments(page);
    };
 
    const renderFooter = () => {
-      if (!loading) return null;
+      if(!loadingFetch) return null
       return (
-         <View style={{ padding: 10 }}>
-            <ActivityIndicator size="small" />
+         <View style={{ flexDirection:"row",padding: 10,justifyContent:"center",alignItems:"center",backgroundColor:"white"}}>
+            <ActivityIndicator color="#cecece" size="small" />
+            <Text style={{color:"#cecece",marginLeft:5}}>Loading</Text>
          </View>
       );
    };
+
 
    const renderItem = ({ item }: any) => (
       <Comment
@@ -122,7 +135,7 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
          renderItem={renderItem}
          keyExtractor={(item) => String(item?.comment?.id)}
          onEndReached={handleLoadMore}
-         onEndReachedThreshold={0.5}
+         onEndReachedThreshold={0.3}
          ListFooterComponent={renderFooter}
          ListEmptyComponent={renderSkeleton}
       />

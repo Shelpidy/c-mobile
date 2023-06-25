@@ -15,6 +15,7 @@ import SharedPostComponent from "./SharedPostComponent";
 import { ActivityIndicator, Divider } from "react-native-paper";
 import { LoadingPostComponent } from "./LoadingComponents";
 import { useNavigation } from "@react-navigation/native";
+import { ThemeConsumer } from "@rneui/themed";
 
 type PostComponentProps = {
    post: Post;
@@ -28,7 +29,7 @@ type PostComponentProps = {
 
 const PostsComponent = () => {
    const [posts, setPosts] = useState<PostComponentProps[]|null>(null);
-   const [allPosts, setAllPosts] = useState<PostComponentProps[]>([]);
+   const [allPosts, setAllPosts] = useState<PostComponentProps[]|null>(null);
    const [page, setPage] = useState<number>(0);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(5);
    const [loading, setLoading] = useState<boolean>(false);
@@ -37,10 +38,9 @@ const PostsComponent = () => {
    const navigation = useNavigation();
    const [hasMore, setHasMore] = useState(true);
 
-   let fetchData = async () => {
-      let pageNumber = page + 1
-    
-   
+   let fetchData = async (pageNum:number) => {
+      let pageNumber = pageNum
+      if(!hasMore) return;
       try {
          if (currentUser) {
             setLoading(true)
@@ -53,17 +53,22 @@ const PostsComponent = () => {
                console.log(data.data)
                // setPosts(data.data);
                let fetchedPost: PostComponentProps[] = data.data;
-
-               setAllPosts(fetchedPost);
-               setPosts(fetchedPost);
+                
+               setAllPosts((prev)=> prev ? [...prev,...fetchedPost]:fetchedPost);
+               setPosts((prev)=> prev ? [...prev,...fetchedPost]:fetchedPost);
+               setLoading(false)
+               if(fetchedPost.length > 0) setPage(pageNumber + 1)
+               if(data.length < numberOfPostsPerPage){
+                  setHasMore(false)
+               }
               
                // Alert.alert("Success",data.message)
             } else {
                Alert.alert("Failed", data.message);
+               setLoading(false)
             }
          }
 
-         setLoading(false);
       } catch (err) {
          Alert.alert("Failed", String(err));
          setLoading(false);
@@ -72,21 +77,23 @@ const PostsComponent = () => {
 
    const handleLoadMore = () => {
       console.log("Reached end")
-      fetchData();
+      if(loading) return;
+      fetchData(page);
    };
 
    const renderFooter = () => {
       if(!loading) return null
       return (
-         <View style={{ padding: 10 }}>
-            <ActivityIndicator size="small" />
+         <View style={{ flexDirection:"row",padding: 10,justifyContent:"center",alignItems:"center",backgroundColor:"white"}}>
+            <ActivityIndicator color="#cecece" size="small" />
+            <Text style={{color:"#cecece",marginLeft:5}}>Loading more posts</Text>
          </View>
       );
    };
 
    useEffect(
       function () {
-         fetchData();
+         fetchData(1);
       },
       [currentUser]
    );
@@ -118,7 +125,7 @@ const PostsComponent = () => {
             }
          }}
          onEndReached={handleLoadMore}
-         onEndReachedThreshold={0.5}
+         onEndReachedThreshold={0.2}
          ListFooterComponent={renderFooter}
       />
    );
