@@ -30,7 +30,7 @@ const ProductsRequestScreen = ({ navigation }: ProductsComponentProps) => {
             let activeUserId = currentUser?.id;
             try {
                let response = await fetch(
-                  `http://192.168.182.183:5000/api/marketing/products/request/${activeUserId}`
+                  `http://192.168.0.114:5000/api/marketing/products/request/${activeUserId}`
                );
                let data = await response.json();
                if (data.status == "success") {

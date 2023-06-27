@@ -44,6 +44,7 @@ import UserComponent from "../UserComponent";
 import HTML from "react-native-render-html";
 import { LoadingPostComponent } from "./LoadingComponents";
 import { useNavigation } from "@react-navigation/native";
+import { dateAgo } from "../../utils/util";
 
 const s3 = new AWS.S3({
    accessKeyId: config.accessKeyId,
@@ -133,7 +134,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
          setLoading(true);
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.182.183:5000/api/media/posts/likes/`,
+            `http://192.168.0.114:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -183,7 +184,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                   fontFamily: "Poppins_300Light",
                   fontSize: 13,
                }}>
-               {moment(props.post?.createdAt).fromNow()}
+              {dateAgo(props.post.createdAt)}
             </Text>
          </View>
          <View style={{ flexDirection: "row" }}></View>
@@ -343,7 +344,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                   }}
                   onPress={() =>
                      navigation.navigate("FullSharedPostViewScreen", {
-                        ...props,
+                        ...props.post
                      })
                   }
                   textColor={theme.colors.secondary}

@@ -24,17 +24,6 @@ declare type CommentReply = {
    updatedAt: Date;
 };
 
-declare type Product = {
-   id?: number;
-   productId?: number;
-   posterId?: number;
-   userId?: number;
-   text?: string;
-   createdAt?: Date;
-   updatedAt?: Date;
-   navigation?: any;
-   route?: any;
-};
 
 declare type ProductComment = {
    id: number;
@@ -96,26 +85,26 @@ declare type Post = {
    updatedAt: Date;
 };
 
-// declare type ProductComponentProps = {
-//    id: number;
-//    productName: string;
-//    category: string;
-//    description: string;
-//    images: string[];
-//    price: string;
-//    affiliateId?: number[] | null;
-//    initialPrice: string | null;
-//    affiliatePrice: string | null;
-//    sizes: string[] | null;
-//    numberAvailable: string | null;
-//    rating: number | null;
-//    availability: string | null;
-//    userId: number;
-//    createdAt: Date;
-//    updatedAt: Date;
-//    navigation?: any;
-//    route?: any;
-// };
+declare type Product = {
+   id: number;
+   productName: string;
+   category: string;
+   description: string;
+   images: string[];
+   price: string;
+   affiliateId?: number[] | null;
+   initialPrice: string | null;
+   affiliatePrice: string | null;
+   sizes: string[] | null;
+   numberAvailable: string | null;
+   rating: number | null;
+   availability: string | null;
+   userId: number;
+   createdAt: Date;
+   updatedAt: Date;
+   navigation?: any;
+   route?: any;
+};
 
 declare type User = {
    id: number;
@@ -145,13 +134,13 @@ declare type Product = {
    description: string;
    images: string[];
    price: string;
-   affiliateId: number | number[] | null;
+   affiliateId: number[] | null;
    initialPrice: string;
    affiliatePrice: string | null;
-   sizes: string[];
+   sizes: string[] | null;
    numberAvailable: string;
    rating: number;
-   availability: boolean | string;
+   availability: string;
    userId: number;
    createdAt: Date;
    updatedAt: Date;

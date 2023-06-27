@@ -275,7 +275,7 @@ const ChatScreen = ({ route, navigation }: any) => {
    React.useEffect(() => {
       if (currentUser) {
          let newSocket = io(
-            `http://192.168.182.183:8080/?userId=${currentUser.id}&roomId=${route.params?.roomId}&roomType=c`
+            `http://192.168.0.114:8080/?userId=${currentUser.id}&roomId=${route.params?.roomId}&roomType=c`
          );
          setSocket(newSocket);
 
@@ -309,7 +309,7 @@ const ChatScreen = ({ route, navigation }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.182.183:8080/api/userstatus/${secUserId}`,
+                  `http://192.168.0.114:8080/api/userstatus/${secUserId}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -449,7 +449,7 @@ const ChatScreen = ({ route, navigation }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.182.183:8080/api/messages/${roomId}/${currentPage}/${numberOfChatsRecord}`,
+                  `http://192.168.0.114:8080/api/messages/${roomId}/${currentPage}/${numberOfChatsRecord}`,
                   { method: "GET" }
                );
                let { messages: chatMessages, count } = await resp.json();

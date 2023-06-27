@@ -36,6 +36,7 @@ import { useCurrentUser } from "../../utils/CustomHooks";
 import TextShortener from "../TextShortener";
 import Reply from "./Reply";
 import { Skeleton } from "@rneui/themed";
+import { dateAgo } from "../../utils/util";
 
 type CommentProps = {
    comment: PostComment;
@@ -69,15 +70,15 @@ const Comment = (props: CommentProps) => {
    const [likesCount, setLikesCount] = useState<number>(0);
    const [liked, setLiked] = useState<boolean>(false);
    const [repliesCount, setRepliesCount] = useState<number>(0);
-   const [page, setPage] = useState(1);
+   const page = React.useRef<number>(1);
    const [hasMore, setHasMore] = useState(true);
 
    const theme = useTheme();
    const inputRef = useRef<TextInput>(null);
    const navigation = useNavigation<any>();
 
-   let fetchData = async (pageNum:number) => {
-      let pageNumber = pageNum
+   let fetchData = async (pageNum?:number) => {
+      let pageNumber = pageNum ?? page.current
       console.log("Replies PageNumber",pageNumber)
       if(!hasMore) return;
       try {
@@ -86,13 +87,13 @@ const Comment = (props: CommentProps) => {
             let commentId = props.comment?.id;
             console.log(commentId, currentUser);
             let response = await fetch(
-               `http://192.168.182.183:5000/api/media/posts/comments/${commentId}/replies/${currentUser?.id}/${pageNumber}/5`
+               `http://192.168.0.114:5000/api/media/posts/comments/${commentId}/replies/${currentUser?.id}/${pageNumber}/5`
             );
             let { data } = await response.json();
             if (response.ok) {
                setReplies(prev => prev?[...prev,...data]:data);
                if(data.length > 0){
-                  setPage(pageNumber + 1)
+                 page.current++
                }
                console.log("Replies=>", data);
                setLoadingFetch(false)
@@ -115,7 +116,7 @@ const Comment = (props: CommentProps) => {
      
       console.log("Replies end reached")
       if(loadingFetch) return;
-      fetchData(page);
+      fetchData();
    };
 
    const renderFooter = () => {
@@ -241,7 +242,7 @@ const Comment = (props: CommentProps) => {
       console.log("ReplyObj", replyObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.182.183:5000/api/media/posts/comments/replies/`,
+            `http://192.168.0.114:5000/api/media/posts/comments/replies/`,
             replyObj
          );
          if (data.status == "success") {
@@ -270,7 +271,7 @@ const Comment = (props: CommentProps) => {
             setLoading(true);
             let activeUserId = currentUser?.id;
             let { data } = await axios.put(
-               `http://192.168.182.183:5000/api/media/posts/comments/likes/`,
+               `http://192.168.0.114:5000/api/media/posts/comments/likes/`,
                { userId: activeUserId, commentId: commentId }
             );
             if (data.status == "success") {
@@ -297,7 +298,7 @@ const Comment = (props: CommentProps) => {
          try {
             let putObj = { text: commentText, id: comment?.id };
             let response = await axios.put(
-               "`http://192.168.182.183:5000/media/posts/comments",
+               "`http://192.168.0.114:5000/media/posts/comments",
                putObj
             );
             if (response.status == 202) {
@@ -329,7 +330,7 @@ const Comment = (props: CommentProps) => {
          <Modal visible={openRepliesModal}>
             <View
                style={{
-                 
+                  position:"relative",
                   backgroundColor: "#00000099",
                }}>
                <ScrollView
@@ -455,10 +456,15 @@ const Comment = (props: CommentProps) => {
                   </View>
                   <View
                      style={{
+                        position:"absolute",
+                        bottom:0,
+                        left:0,
+                        width:"100%",
                         paddingHorizontal: 15,
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "center",
+                        zIndex:10
                      }}>
                      <TextInput
                         value={commentText}
@@ -544,7 +550,7 @@ const Comment = (props: CommentProps) => {
                            />
                         )}
                      </View>
-
+                   
                      <Text
                         style={{
                            fontFamily: "Poppins_300Light",
@@ -566,7 +572,9 @@ const Comment = (props: CommentProps) => {
                            borderRadius: 3,
                            gap: 1,
                         }}>
-                        <Divider style={{ width: 70 }} />
+                         {comment.createdAt &&  <Text style={{fontSize:10,fontFamily:"Poppins_300Light",marginRight:5}}>{dateAgo(comment.createdAt)}</Text> }
+
+                        <Divider style={{ width: 50 }} />
                         <Button
                            disabled={loading}
                            labelStyle={{

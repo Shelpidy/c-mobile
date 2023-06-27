@@ -28,10 +28,20 @@ import {
 
 const { width, height } = Dimensions.get("window");
 
+type PostComponent = {
+   post: Post;
+   commentsCount: number;
+   likesCount: number;
+   sharesCount: number;
+   user: User;
+   liked: boolean;
+   secondUser:User
+};
+
 const ProfileScreen = ({ navigation, route }: any) => {
    const theme = useTheme();
-   const [posts, setPosts] = useState<PostComponentProps[] | null>(null);
-   const [allPosts, setAllPosts] = useState<PostComponentProps[]>([]);
+   const [posts, setPosts] = useState<PostComponent[] | null>(null);
+   const [allPosts, setAllPosts] = useState<PostComponent[]>([]);
    const [user, setUser] = useState<any>(null);
    const [pageNumber, setPageNumber] = useState<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
@@ -43,8 +53,8 @@ const ProfileScreen = ({ navigation, route }: any) => {
       let token = _token.toLowerCase();
       let newPosts = allPosts?.filter(
          (post) =>
-            post?.text?.toLowerCase().includes(token) ||
-            post?.title?.toLowerCase().includes(token)
+            post.post?.text?.toLowerCase().includes(token) ||
+            post.post?.title?.toLowerCase().includes(token)
       );
       setPosts(newPosts);
    };
@@ -57,7 +67,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.182.183:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.0.114:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -86,13 +96,13 @@ const ProfileScreen = ({ navigation, route }: any) => {
             let userId = route.params.userId;
             try {
                let response = await fetch(
-                  `http://192.168.182.183:5000/api/media/posts/user/${userId}`
+                  `http://192.168.0.114:5000/api/media/posts/user/${userId}`
                );
                let data = await response.json();
                if (data.status == "success") {
                   // console.log(data.data)
                   // setPosts(data.data);
-                  let fetchedPost: PostComponentProps[] = data.data;
+                  let fetchedPost: PostComponent[] = data.data;
                   let numOfPageLinks = Math.ceil(
                      fetchedPost.length / numberOfPostsPerPage
                   );
@@ -271,20 +281,20 @@ const ProfileScreen = ({ navigation, route }: any) => {
          )}
          {posts &&
             posts.map((post) => {
-               if (post.fromId) {
+               if (post.post.fromId) {
                   return (
                      <SharedPostComponent
-                        key={String(post.id)}
+                        key={String(post.post.id)}
                         {...post}
-                        navigation={navigation}
+                      
                      />
                   );
                }
                return (
                   <PostComponent
-                     key={String(post.id)}
+                     key={String(post.post.id)}
                      {...post}
-                     navigation={navigation}
+                  
                   />
                );
             })}

@@ -28,7 +28,7 @@ const Replies = ({ commentId, userId }: RepliesProps) => {
          let fetchData = async () => {
             try {
                let response = await fetch(
-                  `http://192.168.182.183:5000/api/media/posts/conmments/${commentId}/replies/${currentUser?.id}`
+                  `http://192.168.0.114:5000/api/media/posts/conmments/${commentId}/replies/${currentUser?.id}`
                );
                let { data } = await response.json();
                if (response.ok) {

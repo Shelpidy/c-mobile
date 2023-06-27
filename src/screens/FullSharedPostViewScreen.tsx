@@ -12,7 +12,7 @@ import {
    TextInput,
    useWindowDimensions,
 } from "react-native";
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer,useRef } from "react";
 import ImagesViewer from "../components/ImagesViewer";
 import VideoPlayer from "../components/VideoPlayer";
 import TextViewer from "../components/TextViewer";
@@ -43,6 +43,7 @@ import moment from "moment";
 import HTML from "react-native-render-html";
 import { LoadingPostComponent } from "../components/MediaPosts/LoadingComponents";
 import TextShortener from "../components/TextShortener";
+import { dateAgo } from "../utils/util";
 
 type FullSharedPostComponentpost = { navigation: any; route: any };
 type NSharedPostComponentProps = {
@@ -105,15 +106,19 @@ const FullSharedPostComponent = ({
    const theme = useTheme();
    const { width } = useWindowDimensions();
    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
+   const [refetchId, setRefetchId] = useState<number>(0);
+
+   let inputRef = useRef<TextInput>(null);
 
    useEffect(
       function () {
          let fetchData = async () => {
             let activeUserId = currentUser?.id;
             let postId = route.params.id;
+            console.log("Shared post Id",postId)
             try {
                let { data, status } = await axios.get(
-                  `http://192.168.182.183:5000/api/media/posts/${postId}/users/${activeUserId}`
+                  `http://192.168.0.114:5000/api/media/posts/${postId}/users/${activeUserId}`
                );
                if (status === 200) {
                   console.log(data.data);
@@ -173,15 +178,15 @@ const FullSharedPostComponent = ({
       console.log(commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.182.183:5000/api/media/posts/comments/`,
+            `http://192.168.0.114:5000/api/media/posts/comments/`,
             commentObj
          );
          if (data.status == "success") {
             // console.log(data.data);
-            setComments([...comments, data.data]);
             dispatchPostComment({ type: "TEXT", payload: "" });
             setTextValue("");
             setCommentsCount((prev) => prev + 1);
+            setRefetchId(refetchId + 1);
             // Alert.alert("Success",data.message)
          } else {
             Alert.alert("Failed", data.message);
@@ -199,7 +204,7 @@ const FullSharedPostComponent = ({
          setLoading(true);
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.182.183:5000/api/media/posts/likes/`,
+            `http://192.168.0.114:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -308,8 +313,9 @@ const FullSharedPostComponent = ({
                         textAlignVertical: "center",
                         color: theme.colors.secondary,
                         fontFamily: "Poppins_300Light",
+                        fontSize:11
                      }}>
-                     posted {moment(post.createdAt).fromNow()}
+                     {dateAgo(post.createdAt)}
                   </Text>
                </View>
                {post?.images && <ImagesViewer images={post?.images} />}
@@ -328,12 +334,40 @@ const FullSharedPostComponent = ({
                </View>
             )}
             <View>
-               <View style={{ paddingHorizontal: 8, marginVertical: 4 }}>
-                  <Text>
-                     <LikesComponent
-                        postId={post.id}
-                        numberOfLikes={likesCount}
-                     />
+              
+
+               <View style={{ marginBottom: 1 }}>
+            <View style={{ paddingHorizontal: 8, marginVertical: 5 }}>
+               <Text>
+                  <LikesComponent
+                     postId={post?.id}
+                     numberOfLikes={likesCount}
+                  />
+               </Text>
+            </View>
+            <View style={{ flex: 1, flexDirection: "row" }}>
+               <View
+                  style={{
+                     flex: 1,
+                     flexDirection: "row",
+                     alignItems: "center",
+                     justifyContent: "center",
+                  }}>
+                  <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        fontSize: 12,
+                        marginHorizontal: 1,
+                     }}>
+                     {likesCount}
+                  </Text>
+                  <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        fontSize: 12,
+                        marginHorizontal: 1,
+                     }}>
+                     Like
                   </Text>
                </View>
 
@@ -342,130 +376,62 @@ const FullSharedPostComponent = ({
                      flex: 1,
                      flexDirection: "row",
                      alignItems: "center",
-                     justifyContent: "space-between",
+                     justifyContent: "center",
                   }}>
-                  <View
+                  <Text
                      style={{
-                        flex: 1,
-                        flexDirection: "row",
-                        alignItems: "center",
+                        fontFamily: "Poppins_300Light",
+                        fontSize: 12,
+                        marginHorizontal: 1,
                      }}>
-                     <Text
-                        style={{
-                           fontFamily: "Poppins_300Light",
-                           fontSize: 11,
-                           marginHorizontal: 1,
-                        }}>
-                        {likesCount}
-                     </Text>
-                     <Text
-                        style={{
-                           fontFamily: "Poppins_300Light",
-                           fontSize: 11,
-                           marginHorizontal: 1,
-                        }}>
-                        Like
-                     </Text>
-                  </View>
-                  <View
+                     {commentsCount}
+                  </Text>
+                  <Text
                      style={{
-                        flex: 1,
-                        flexDirection: "row",
-                        alignItems: "center",
+                        fontFamily: "Poppins_300Light",
+                        fontSize: 12,
+                        marginHorizontal: 1,
                      }}>
-                     <View
-                        style={{
-                           flex: 1,
-                           flexDirection: "row",
-                           alignItems: "center",
-                        }}>
-                        <Text
-                           style={{
-                              fontFamily: "Poppins_300Light",
-                              fontSize: 11,
-                              marginHorizontal: 1,
-                           }}>
-                           {commentsCount}
-                        </Text>
-                        <Text
-                           style={{
-                              fontFamily: "Poppins_300Light",
-                              fontSize: 11,
-                              marginHorizontal: 1,
-                           }}>
-                           Comments
-                        </Text>
-                     </View>
-                     <View
-                        style={{
-                           flex: 1,
-                           flexDirection: "row",
-                           alignItems: "center",
-                        }}>
-                        <Text
-                           style={{
-                              fontFamily: "Poppins_300Light",
-                              fontSize: 11,
-                              marginHorizontal: 1,
-                           }}>
-                           {sharesCount}
-                        </Text>
-                        <Text
-                           style={{
-                              fontFamily: "Poppins_300Light",
-                              fontSize: 11,
-                              marginHorizontal: 1,
-                           }}>
-                           Shares
-                        </Text>
-                     </View>
-                  </View>
+                     Comments
+                  </Text>
                </View>
-               <Divider style={{ width: width - 20 }} />
-               <View style={styles.likeCommentAmountCon}>
-                  <Button
-                     disabled={loading}
-                     onPress={() => handleLike(post.id)}
-                     textColor={theme.colors.secondary}
-                     style={{
-                        backgroundColor: "#f6f6f6",
-                        flex: 1,
-                        alignItems: "center",
-                     }}>
-                     <Ionicons
-                        size={18}
-                        color={theme.colors.secondary}
-                        name={liked ? "heart-sharp" : "heart-outline"}
-                     />
-                     <Text style={styles.commentAmountText}>Like</Text>
-                  </Button>
+            </View>
+            <Divider style={{ width: width - 40, alignSelf: "center" }} />
+            <View style={styles.likeCommentAmountCon}>
+               <Button
+                  disabled={loading}
+                  onPress={() => handleLike(post?.id)}
+                  textColor={theme.colors.secondary}
+                  style={{
+                     backgroundColor: "#f6f6f6",
+                     flex: 1,
+                     alignItems: "center",
+                  }}>
+                  <Ionicons
+                     size={18}
+                     color={theme.colors.secondary}
+                     name={liked ? "heart-sharp" : "heart-outline"}
+                  />
+               </Button>
 
-                  <Button
+               <Button
                      contentStyle={{
-                        backgroundColor: "#f6f6f6",
                         flex: 1,
                         alignItems: "center",
                         flexDirection: "row",
                      }}
-                     onPress={() =>
-                        navigation.navigate("FullPostViewScreen", { ...post })
-                     }
+                     onPress={() => inputRef?.current?.focus()}
                      textColor={theme.colors.secondary}
-                     style={{
-                        backgroundColor: "#f6f6f6",
-                        flex: 1,
-                        alignItems: "center",
-                     }}>
+                     style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
                      <Ionicons
-                        size={18}
+                        size={20}
                         color={theme.colors.secondary}
                         name="chatbox-outline"
                      />
-                     <Text style={styles.commentAmountText}>Comment</Text>
-                  </Button>
-               </View>
-
-               <View
+               </Button>
+            </View>
+         </View>
+         <View
                   style={{
                      marginTop: 5,
                      paddingHorizontal: 15,
@@ -474,12 +440,12 @@ const FullSharedPostComponent = ({
                      justifyContent: "center",
                   }}>
                   <TextInput
+                     ref={inputRef}
                      value={textValue}
                      placeholder="Comment here..."
                      onChangeText={(v) => setTextValue(v)}
                      style={{
                         flex: 1,
-                        //  backgroundColor: "#f6f6f6",
                         borderTopLeftRadius: 20,
                         borderBottomLeftRadius: 20,
                         height: 50,
@@ -495,12 +461,11 @@ const FullSharedPostComponent = ({
                         justifyContent: "center",
                         borderTopRightRadius: 20,
                         borderBottomRightRadius: 20,
-                        //  backgroundColor: "#f6f6f6",
                      }}>
                      <FontAwesome
                         color={theme.colors.secondary}
-                        name="comment-o"
-                        size={23}
+                        name="send"
+                        size={20}
                      />
                   </Pressable>
                </View>
@@ -529,7 +494,7 @@ const FullSharedPostComponent = ({
                    />
                 </KeyboardAvoidingView> */}
                <View style={{ padding: 5, marginBottom: 10 }}>
-                  <Comments userId={post?.userId} postId={post.id} />
+                   <Comments refetchId = {refetchId} userId={post?.userId} postId={post.id} />
                </View>
             </View>
          </ScrollView>

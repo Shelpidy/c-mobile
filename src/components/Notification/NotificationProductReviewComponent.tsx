@@ -84,7 +84,7 @@ const NotificationProductReviewComponent = ({
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.182.183:8080/api/room/${buyer?.id}/${currentUser?.id}`,
+                  `http://192.168.0.114:8080/api/room/${buyer?.id}/${currentUser?.id}`,
                   { method: "GET" }
                );
                let data = await response.json();
@@ -113,7 +113,7 @@ const NotificationProductReviewComponent = ({
          try {
             if (props) {
                let response = await fetch(
-                  `http://192.168.182.183:5000/api/auth/users/${props.userId}`,
+                  `http://192.168.0.114:5000/api/auth/users/${props.userId}`,
                   { method: "GET" }
                );
 
@@ -148,7 +148,7 @@ const NotificationProductReviewComponent = ({
          try {
             if (props) {
                let response = await fetch(
-                  `http://192.168.182.183:5000/api/auth/users/${buyerId}`,
+                  `http://192.168.0.114:5000/api/auth/users/${buyerId}`,
                   { method: "GET" }
                );
 

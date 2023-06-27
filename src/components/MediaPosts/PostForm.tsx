@@ -93,7 +93,7 @@ const PostForm = () => {
       console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.182.183:5000/api/media/posts/",
+            "http://192.168.0.114:5000/api/media/posts/",
             finalPostObj
          );
          if (response.status === 201) {

@@ -33,13 +33,14 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
    const [comments, setComments] = useState<FetchComment[] | null>(null);
    const [loading, setLoading] = useState(false);
    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
-   const [page, setPage] = useState(1);
+   const page = React.useRef<number>(1);
    const [hasMore, setHasMore] = useState(true);
    const navigation = useNavigation<any>();
    const currentUser = useCurrentUser();
+   const [refetchComments,setReFetchComments] = useState<number>(refetchId)
 
-   const fetchComments = async (pageNum:number) => {
-      let pageNumber = pageNum
+   const fetchComments = async (pageNum?:number) => {
+      let pageNumber = pageNum ?? page.current
       console.log("Page number",pageNumber)
       if(!hasMore) return;
      
@@ -47,7 +48,7 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
          setLoadingFetch(true);
          if (currentUser && postId) {
             let response = await fetch(
-               `http://192.168.182.183:5000/api/media/posts/${postId}/comments/${currentUser?.id}/${pageNumber}/5`
+               `http://192.168.0.114:5000/api/media/posts/${postId}/comments/${currentUser?.id}/${pageNumber}/5`
             );
             let { data } = await response.json();
             if (response.ok) {
@@ -55,7 +56,7 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
                   prevComments ? [...prevComments, ...data] : data
                );
                if(data.length > 0){
-                  setPage(pageNumber + 1)
+                 page.current++
                }
                console.log("Comments=>", data);
                if(data.length < 5){
@@ -78,13 +79,13 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
 
    useEffect(() => {
       fetchComments(1);
-   }, [currentUser,refetchId]);
+   }, [currentUser,refetchComments]);
 
    const handleLoadMore = () => {
     
       console.log("Comments reached end")
       if(loadingFetch) return;
-      fetchComments(page);
+      fetchComments();
    };
 
    const renderFooter = () => {
@@ -111,6 +112,23 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
    );
 
    const renderSkeleton = () => (
+      <View>
+          <View
+         style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            gap: 4,
+            margin: 3,
+         }}>
+         <Skeleton animation="wave" circle width={50} height={50} />
+         <Skeleton
+            style={{ borderRadius: 5, marginTop: 4 }}
+            animation="wave"
+            width={width - 70}
+            height={80}
+         />
+      </View>
       <View
          style={{
             flex: 1,
@@ -127,8 +145,42 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
             height={80}
          />
       </View>
-   );
+      <View
+         style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            gap: 4,
+            margin: 3,
+         }}>
+         <Skeleton animation="wave" circle width={50} height={50} />
+         <Skeleton
+            style={{ borderRadius: 5, marginTop: 4 }}
+            animation="wave"
+            width={width - 70}
+            height={80}
+         />
+      </View>
+      <View
+         style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            gap: 4,
+            margin: 3,
+         }}>
+         <Skeleton animation="wave" circle width={50} height={50} />
+         <Skeleton
+            style={{ borderRadius: 5, marginTop: 4 }}
+            animation="wave"
+            width={width - 70}
+            height={80}
+         />
+      </View>
 
+      </View>
+     
+   );
    return (
       <FlatList
          data={comments}
@@ -137,7 +189,7 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
          onEndReached={handleLoadMore}
          onEndReachedThreshold={0.3}
          ListFooterComponent={renderFooter}
-         ListEmptyComponent={renderSkeleton}
+         // ListEmptyComponent={renderSkeleton}
       />
    );
 };

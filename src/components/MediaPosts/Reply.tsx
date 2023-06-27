@@ -64,7 +64,7 @@ const Reply = (props: ReplyProps) => {
             setLoading(true);
             let activeUserId = currentUser?.id;
             let { data } = await axios.put(
-               `http://192.168.182.183:5000/api/media/posts/comments/replies/likes/`,
+               `http://192.168.0.114:5000/api/media/posts/comments/replies/likes/`,
                { userId: activeUserId, replyId: replyId }
             );
             if (data.status == "success") {
@@ -91,7 +91,7 @@ const Reply = (props: ReplyProps) => {
          try {
             let putObj = { text: replyText, id: reply?.id };
             let response = await axios.put(
-               "`http://192.168.182.183:5000/media/posts/comments/replies",
+               "`http://192.168.0.114:5000/media/posts/comments/replies",
                putObj
             );
             if (response.status == 202) {

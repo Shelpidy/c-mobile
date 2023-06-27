@@ -15,7 +15,6 @@ import SharedPostComponent from "./SharedPostComponent";
 import { ActivityIndicator, Divider } from "react-native-paper";
 import { LoadingPostComponent } from "./LoadingComponents";
 import { useNavigation } from "@react-navigation/native";
-import { ThemeConsumer } from "@rneui/themed";
 
 type PostComponentProps = {
    post: Post;
@@ -30,23 +29,24 @@ type PostComponentProps = {
 const PostsComponent = () => {
    const [posts, setPosts] = useState<PostComponentProps[]|null>(null);
    const [allPosts, setAllPosts] = useState<PostComponentProps[]|null>(null);
-   const [page, setPage] = useState<number>(0);
+   const page = React.useRef<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(5);
    const [loading, setLoading] = useState<boolean>(false);
    const [refreshing, setRefreshing] = useState<boolean>(false);
    const currentUser = useCurrentUser();
    const navigation = useNavigation();
    const [hasMore, setHasMore] = useState(true);
+   const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
 
-   let fetchData = async (pageNum:number) => {
-      let pageNumber = pageNum
+   let fetchData = async (pageNum?:number) => {
+      let pageNumber = pageNum ?? page.current
       if(!hasMore) return;
       try {
          if (currentUser) {
-            setLoading(true)
+            setLoadingFetch(true)
             let activeUserId = currentUser?.id;
             let response = await fetch(
-               `http://192.168.182.183:5000/api/media/posts/session/${activeUserId}/${pageNumber}/${numberOfPostsPerPage}`
+               `http://192.168.0.114:5000/api/media/posts/session/${activeUserId}/${pageNumber}/${numberOfPostsPerPage}`
             );
             let data = await response.json();
             if (data.status == "success") {
@@ -56,29 +56,29 @@ const PostsComponent = () => {
                 
                setAllPosts((prev)=> prev ? [...prev,...fetchedPost]:fetchedPost);
                setPosts((prev)=> prev ? [...prev,...fetchedPost]:fetchedPost);
-               setLoading(false)
-               if(fetchedPost.length > 0) setPage(pageNumber + 1)
+              
+               if(fetchedPost.length > 0) page.current++
                if(data.length < numberOfPostsPerPage){
                   setHasMore(false)
                }
-              
+               setLoadingFetch(false)
                // Alert.alert("Success",data.message)
             } else {
                Alert.alert("Failed", data.message);
-               setLoading(false)
+               setLoadingFetch(false)
             }
          }
 
       } catch (err) {
          Alert.alert("Failed", String(err));
-         setLoading(false);
+         setLoadingFetch(false);
       }
    };
 
    const handleLoadMore = () => {
-      console.log("Reached end")
-      if(loading) return;
-      fetchData(page);
+      console.log("Posts Reached end")
+      if(loadingFetch) return;
+      fetchData();
    };
 
    const renderFooter = () => {
@@ -125,7 +125,7 @@ const PostsComponent = () => {
             }
          }}
          onEndReached={handleLoadMore}
-         onEndReachedThreshold={0.2}
+         onEndReachedThreshold={0.3}
          ListFooterComponent={renderFooter}
       />
    );

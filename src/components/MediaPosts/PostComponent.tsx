@@ -43,6 +43,7 @@ import { Skeleton } from "@rneui/themed";
 import { useWindowDimensions } from "react-native";
 import HTML from "react-native-render-html";
 import { useNavigation } from "@react-navigation/native";
+import { dateAgo } from "../../utils/util";
 
 const s3 = new AWS.S3({
    accessKeyId: config.accessKeyId,
@@ -138,7 +139,7 @@ const PostComponent = (props: PostComponentProps) => {
          setLoading(true);
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.182.183:5000/api/media/posts/likes/`,
+            `http://192.168.0.114:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -178,7 +179,7 @@ const PostComponent = (props: PostComponentProps) => {
       console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.182.183:5000/api/media/posts/",
+            "http://192.168.0.114:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {
@@ -340,9 +341,9 @@ const PostComponent = (props: PostComponentProps) => {
                      textAlignVertical: "center",
                      color: theme.colors.secondary,
                      fontFamily: "Poppins_300Light",
-                     fontSize: 13,
+                     fontSize: 12,
                   }}>
-                  posted {moment(props.post.createdAt).fromNow()}
+                  {dateAgo(props.post.createdAt)}
                </Text>
             </View>
 

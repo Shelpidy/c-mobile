@@ -43,6 +43,7 @@ import moment from "moment";
 import HTML from "react-native-render-html";
 import { LoadingPostComponent } from "../components/MediaPosts/LoadingComponents";
 import TextShortener from "../components/TextShortener";
+import { dateAgo } from "../utils/util";
 
 type FullPostComponentProps = { navigation: any; route: any };
 type PostComponentProps = {
@@ -113,7 +114,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
             let postId = route.params.id;
             try {
                let { data, status } = await axios.get(
-                  `http://192.168.182.183:5000/api/media/posts/${postId}/users/${activeUserId}`
+                  `http://192.168.0.114:5000/api/media/posts/${postId}/users/${activeUserId}`
                );
                if (status === 200) {
                   console.log(data.data);
@@ -173,7 +174,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
       console.log("CommentObj", commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.182.183:5000/api/media/posts/comments/`,
+            `http://192.168.0.114:5000/api/media/posts/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -215,7 +216,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
       console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.182.183:5000/api/media/posts/",
+            "http://192.168.0.114:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {
@@ -242,7 +243,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
          setLoading(true);
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.182.183:5000/api/media/posts/likes/`,
+            `http://192.168.0.114:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -413,7 +414,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                         fontFamily: "Poppins_300Light",
                         fontSize: 12,
                      }}>
-                     posted {moment(post.createdAt).fromNow()}
+                     {dateAgo(post.createdAt)}
                   </Text>
                </View>
                {post?.images && <ImagesViewer images={post?.images} />}
