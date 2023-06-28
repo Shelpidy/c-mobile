@@ -134,7 +134,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
          setLoading(true);
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.0.114:5000/api/media/posts/likes/`,
+            `http://192.168.148.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -184,7 +184,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                   fontFamily: "Poppins_300Light",
                   fontSize: 13,
                }}>
-              {dateAgo(props.post.createdAt)}
+               {dateAgo(props.post.createdAt)}
             </Text>
          </View>
          <View style={{ flexDirection: "row" }}></View>
@@ -235,6 +235,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                mode="text"
                onPress={() =>
                   navigation.navigate("FullPostViewScreen", {
+                     ...props.post, 
                      userId: props.post.fromId,
                      id: props.post.fromPostId,
                   })
@@ -288,7 +289,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                         fontSize: 12,
                         marginHorizontal: 1,
                      }}>
-                     Like
+                     Likes
                   </Text>
                </View>
 
@@ -344,7 +345,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                   }}
                   onPress={() =>
                      navigation.navigate("FullSharedPostViewScreen", {
-                        ...props.post
+                        ...props.post,
                      })
                   }
                   textColor={theme.colors.secondary}
@@ -372,10 +373,7 @@ const styles = StyleSheet.create({
       backgroundColor: "#ffffff",
       // marginHorizontal:6,
       marginVertical: 3,
-      borderRadius: 4,
       paddingVertical: 10,
-      borderWidth: 1,
-      borderColor: "#f3f3f3",
    },
    commentBox: {
       flex: 1,

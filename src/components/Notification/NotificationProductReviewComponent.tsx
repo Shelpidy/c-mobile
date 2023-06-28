@@ -26,15 +26,13 @@ import {
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { useCurrentUser } from "../../utils/CustomHooks";
-// import UpdateProductForm from "./UpdateProduct";
 
-// type ProductComment = Omit<CommentProps, "posterId">;
-const initialState: ProductComment = {};
+const initialState: Partial<ProductComment> = {};
 
 const { width } = Dimensions.get("window");
 
 const postCommentReducer = (
-   state: ProductComment = initialState,
+   state: Partial<ProductComment> = initialState,
    action: Action
 ) => {
    switch (action.type) {
@@ -59,12 +57,12 @@ const postCommentReducer = (
 };
 
 type NotificationProductReviewComponentProps = {
-   props: ProductComponentProps;
+   product: Product;
    buyerId: number;
 };
 
 const NotificationProductReviewComponent = ({
-   props,
+   product,
    buyerId,
 }: NotificationProductReviewComponentProps) => {
    const currentUser = useCurrentUser();
@@ -84,7 +82,7 @@ const NotificationProductReviewComponent = ({
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.0.114:8080/api/room/${buyer?.id}/${currentUser?.id}`,
+                  `http://192.168.148.183:8080/api/room/${buyer?.id}/${currentUser?.id}`,
                   { method: "GET" }
                );
                let data = await response.json();
@@ -111,9 +109,9 @@ const NotificationProductReviewComponent = ({
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
-            if (props) {
+            if (product) {
                let response = await fetch(
-                  `http://192.168.0.114:5000/api/auth/users/${props.userId}`,
+                  `http://192.168.148.183:5000/api/auth/users/${product.userId}`,
                   { method: "GET" }
                );
 
@@ -146,9 +144,9 @@ const NotificationProductReviewComponent = ({
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
-            if (props) {
+            if (product) {
                let response = await fetch(
-                  `http://192.168.0.114:5000/api/auth/users/${buyerId}`,
+                  `http://192.168.148.183:5000/api/auth/users/${buyerId}`,
                   { method: "GET" }
                );
 
@@ -201,8 +199,8 @@ const NotificationProductReviewComponent = ({
             </View>
          )}
          <View>
-            {props.images && <ImagesViewer images={props.images} />}
-            {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
+            {product.images && <ImagesViewer images={product.images} />}
+            {/* {product?.video && <VideoPlayer video={product?.video}/>} */}
          </View>
          <View
             style={{
@@ -210,9 +208,9 @@ const NotificationProductReviewComponent = ({
                marginVertical: 5,
                alignItems: "center",
             }}>
-            <Text style={styles.productName}>{props?.productName}</Text>
+            <Text style={styles.productName}>{product?.productName}</Text>
 
-            {props.initialPrice && (
+            {product.initialPrice && (
                <Text
                   style={[
                      styles.productInitialPrice,
@@ -221,17 +219,17 @@ const NotificationProductReviewComponent = ({
                         textDecorationLine: "line-through",
                      },
                   ]}>
-                  C{props?.initialPrice}
+                  C{product?.initialPrice}
                </Text>
             )}
             <Text
                style={[styles.productPrice, { color: theme.colors.primary }]}>
-               C{props?.price}
+               C{product?.price}
             </Text>
             {/* <Button  mode='contained'>Affiliate</Button> */}
          </View>
 
-         {props?.description && <TextViewer text={props.description} />}
+         {product?.description && <TextViewer text={product.description} />}
          <View>
             <View
                style={[
@@ -244,10 +242,10 @@ const NotificationProductReviewComponent = ({
                      style={{ flex: 1, borderColor: theme.colors.primary }}
                      onPress={() =>
                         navigation.navigate("ProductScreen", {
-                           productId: props.id,
-                           userId: props.userId,
+                           productId: product.id,
+                           userId: product.userId,
                            affiliateId:
-                              props?.affiliateId && props.affiliateId[0],
+                              product?.affiliateId && product.affiliateId[0],
                         })
                      }
                      mode="outlined">

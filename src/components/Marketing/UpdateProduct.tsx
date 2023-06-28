@@ -53,7 +53,7 @@ const productReducer = (state: NewProduct = initialState, action: Action) => {
    }
 };
 
-type NProductComponentProps = ProductComponentProps & { navigation?: any };
+type NProductComponentProps = Product & { navigation?: any };
 
 const UpdateProductForm = (product: NProductComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
@@ -111,7 +111,7 @@ const UpdateProductForm = (product: NProductComponentProps) => {
 
       try {
          let response = await axios.put(
-            "http://192.168.0.114:5000/api/marketing/products/",
+            "http://192.168.148.183:5000/api/marketing/products/",
             productObj
          );
          if (response.status === 202) {

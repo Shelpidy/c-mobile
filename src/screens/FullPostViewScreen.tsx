@@ -112,9 +112,11 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
          let fetchData = async () => {
             let activeUserId = currentUser?.id;
             let postId = route.params.id;
+            console.log('PostId',postId)
+            console.log('Post',route.params)
             try {
                let { data, status } = await axios.get(
-                  `http://192.168.0.114:5000/api/media/posts/${postId}/users/${activeUserId}`
+                  `http://192.168.148.183:5000/api/media/posts/${postId}/users/${activeUserId}`
                );
                if (status === 200) {
                   console.log(data.data);
@@ -174,7 +176,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
       console.log("CommentObj", commentObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.114:5000/api/media/posts/comments/`,
+            `http://192.168.148.183:5000/api/media/posts/comments/`,
             commentObj
          );
          if (data.status == "success") {
@@ -183,7 +185,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
             setTextValue("");
             setCommentsCount((prev) => prev + 1);
 
-           setRefetchId(refetchId + 1);
+            setRefetchId(refetchId + 1);
 
             Alert.alert("Success", data.message);
          } else {
@@ -216,7 +218,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
       console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.0.114:5000/api/media/posts/",
+            "http://192.168.148.183:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {
@@ -224,7 +226,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
             setLoadingShare(false);
             setShared(true);
             setSharesCount((prev) => prev + 1);
-            // Alert.alert("Successful", "Post successfully");
+          
          } else {
             setLoadingShare(false);
             Alert.alert("Failed", "Post Failed");
@@ -234,7 +236,6 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
          console.log(err);
       }
 
-      // console.log(postState);
    };
 
    const handleLike = async (postId: number) => {
@@ -243,7 +244,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
          setLoading(true);
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.0.114:5000/api/media/posts/likes/`,
+            `http://192.168.148.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -379,8 +380,8 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                         justifyContent: "flex-end",
                         alignItems: "flex-end",
                         marginBottom: 2,
-                        paddingHorizontal: 1,
-                        borderRadius: 3,
+                      
+                       
                      }}>
                      {currentUser?.id == post?.userId && (
                         <View>
@@ -616,7 +617,11 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                   />
                </KeyboardAvoidingView> */}
                <View style={{ padding: 5, marginBottom: 10 }}>
-                  <Comments refetchId = {refetchId} userId={post?.userId} postId={post.id} />
+                  <Comments
+                     refetchId={refetchId}
+                     userId={post?.userId}
+                     postId={post.id}
+                  />
                </View>
             </View>
          </ScrollView>

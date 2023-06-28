@@ -19,7 +19,7 @@ const LikesComponent = ({ postId, numberOfLikes }: LikesComponentProps) => {
             try {
                if (currentUser) {
                   let { data, status } = await axios.get(
-                     `http://192.168.0.114:5000/api/media/posts/likes/${postId}/${currentUser.id}`
+                     `http://192.168.148.183:5000/api/media/posts/likes/${postId}/${currentUser.id}`
                   );
                   if (status == 200) {
                      setUsers(data.data.sessionUsers);

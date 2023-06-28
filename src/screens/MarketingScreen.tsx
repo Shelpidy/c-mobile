@@ -6,7 +6,7 @@ import {
    ScrollView,
    FlatList,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import ProductComponent from "../components/Marketing/ProductComponent";
 import SearchForm from "../components/SearchForm";
 import PostProductFormNav from "../components/PostProductFormNav";
@@ -24,65 +24,102 @@ type ProductsComponentProps = {
    navigation?: any;
 };
 
+type FetchedProduct = {
+   product:Product,
+   likesCount:number,
+   liked:boolean,
+   previewed:boolean,
+   previewsCount:number,
+   user:User
+}
+
 const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
-   const [products, setProducts] = useState<
-      ProductComponentProps[] | null | []
-   >(null);
-   const [allProducts, setAllProducts] = useState<ProductComponentProps[]>([]);
+   const [products, setProducts] = useState<FetchedProduct[]|null>(null);
+   const [allProducts, setAllProducts] = useState<FetchedProduct[]>([]);
    const [pageNumber, setPageNumber] = useState<number>(1);
-   const [numberOfProductsPerPage, setNumberOfProductsPerPage] =
-      useState<number>(20);
-   const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
+   const page = React.useRef<number>(1);
+   const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(5);
    const [loading, setLoading] = useState<boolean>(false);
+   const [hasMore, setHasMore] = useState(true);
+   const currentUser = useCurrentUser()
+
+   let fetchProducts = async (pageNum?: number) => {
+      let pageNumber = pageNum ?? page.current;
+      console.log("Fetching products")
+
+      if (!hasMore) return;
+      if(!currentUser) return;
+      try {
+          console.log("UserId",currentUser?.id)
+         setLoading(true);
+         let response = await fetch(
+            `http://192.168.148.183:5000/api/marketing/products/${currentUser?.id}/${pageNumber}/${numberOfPostsPerPage}`
+         );
+       
+         if (response.status === 200) {
+            let {data} = await response.json();
+          
+            setAllProducts((prev) =>
+            prev ? [...prev, ...data] : data
+         );
+         setProducts((prev) =>
+            prev ? [...prev, ...data] : data
+         );
+         if (data.length > 0) page.current++;
+         if (data.length < numberOfPostsPerPage) {
+            setHasMore(false);
+         }
+            
+         } else {
+            let {data} = await response.json();
+            Alert.alert("Failed", data.message);
+         }
+         setLoading(false);
+      } catch (err) {
+         console.log(err)
+         Alert.alert("Failed", String(err));
+         setLoading(false);
+      }
+   };
+
 
    useEffect(function () {
-      setLoading(true);
-      let fetchData = async () => {
-         try {
-            let response = await fetch(
-               "http://192.168.0.114:5000/api/marketing/products"
-            );
-            let data = await response.json();
-            if (data.status == "success") {
-               // console.log('Products',data.data);
-               // setProducts(data.data);
-               let fetchedPost: ProductComponentProps[] = data.data;
-               let numOfPageLinks = Math.ceil(
-                  fetchedPost.length / numberOfProductsPerPage
-               );
-               // console.log(fetchedPost);
-               setAllProducts(fetchedPost);
-               setNumberOfPageLinks(numOfPageLinks);
-               const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
-               const lastIndex = currentIndex + numberOfProductsPerPage;
-               setProducts(data.data.slice(currentIndex, lastIndex));
-               // Alert.alert("Success",data.message)
-            } else {
-               Alert.alert("Failed", data.message);
-            }
-            setLoading(false);
-         } catch (err) {
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      };
-      fetchData();
-   }, []);
+      fetchProducts(1);
+   }, [currentUser]);
 
-   useEffect(() => {
-      const currentIndex = numberOfProductsPerPage * (pageNumber - 1);
-      const lastIndex = currentIndex + numberOfProductsPerPage;
-      setProducts(products?.slice(currentIndex, lastIndex) ?? []);
-   }, [pageNumber]);
+   const handleLoadMore = () => {
+      console.log("Products Reached end");
+      if (loading) return;
+      fetchProducts();
+   };
+
+   const renderFooter = () => {
+      if (!loading) return null;
+      return (
+         <View
+            style={{
+               flexDirection: "row",
+               padding: 10,
+               justifyContent: "center",
+               alignItems: "center",
+               backgroundColor: "white",
+            }}>
+            <ActivityIndicator color="#cecece" size="small" />
+            <Text style={{ color: "#cecece", marginLeft: 5 }}>
+               Loading more posts
+            </Text>
+         </View>
+      );
+   };
 
    const searchProducts = (_token: string) => {
       console.log("From product", _token);
       let token = _token.toLowerCase();
       let newProducts = allProducts?.filter(
          (Product) =>
-            Product?.description.toLowerCase().includes(token) ||
-            Product?.productName?.toLowerCase().includes(token) ||
-            Product?.price?.toLowerCase().includes(token)
+            Product.product?.description.toLowerCase().includes(token) ||
+            Product.product?.productName?.toLowerCase().includes(token) ||
+            Product.product?.price?.toLowerCase().includes(token)
       );
       setProducts(newProducts);
    };
@@ -115,15 +152,18 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
          <SearchForm setSearchValue={searchProducts} />
          <FlatList
             data={products}
-            keyExtractor={(item) => String(item.id)}
+            keyExtractor={(item) => String(item.product.id)}
             indicatorStyle="white"
             renderItem={({ item, index, separators }) => (
                <ProductComponent
-                  key={String(item.id)}
+                  key={String(item.product.id)}
                   {...item}
-                  navigation={navigation}
+                
                />
             )}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.3}
+            ListFooterComponent={renderFooter}
          />
       </ScrollView>
    );

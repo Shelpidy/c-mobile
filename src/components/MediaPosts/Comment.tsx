@@ -77,54 +77,60 @@ const Comment = (props: CommentProps) => {
    const inputRef = useRef<TextInput>(null);
    const navigation = useNavigation<any>();
 
-   let fetchData = async (pageNum?:number) => {
-      let pageNumber = pageNum ?? page.current
-      console.log("Replies PageNumber",pageNumber)
-      if(!hasMore) return;
+   let fetchData = async (pageNum?: number) => {
+      let pageNumber = pageNum ?? page.current;
+      console.log("Replies PageNumber", pageNumber);
+      if (!hasMore) return;
       try {
-         setLoadingFetch(true)
+         setLoadingFetch(true);
          if (currentUser) {
             let commentId = props.comment?.id;
             console.log(commentId, currentUser);
             let response = await fetch(
-               `http://192.168.0.114:5000/api/media/posts/comments/${commentId}/replies/${currentUser?.id}/${pageNumber}/5`
+               `http://192.168.148.183:5000/api/media/posts/comments/${commentId}/replies/${currentUser?.id}/${pageNumber}/5`
             );
             let { data } = await response.json();
             if (response.ok) {
-               setReplies(prev => prev?[...prev,...data]:data);
-               if(data.length > 0){
-                 page.current++
+               setReplies((prev) => (prev ? [...prev, ...data] : data));
+               if (data.length > 0) {
+                  page.current++;
                }
                console.log("Replies=>", data);
-               setLoadingFetch(false)
-               if(data.length < 5){
-                  setHasMore(false)
+               setLoadingFetch(false);
+               if (data.length < 5) {
+                  setHasMore(false);
                }
             } else {
                Alert.alert("Failed", data.message);
-               setLoadingFetch(false)
+               setLoadingFetch(false);
             }
          }
       } catch (err) {
          console.log("From Comment", String(err));
          Alert.alert("Failed Comment", String(err));
-         setLoadingFetch(false)
+         setLoadingFetch(false);
       }
    };
 
    const handleLoadMore = () => {
-     
-      console.log("Replies end reached")
-      if(loadingFetch) return;
+      console.log("Replies end reached");
+      if (loadingFetch) return;
       fetchData();
    };
 
    const renderFooter = () => {
-      if(!loadingFetch) return null
+      if (!loadingFetch) return null;
       return (
-         <View style={{ flexDirection:"row",padding: 10,justifyContent:"center",alignItems:"center",backgroundColor:"white"}}>
+         <View
+            style={{
+               flexDirection: "row",
+               padding: 10,
+               justifyContent: "center",
+               alignItems: "center",
+               backgroundColor: "white",
+            }}>
             <ActivityIndicator color="#cecece" size="small" />
-            <Text style={{color:"#cecece",marginLeft:5}}>Loading</Text>
+            <Text style={{ color: "#cecece", marginLeft: 5 }}>Loading</Text>
          </View>
       );
    };
@@ -142,73 +148,71 @@ const Comment = (props: CommentProps) => {
 
    const renderSkeleton = () => (
       <View>
-          <View
-         style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            gap: 4,
-            margin: 3,
-         }}>
-         <Skeleton animation="wave" circle width={50} height={50} />
-         <Skeleton
-            style={{ borderRadius: 5, marginTop: 4 }}
-            animation="wave"
-            width={width - 70}
-            height={80}
-         />
+         <View
+            style={{
+               flex: 1,
+               flexDirection: "row",
+               justifyContent: "flex-start",
+               gap: 4,
+               margin: 3,
+            }}>
+            <Skeleton animation="wave" circle width={50} height={50} />
+            <Skeleton
+               style={{ borderRadius: 5, marginTop: 4 }}
+               animation="wave"
+               width={width - 70}
+               height={80}
+            />
+         </View>
+         <View
+            style={{
+               flex: 1,
+               flexDirection: "row",
+               justifyContent: "flex-start",
+               gap: 4,
+               margin: 3,
+            }}>
+            <Skeleton animation="wave" circle width={50} height={50} />
+            <Skeleton
+               style={{ borderRadius: 5, marginTop: 4 }}
+               animation="wave"
+               width={width - 70}
+               height={80}
+            />
+         </View>
+         <View
+            style={{
+               flex: 1,
+               flexDirection: "row",
+               justifyContent: "flex-start",
+               gap: 4,
+               margin: 3,
+            }}>
+            <Skeleton animation="wave" circle width={50} height={50} />
+            <Skeleton
+               style={{ borderRadius: 5, marginTop: 4 }}
+               animation="wave"
+               width={width - 70}
+               height={80}
+            />
+         </View>
+         <View
+            style={{
+               flex: 1,
+               flexDirection: "row",
+               justifyContent: "flex-start",
+               gap: 4,
+               margin: 3,
+            }}>
+            <Skeleton animation="wave" circle width={50} height={50} />
+            <Skeleton
+               style={{ borderRadius: 5, marginTop: 4 }}
+               animation="wave"
+               width={width - 70}
+               height={80}
+            />
+         </View>
       </View>
-      <View
-         style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            gap: 4,
-            margin: 3,
-         }}>
-         <Skeleton animation="wave" circle width={50} height={50} />
-         <Skeleton
-            style={{ borderRadius: 5, marginTop: 4 }}
-            animation="wave"
-            width={width - 70}
-            height={80}
-         />
-      </View>
-      <View
-         style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            gap: 4,
-            margin: 3,
-         }}>
-         <Skeleton animation="wave" circle width={50} height={50} />
-         <Skeleton
-            style={{ borderRadius: 5, marginTop: 4 }}
-            animation="wave"
-            width={width - 70}
-            height={80}
-         />
-      </View>
-      <View
-         style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            gap: 4,
-            margin: 3,
-         }}>
-         <Skeleton animation="wave" circle width={50} height={50} />
-         <Skeleton
-            style={{ borderRadius: 5, marginTop: 4 }}
-            animation="wave"
-            width={width - 70}
-            height={80}
-         />
-      </View>
-
-      </View>
-     
    );
    useEffect(() => {
       setComment(props.comment);
@@ -242,12 +246,12 @@ const Comment = (props: CommentProps) => {
       console.log("ReplyObj", replyObj);
       try {
          let { data } = await axios.post(
-            `http://192.168.0.114:5000/api/media/posts/comments/replies/`,
+            `http://192.168.148.183:5000/api/media/posts/comments/replies/`,
             replyObj
          );
          if (data.status == "success") {
             console.log(data.data);
-            setReplies(prev =>prev?[data.data,...prev]:[data.data]);
+            setReplies((prev) => (prev ? [data.data, ...prev] : [data.data]));
             setReplyText("");
             setRepliesCount((prev) => prev + 1);
 
@@ -271,7 +275,7 @@ const Comment = (props: CommentProps) => {
             setLoading(true);
             let activeUserId = currentUser?.id;
             let { data } = await axios.put(
-               `http://192.168.0.114:5000/api/media/posts/comments/likes/`,
+               `http://192.168.148.183:5000/api/media/posts/comments/likes/`,
                { userId: activeUserId, commentId: commentId }
             );
             if (data.status == "success") {
@@ -298,7 +302,7 @@ const Comment = (props: CommentProps) => {
          try {
             let putObj = { text: commentText, id: comment?.id };
             let response = await axios.put(
-               "`http://192.168.0.114:5000/media/posts/comments",
+               "`http://192.168.148.183:5000/media/posts/comments",
                putObj
             );
             if (response.status == 202) {
@@ -330,18 +334,16 @@ const Comment = (props: CommentProps) => {
          <Modal visible={openRepliesModal}>
             <View
                style={{
-                  position:"relative",
+                  position: "relative",
                   backgroundColor: "#00000099",
                }}>
                <ScrollView
                   style={{
                      top: height / 7,
-                     borderTopRightRadius:8,
-                     borderTopLeftRadius:8,
+                     borderTopRightRadius: 8,
+                     borderTopLeftRadius: 8,
                      backgroundColor: "#fff",
-                     paddingBottom:100,
-
-                    
+                     paddingBottom: 100,
                   }}>
                   <View
                      style={{
@@ -372,7 +374,7 @@ const Comment = (props: CommentProps) => {
                      </View>
                   )}
                   <FlatList
-                  style={{ paddingHorizontal:10}}
+                     style={{ paddingHorizontal: 10 }}
                      data={replies}
                      renderItem={renderItem}
                      keyExtractor={(item) => String(item?.reply?.id)}
@@ -423,9 +425,7 @@ const Comment = (props: CommentProps) => {
                         />
                      </Button>
                   </KeyboardAvoidingView>
-                  <View style={{height:height/5}}>
-
-                  </View>
+                  <View style={{ height: height / 5 }}></View>
                </ScrollView>
             </View>
          </Modal>
@@ -456,15 +456,15 @@ const Comment = (props: CommentProps) => {
                   </View>
                   <View
                      style={{
-                        position:"absolute",
-                        bottom:0,
-                        left:0,
-                        width:"100%",
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        width: "100%",
                         paddingHorizontal: 15,
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "center",
-                        zIndex:10
+                        zIndex: 10,
                      }}>
                      <TextInput
                         value={commentText}
@@ -513,7 +513,6 @@ const Comment = (props: CommentProps) => {
                         source={{ uri: commentor.profileImage }}
                      /> */}
                   </Pressable>
-
                   <View
                      style={{
                         // backgroundColor: "#f5f5f5",
@@ -550,7 +549,7 @@ const Comment = (props: CommentProps) => {
                            />
                         )}
                      </View>
-                   
+
                      <Text
                         style={{
                            fontFamily: "Poppins_300Light",
@@ -572,7 +571,16 @@ const Comment = (props: CommentProps) => {
                            borderRadius: 3,
                            gap: 1,
                         }}>
-                         {comment.createdAt &&  <Text style={{fontSize:10,fontFamily:"Poppins_300Light",marginRight:5}}>{dateAgo(comment.createdAt)}</Text> }
+                        {comment.createdAt && (
+                           <Text
+                              style={{
+                                 fontSize: 10,
+                                 fontFamily: "Poppins_300Light",
+                                 marginRight: 5,
+                              }}>
+                              {dateAgo(comment.createdAt)}
+                           </Text>
+                        )}
 
                         <Divider style={{ width: 50 }} />
                         <Button
@@ -595,7 +603,7 @@ const Comment = (props: CommentProps) => {
                               fontSize: 13,
                               color: theme.colors.secondary,
                            }}
-                           onPress={() => console.log("Comment Pressed")}>
+                           onPress={() => setOpenRepliesModal(true)}>
                            <Ionicons
                               size={15}
                               color={theme.colors.secondary}

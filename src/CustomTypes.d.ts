@@ -24,7 +24,6 @@ declare type CommentReply = {
    updatedAt: Date;
 };
 
-
 declare type ProductComment = {
    id: number;
    productId: number;
@@ -134,7 +133,6 @@ declare type Product = {
    description: string;
    images: string[];
    price: string;
-   affiliateId: number[] | null;
    initialPrice: string;
    affiliatePrice: string | null;
    sizes: string[] | null;

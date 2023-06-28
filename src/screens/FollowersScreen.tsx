@@ -18,7 +18,7 @@ const FollowersScreen = ({ navigation, route }: any) => {
          let userId = route.params.user.id;
          try {
             let response = await fetch(
-               `http://192.168.0.114:5000/api/media/followers/${userId}`,
+               `http://192.168.148.183:5000/api/media/followers/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();

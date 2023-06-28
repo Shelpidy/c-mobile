@@ -27,8 +27,8 @@ type PostComponentProps = {
 };
 
 const PostsComponent = () => {
-   const [posts, setPosts] = useState<PostComponentProps[]|null>(null);
-   const [allPosts, setAllPosts] = useState<PostComponentProps[]|null>(null);
+   const [posts, setPosts] = useState<PostComponentProps[] | null>(null);
+   const [allPosts, setAllPosts] = useState<PostComponentProps[] | null>(null);
    const page = React.useRef<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(5);
    const [loading, setLoading] = useState<boolean>(false);
@@ -38,37 +38,43 @@ const PostsComponent = () => {
    const [hasMore, setHasMore] = useState(true);
    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
 
-   let fetchData = async (pageNum?:number) => {
-      let pageNumber = pageNum ?? page.current
-      if(!hasMore) return;
+   let fetchData = async (pageNum?: number) => {
+      let pageNumber = pageNum ?? page.current;
+      if (!hasMore) return;
       try {
          if (currentUser) {
-            setLoadingFetch(true)
+            setLoadingFetch(true);
             let activeUserId = currentUser?.id;
             let response = await fetch(
-               `http://192.168.0.114:5000/api/media/posts/session/${activeUserId}/${pageNumber}/${numberOfPostsPerPage}`
+               `http://192.168.148.183:5000/api/media/posts/session/${activeUserId}/${pageNumber}/${numberOfPostsPerPage}`
             );
-            let data = await response.json();
-            if (data.status == "success") {
-               console.log(data.data)
+          
+            if (response.status === 200) {
+               let {data} = await response.json()
+               console.log(data);
                // setPosts(data.data);
-               let fetchedPost: PostComponentProps[] = data.data;
-                
-               setAllPosts((prev)=> prev ? [...prev,...fetchedPost]:fetchedPost);
-               setPosts((prev)=> prev ? [...prev,...fetchedPost]:fetchedPost);
-              
-               if(fetchedPost.length > 0) page.current++
-               if(data.length < numberOfPostsPerPage){
-                  setHasMore(false)
+               let fetchedPost: PostComponentProps[] = data;
+
+               setAllPosts((prev) =>
+                  prev ? [...prev, ...fetchedPost] : fetchedPost
+               );
+               setPosts((prev) =>
+                  prev ? [...prev, ...fetchedPost] : fetchedPost
+               );
+
+               if (fetchedPost.length > 0) page.current++;
+               if (data.length < numberOfPostsPerPage) {
+                  setHasMore(false);
                }
-               setLoadingFetch(false)
+               setLoadingFetch(false);
                // Alert.alert("Success",data.message)
             } else {
-               Alert.alert("Failed", data.message);
-               setLoadingFetch(false)
+
+               let {message} = await response.json()
+               Alert.alert("Failed",message);
+               setLoadingFetch(false);
             }
          }
-
       } catch (err) {
          Alert.alert("Failed", String(err));
          setLoadingFetch(false);
@@ -76,17 +82,26 @@ const PostsComponent = () => {
    };
 
    const handleLoadMore = () => {
-      console.log("Posts Reached end")
-      if(loadingFetch) return;
+      console.log("Posts Reached end");
+      if (loadingFetch) return;
       fetchData();
    };
 
    const renderFooter = () => {
-      if(!loading) return null
+      if (!loading) return null;
       return (
-         <View style={{ flexDirection:"row",padding: 10,justifyContent:"center",alignItems:"center",backgroundColor:"white"}}>
+         <View
+            style={{
+               flexDirection: "row",
+               padding: 10,
+               justifyContent: "center",
+               alignItems: "center",
+               backgroundColor: "white",
+            }}>
             <ActivityIndicator color="#cecece" size="small" />
-            <Text style={{color:"#cecece",marginLeft:5}}>Loading more posts</Text>
+            <Text style={{ color: "#cecece", marginLeft: 5 }}>
+               Loading more posts
+            </Text>
          </View>
       );
    };
@@ -97,7 +112,6 @@ const PostsComponent = () => {
       },
       [currentUser]
    );
-
 
    if (!posts) {
       return (

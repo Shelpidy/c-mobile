@@ -14,7 +14,6 @@ import axios from "axios";
 import { useCurrentUser } from "../utils/CustomHooks";
 import TextShortener from "./TextShortener";
 
-
 const { width, height } = Dimensions.get("window");
 
 type FindFriendProps = {
@@ -37,7 +36,7 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
       setLoading(true);
       try {
          let { data } = await axios.put(
-            `http://192.168.0.114:5000/api/media/follows/`,
+            `http://192.168.148.183:5000/api/media/follows/`,
             { followerId: currentUser?.id, followingId: user?.id },
             { headers: { Accept: "application/json" } }
          );
@@ -58,10 +57,7 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
    return (
       <Pressable onPress={gotoUserProfile}>
          <View style={styles.container}>
-            <Avatar.Image
-            size={150}
-               source={{ uri: user.profileImage }}
-            />
+            <Avatar.Image size={150} source={{ uri: user.profileImage }} />
             <TextShortener
                style={styles.nameText}
                text={
@@ -78,13 +74,13 @@ const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
                   mode={followed ? "text" : "contained"}
                   style={{ borderColor: theme.colors.primary }}>
                   <SimpleLineIcons
-                      size={13}
+                     size={13}
                      name={followed ? "user-following" : "user-follow"}
                   />
                   <Text
                      style={{
                         fontFamily: "Poppins_400Regular",
-                        fontSize:11
+                        fontSize: 11,
                      }}>
                      {followed ? " Unfollow" : " Follow"}
                   </Text>
@@ -108,10 +104,10 @@ const styles = StyleSheet.create({
       borderRadius: 3,
       backgroundColor: "#fff",
       margin: 1,
-      borderWidth:1,
-      borderColor:"#ccc",
-      alignItems:"center",
-      paddingVertical:2
+      borderWidth: 1,
+      borderColor: "#ccc",
+      alignItems: "center",
+      paddingVertical: 2,
    },
    followerContainer: {
       padding: 3,
@@ -119,6 +115,6 @@ const styles = StyleSheet.create({
    nameText: {
       fontFamily: "Poppins_400Regular",
       margin: 5,
-      fontSize:11
+      fontSize: 11,
    },
 });

@@ -12,13 +12,13 @@ const styles = StyleSheet.create({
 type IconBadgeProps = {
    children?: JSX.Element;
    value: number | string;
-   onPress:()=> void
-}; 
+   onPress: () => void;
+};
 
-const IconBadge = ({ children, value,onPress }: IconBadgeProps) => {
+const IconBadge = ({ children, value, onPress }: IconBadgeProps) => {
    return (
       <TouchableOpacity
-         style={{ marginHorizontal: 25,paddingHorizontal:2 }}
+         style={{ marginHorizontal: 25, paddingHorizontal: 2 }}
          onPress={onPress}>
          <View style={{ position: "relative" }}>
             <Badge

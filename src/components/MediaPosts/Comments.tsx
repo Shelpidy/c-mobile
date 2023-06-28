@@ -16,7 +16,7 @@ import { Skeleton } from "@rneui/themed";
 type CommentsProps = {
    postId: number;
    userId?: number;
-   refetchId:number
+   refetchId: number;
 };
 
 type FetchComment = {
@@ -29,7 +29,7 @@ type FetchComment = {
 
 const { width, height } = Dimensions.get("window");
 
-const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
+const Comments = ({ postId, userId, refetchId }: CommentsProps) => {
    const [comments, setComments] = useState<FetchComment[] | null>(null);
    const [loading, setLoading] = useState(false);
    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
@@ -37,30 +37,30 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
    const [hasMore, setHasMore] = useState(true);
    const navigation = useNavigation<any>();
    const currentUser = useCurrentUser();
-   const [refetchComments,setReFetchComments] = useState<number>(refetchId)
+   const [refetchComments, setReFetchComments] = useState<number>(refetchId);
 
-   const fetchComments = async (pageNum?:number) => {
-      let pageNumber = pageNum ?? page.current
-      console.log("Page number",pageNumber)
-      if(!hasMore) return;
-     
+   const fetchComments = async (pageNum?: number) => {
+      let pageNumber = pageNum ?? page.current;
+      console.log("Page number", pageNumber);
+      if (!hasMore) return;
+
       try {
          setLoadingFetch(true);
          if (currentUser && postId) {
             let response = await fetch(
-               `http://192.168.0.114:5000/api/media/posts/${postId}/comments/${currentUser?.id}/${pageNumber}/5`
+               `http://192.168.148.183:5000/api/media/posts/${postId}/comments/${currentUser?.id}/${pageNumber}/5`
             );
             let { data } = await response.json();
             if (response.ok) {
                setComments((prevComments) =>
                   prevComments ? [...prevComments, ...data] : data
                );
-               if(data.length > 0){
-                 page.current++
+               if (data.length > 0) {
+                  page.current++;
                }
                console.log("Comments=>", data);
-               if(data.length < 5){
-                  setHasMore(false)
+               if (data.length < 5) {
+                  setHasMore(false);
                }
                setLoadingFetch(false);
             } else {
@@ -74,30 +74,34 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
          Alert.alert("Failed", String(err));
          setLoadingFetch(false);
       }
-     
    };
 
    useEffect(() => {
       fetchComments(1);
-   }, [currentUser,refetchComments]);
+   }, [currentUser, refetchComments]);
 
    const handleLoadMore = () => {
-    
-      console.log("Comments reached end")
-      if(loadingFetch) return;
+      console.log("Comments reached end");
+      if (loadingFetch) return;
       fetchComments();
    };
 
    const renderFooter = () => {
-      if(!loadingFetch) return null
+      if (!loadingFetch) return null;
       return (
-         <View style={{ flexDirection:"row",padding: 10,justifyContent:"center",alignItems:"center",backgroundColor:"white"}}>
+         <View
+            style={{
+               flexDirection: "row",
+               padding: 10,
+               justifyContent: "center",
+               alignItems: "center",
+               backgroundColor: "white",
+            }}>
             <ActivityIndicator color="#cecece" size="small" />
-            <Text style={{color:"#cecece",marginLeft:5}}>Loading</Text>
+            <Text style={{ color: "#cecece", marginLeft: 5 }}>Loading</Text>
          </View>
       );
    };
-
 
    const renderItem = ({ item }: any) => (
       <Comment
@@ -113,73 +117,71 @@ const Comments = ({ postId, userId,refetchId }: CommentsProps) => {
 
    const renderSkeleton = () => (
       <View>
-          <View
-         style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            gap: 4,
-            margin: 3,
-         }}>
-         <Skeleton animation="wave" circle width={50} height={50} />
-         <Skeleton
-            style={{ borderRadius: 5, marginTop: 4 }}
-            animation="wave"
-            width={width - 70}
-            height={80}
-         />
+         <View
+            style={{
+               flex: 1,
+               flexDirection: "row",
+               justifyContent: "flex-start",
+               gap: 4,
+               margin: 3,
+            }}>
+            <Skeleton animation="wave" circle width={50} height={50} />
+            <Skeleton
+               style={{ borderRadius: 5, marginTop: 4 }}
+               animation="wave"
+               width={width - 70}
+               height={80}
+            />
+         </View>
+         <View
+            style={{
+               flex: 1,
+               flexDirection: "row",
+               justifyContent: "flex-start",
+               gap: 4,
+               margin: 3,
+            }}>
+            <Skeleton animation="wave" circle width={50} height={50} />
+            <Skeleton
+               style={{ borderRadius: 5, marginTop: 4 }}
+               animation="wave"
+               width={width - 70}
+               height={80}
+            />
+         </View>
+         <View
+            style={{
+               flex: 1,
+               flexDirection: "row",
+               justifyContent: "flex-start",
+               gap: 4,
+               margin: 3,
+            }}>
+            <Skeleton animation="wave" circle width={50} height={50} />
+            <Skeleton
+               style={{ borderRadius: 5, marginTop: 4 }}
+               animation="wave"
+               width={width - 70}
+               height={80}
+            />
+         </View>
+         <View
+            style={{
+               flex: 1,
+               flexDirection: "row",
+               justifyContent: "flex-start",
+               gap: 4,
+               margin: 3,
+            }}>
+            <Skeleton animation="wave" circle width={50} height={50} />
+            <Skeleton
+               style={{ borderRadius: 5, marginTop: 4 }}
+               animation="wave"
+               width={width - 70}
+               height={80}
+            />
+         </View>
       </View>
-      <View
-         style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            gap: 4,
-            margin: 3,
-         }}>
-         <Skeleton animation="wave" circle width={50} height={50} />
-         <Skeleton
-            style={{ borderRadius: 5, marginTop: 4 }}
-            animation="wave"
-            width={width - 70}
-            height={80}
-         />
-      </View>
-      <View
-         style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            gap: 4,
-            margin: 3,
-         }}>
-         <Skeleton animation="wave" circle width={50} height={50} />
-         <Skeleton
-            style={{ borderRadius: 5, marginTop: 4 }}
-            animation="wave"
-            width={width - 70}
-            height={80}
-         />
-      </View>
-      <View
-         style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            gap: 4,
-            margin: 3,
-         }}>
-         <Skeleton animation="wave" circle width={50} height={50} />
-         <Skeleton
-            style={{ borderRadius: 5, marginTop: 4 }}
-            animation="wave"
-            width={width - 70}
-            height={80}
-         />
-      </View>
-
-      </View>
-     
    );
    return (
       <FlatList

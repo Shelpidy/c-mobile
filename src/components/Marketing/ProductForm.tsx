@@ -94,7 +94,7 @@ const ProductForm = () => {
 
       try {
          let response = await axios.post(
-            "http://192.168.0.114:5000/api/marketing/poroducts/",
+            "http://192.168.148.183:5000/api/marketing/products/",
             productObj
          );
          if (response.status === 201) {
@@ -117,7 +117,7 @@ const ProductForm = () => {
    //    let productObj = { ...productState, userId: activeUserId };
    //    try {
    //       let response = await axios.post(
-   //          "http://192.168.0.114:5000/api/marketing/poroducts/",
+   //          "http://192.168.148.183:5000/api/marketing/poroducts/",
    //          productObj
    //       );
    //       if (response.status === 201) {

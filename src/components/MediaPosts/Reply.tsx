@@ -64,7 +64,7 @@ const Reply = (props: ReplyProps) => {
             setLoading(true);
             let activeUserId = currentUser?.id;
             let { data } = await axios.put(
-               `http://192.168.0.114:5000/api/media/posts/comments/replies/likes/`,
+               `http://192.168.148.183:5000/api/media/posts/comments/replies/likes/`,
                { userId: activeUserId, replyId: replyId }
             );
             if (data.status == "success") {
@@ -91,7 +91,7 @@ const Reply = (props: ReplyProps) => {
          try {
             let putObj = { text: replyText, id: reply?.id };
             let response = await axios.put(
-               "`http://192.168.0.114:5000/media/posts/comments/replies",
+               "`http://192.168.148.183:5000/media/posts/comments/replies",
                putObj
             );
             if (response.status == 202) {
@@ -261,28 +261,26 @@ const Reply = (props: ReplyProps) => {
                         }}>
                         <Divider style={{ width: 100 }} />
                         <Button
-                          disabled={loading}
-                          labelStyle={{
-                          fontFamily: "Poppins_300Light",
-                          paddingHorizontal: 3,
-                          fontSize: 13,
-                          color: theme.colors.secondary,
-                       }}
+                           disabled={loading}
+                           labelStyle={{
+                              fontFamily: "Poppins_300Light",
+                              paddingHorizontal: 3,
+                              fontSize: 13,
+                              color: theme.colors.secondary,
+                           }}
                            onPress={() => handleLike(reply.id)}>
-                           
-                              <AntDesign
-                                 size={props.size==="small"?14:15}
-                                 name={liked ? "like1" : "like2"}
-                              />
-                              <Text
-                                 style={{
-                                    fontFamily: "Poppins_300Light",
-                                    paddingHorizontal: 3,
-                                    fontSize: 13,
-                                 }}>
-                                 {likesCount}
-                              </Text>
-                           
+                           <AntDesign
+                              size={props.size === "small" ? 14 : 15}
+                              name={liked ? "like1" : "like2"}
+                           />
+                           <Text
+                              style={{
+                                 fontFamily: "Poppins_300Light",
+                                 paddingHorizontal: 3,
+                                 fontSize: 13,
+                              }}>
+                              {likesCount}
+                           </Text>
                         </Button>
                      </View>
                   </View>

@@ -26,13 +26,13 @@ import { useCurrentUser } from "../../utils/CustomHooks";
 import UpdateProductForm from "./UpdateProduct";
 import { LoadingProductComponent } from "../MediaPosts/LoadingComponents";
 
-// type ProductComment = Omit<CommentProps, "posterId">;
-const initialState: ProductComment = {};
+// type ProductComment = Omit<Commentproduct, "posterId">;
+const initialState: Partial<ProductComment> = {};
 
 const { width } = Dimensions.get("window");
 
-const postCommentReducer = (
-   state: ProductComment = initialState,
+const productCommentReducer = (
+   state: Partial<ProductComment> = initialState,
    action: Action
 ) => {
    switch (action.type) {
@@ -56,115 +56,51 @@ const postCommentReducer = (
    }
 };
 
-const ProductComponent = (props: ProductComponentProps) => {
+type FetchedProductProps = {
+   product:Product,
+   likesCount:number,
+   liked:boolean,
+   previewed:boolean,
+   previewsCount:number,
+   user:User
+}
+
+const ProductComponent = ({product,...props}: FetchedProductProps) => {
    const [postProductCommentstate, dispatchPostComment] = useReducer(
-      postCommentReducer,
+      productCommentReducer,
       initialState
    );
    const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [productComments, setProductComments] = useState<ProductComment[]>([]);
-   const [likes, setLikes] = useState<ProductLike[] | null>(null);
-   const [poster, SetPoster] = useState<any>();
+   const [likesCount, setLikesCount] = useState<number>(0);
+   const [user, setUser] = useState<User|null>(null);
    const [liked, setLiked] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
    const theme = useTheme();
 
    useEffect(
       function () {
-         let fetchData = async () => {
-            try {
-               if (props) {
-                  let { data } = await axios.get(
-                     `http://192.168.0.114:5000/api/marketing/products/cl/${props?.id}`
-                  );
-                  if (data.status == "success") {
-                     // console.log("Comments and Likes -----", data.data);
-                     let ls: any[] = data.data.likes;
-                     let cs = data.data.comments;
-                     setProductComments(cs);
-                     setLikes(ls);
-                     if (
-                        ls.map((like) => like.userId).includes(currentUser?.id)
-                     ) {
-                        setLiked(true);
-                     }
-                     // Alert.alert("Success",data.message)
-                  } else {
-                     Alert.alert("Failed", data.message);
-                  }
-               }
-
-               setLoading(false);
-            } catch (err) {
-               Alert.alert("Failed", String(err));
-               setLoading(false);
-            }
-         };
-         fetchData();
+         setUser(props.user)
+         setLiked(props.liked)
+         setLikesCount(props.likesCount)
       },
-      [currentUser, props]
+      []
    );
 
-   useEffect(
-      function () {
-         // console.log("Fetching user");s
-         setLoading(true);
-         let fetchData = async () => {
-            // console.log("Fetching user")
-            //  let activeUserId = 1
-            try {
-               if (props) {
-                  let response = await fetch(
-                     `http://192.168.0.114:5000/api/auth/users/${props?.userId}`,
-                     { method: "GET" }
-                  );
 
-                  if (response.ok) {
-                     let data = await response.json();
-                     // console.log("Users-----", data.data);
-                     SetPoster(data.data.personal);
-                     // Alert.alert("Success",data.message)
-                     setLoading(false);
-                  } else {
-                     let data = await response.json();
-                     Alert.alert("Failed", data.message);
-                  }
-               }
-
-               setLoading(false);
-            } catch (err) {
-               console.log(err);
-               Alert.alert("Failed", String(err));
-               setLoading(false);
-            }
-         };
-         fetchData();
-      },
-      [props]
-   );
 
    const handleLike = async (productId: number) => {
       console.log(productId);
       try {
          let activeUserId = currentUser?.id;
-         let { data } = await axios.put(
-            `http://192.168.0.114:5000/api/marketing/products/likes/`,
+         let { data,status } = await axios.put(
+            `http://192.168.148.183:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
             // console.log(data.data);
-            if (liked) {
-               if (likes) {
-                  setLikes(likes.slice(0, likes.length - 1));
-                  setLiked(!liked);
-               }
-            } else {
-               if (likes) {
-                  setLikes([...likes, data.data]);
-                  setLiked(!liked);
-               }
-            }
+          
 
             Alert.alert("Success", data.message);
          } else {
@@ -179,15 +115,15 @@ const ProductComponent = (props: ProductComponentProps) => {
    };
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === poster.id) {
-         props.navigation.navigate("ProfileScreen", { userId: poster.id });
+      if (currentUser?.id === user?.id) {
+         product.navigation.navigate("ProfileScreen", { userId: user?.id });
       } else {
-         props.navigation.navigate("UserProfileScreen", { userId: poster.id });
+         product.navigation.navigate("UserProfileScreen", { userId: user?.id });
       }
    };
 
-   if (!poster) {
-      return <LoadingProductComponent />;
+   if (!user) {
+      return <View></View>;
    }
 
    return (
@@ -206,11 +142,11 @@ const ProductComponent = (props: ProductComponentProps) => {
                   <Button mode="text" onPress={() => setOpenModal(false)}>
                      <Feather size={26} name="x" />
                   </Button>
-                  <UpdateProductForm {...props} />
+                  <UpdateProductForm {...product} />
                </View>
             </View>
          </Modal>
-         {poster && (
+         {user && (
             <View
                style={{
                   flexDirection: "row",
@@ -220,16 +156,16 @@ const ProductComponent = (props: ProductComponentProps) => {
                <Pressable onPress={gotoUserProfile}>
                   <Avatar.Image
                      size={30}
-                     source={{ uri: poster.profileImage }}
+                     source={{ uri: user.profileImage }}
                   />
                   {/* <Image
                      style={styles.profileImage}
-                     source={{ uri: poster.profileImage }}
+                     source={{ uri: user.profileImage }}
                   /> */}
                </Pressable>
 
                <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
-                  {poster.firstName} {poster.middleName} {poster.lastName}
+                  {user.firstName} {user.middleName} {user.lastName}
                </Text>
                <View
                   style={{
@@ -240,7 +176,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                      paddingHorizontal: 1,
                      borderRadius: 3,
                   }}>
-                  {currentUser?.id == props?.userId && (
+                  {currentUser?.id == product?.userId && (
                      <View>
                         <Button
                            style={{ backgroundColor: "#f9f9f9" }}
@@ -253,8 +189,8 @@ const ProductComponent = (props: ProductComponentProps) => {
             </View>
          )}
          <View>
-            {props.images && <ImagesViewer images={props.images} />}
-            {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
+            {product.images && <ImagesViewer images={product.images} />}
+            {/* {product?.video && <VideoPlayer video={product?.video}/>} */}
          </View>
          <View
             style={{
@@ -262,9 +198,9 @@ const ProductComponent = (props: ProductComponentProps) => {
                marginVertical: 5,
                alignItems: "center",
             }}>
-            <Text style={styles.productName}>{props?.productName}</Text>
+            <Text style={styles.productName}>{product?.productName}</Text>
 
-            {props.initialPrice && (
+            {product.initialPrice && (
                <Text
                   style={[
                      styles.productInitialPrice,
@@ -273,25 +209,25 @@ const ProductComponent = (props: ProductComponentProps) => {
                         textDecorationLine: "line-through",
                      },
                   ]}>
-                  C{props?.initialPrice}
+                  C{product?.initialPrice}
                </Text>
             )}
             <Text
                style={[styles.productPrice, { color: theme.colors.primary }]}>
-               C{props?.price}
+               C{product?.price}
             </Text>
             {/* <Button  mode='contained'>Affiliate</Button> */}
          </View>
 
-         {props?.description && (
+         {product?.description && (
             <TextShortener
                style={{ marginHorizontal: 8, fontFamily: "Poppins_300Light" }}
-               text={props.description}
+               text={product.description}
                onPressViewMore={() =>
-                  props.navigation.navigate("ProductScreen", {
-                     productId: props.id,
-                     userId: props.userId,
-                     affiliateId: props?.affiliateId && props.affiliateId[0],
+                  product.navigation.navigate("ProductScreen", {
+                     productId: product.id,
+                     userId: product.userId,
+                     affiliateId: product?.affiliateId && product.affiliateId[0],
                   })
                }
                showViewMore={true}
@@ -311,7 +247,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                   }}>
                   <Pressable
                      disabled={loading}
-                     onPress={() => handleLike(props.id)}>
+                     onPress={() => handleLike(product.id)}>
                      <Ionicons
                         size={30}
                         color={theme.colors.secondary}
@@ -325,7 +261,7 @@ const ProductComponent = (props: ProductComponentProps) => {
                      size={20}
                      icon={liked ? "heart" : "heart-outline"}
                   /> */}
-                  <Text style={styles.commentAmountText}>{likes?.length}</Text>
+                  <Text style={styles.commentAmountText}>{likesCount}</Text>
                </View>
                <View
                   style={{
@@ -348,11 +284,11 @@ const ProductComponent = (props: ProductComponentProps) => {
                   <Button
                      // textColor={theme.colors.primary}
                      onPress={() =>
-                        props.navigation.navigate("ProductScreen", {
-                           productId: props.id,
-                           userId: props.userId,
+                        product.navigation.navigate("ProductScreen", {
+                           productId: product.id,
+                           userId: product.userId,
                            affiliateId:
-                              props?.affiliateId && props.affiliateId[0],
+                              product?.affiliateId && product.affiliateId[0],
                         })
                      }
                      mode="contained">
@@ -364,8 +300,8 @@ const ProductComponent = (props: ProductComponentProps) => {
 
             <View style={{ padding: 5 }}>
                <ProductComments
-                  posterId={props.userId}
-                  navigation={props?.navigation}
+                  posterId={product.userId}
+                  navigation={product?.navigation}
                   productComments={productComments}
                />
             </View>

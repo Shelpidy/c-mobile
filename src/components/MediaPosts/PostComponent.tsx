@@ -108,7 +108,6 @@ const PostComponent = (props: PostComponentProps) => {
    const [reloadCLS, setRelaodCLS] = useState<number>(0);
    const { width } = useWindowDimensions();
    const navigation = useNavigation<any>();
-   
 
    const source = {
       html: `
@@ -139,7 +138,7 @@ const PostComponent = (props: PostComponentProps) => {
          setLoading(true);
          let activeUserId = currentUser?.id;
          let { data } = await axios.put(
-            `http://192.168.0.114:5000/api/media/posts/likes/`,
+            `http://192.168.148.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
          if (data.status == "success") {
@@ -172,6 +171,7 @@ const PostComponent = (props: PostComponentProps) => {
             video: props.post.video,
             text: props.post.text,
             fromId: props.post.userId,
+            fromPostId:props.post.id,
             shared: true,
          },
          sharedPostId: props.post.id,
@@ -179,7 +179,7 @@ const PostComponent = (props: PostComponentProps) => {
       console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.0.114:5000/api/media/posts/",
+            "http://192.168.148.183:5000/api/media/posts/",
             postObj
          );
          if (response.status === 201) {
@@ -276,7 +276,7 @@ const PostComponent = (props: PostComponentProps) => {
                   <Button mode="text" onPress={() => setOpenShareModal(false)}>
                      <Feather size={26} name="x" />
                   </Button>
-                  <UpdatePostForm {...props} />
+                  <UpdatePostForm {...props.post} />
                </View>
             </View>
          </Modal>
@@ -311,7 +311,7 @@ const PostComponent = (props: PostComponentProps) => {
                      justifyContent: "flex-end",
                      alignItems: "flex-end",
                      marginBottom: 2,
-                     paddingHorizontal: 1,
+                     paddingHorizontal: 0,
                      borderRadius: 3,
                   }}>
                   {currentUser?.id == props.post?.userId && (
@@ -512,10 +512,7 @@ const styles = StyleSheet.create({
       backgroundColor: "#ffffff",
       // marginHorizontal:6,
       marginVertical: 3,
-      borderRadius: 4,
       paddingVertical: 10,
-      borderWidth: 1,
-      borderColor: "#f3f3f3",
    },
    commentBox: {
       flex: 1,

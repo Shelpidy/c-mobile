@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
    Alert,
    Dimensions,
-   Image,
+   FlatList,
    ScrollView,
    StyleSheet,
    Text,
@@ -27,18 +27,29 @@ import SharedPostComponent from "../components/MediaPosts/SharedPostComponent";
 
 const { width, height } = Dimensions.get("window");
 
+type PostComponent = {
+   post: Post;
+   commentsCount: number;
+   likesCount: number;
+   sharesCount: number;
+   user: User;
+   liked: boolean;
+   secondUser: User;
+};
+
 const UserProfileScreen = ({ navigation, route }: any) => {
    const theme = useTheme();
-   const [posts, setPosts] = useState<PostComponentProps[] | null>(null);
-   const [allPosts, setAllPosts] = useState<PostComponentProps[]>([]);
+   const [posts, setPosts] = useState<PostComponent[] | null>(null);
+   const [allPosts, setAllPosts] = useState<PostComponent[]>([]);
    const [user, setUser] = useState<any>(null);
-   const [pageNumber, setPageNumber] = useState<number>(1);
+   const page = React.useRef<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
-   const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(false);
    const currentUser = useCurrentUser();
    const [followed, setFollowed] = useState<boolean>(false);
    const [roomId, setRoomId] = useState<number | null>(null);
+   const [hasMore, setHasMore] = useState(true);
+   const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
 
    //////////////////// GET ROOM ID /////////////////
 
@@ -49,7 +60,7 @@ const UserProfileScreen = ({ navigation, route }: any) => {
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.0.114:8080/api/room/${route.params?.userId}/${currentUser?.id}`,
+                  `http://192.168.148.183:8080/api/room/${route.params?.userId}/${currentUser?.id}`,
                   { method: "GET" }
                );
                let data = await response.json();
@@ -71,14 +82,14 @@ const UserProfileScreen = ({ navigation, route }: any) => {
 
    useEffect(
       function () {
-         console.log("Fetching user");
+         console.log("Fetching user profile details");
          console.log(route.params.userId);
          let fetchData = async () => {
             // console.log("Fetching user")
             //  let activeUserId = 1
             try {
                let response = await fetch(
-                  `http://192.168.0.114:5000/api/auth/users/${route.params?.userId}`,
+                  `http://192.168.148.183:5000/api/auth/users/${route.params?.userId}`,
                   { method: "GET" }
                );
                let data = await response.json();
@@ -109,58 +120,55 @@ const UserProfileScreen = ({ navigation, route }: any) => {
       [currentUser, route.params, followed]
    );
 
-   useEffect(
-      function () {
-         let fetchData = async () => {
-            let userId = route.params?.userId;
-            try {
-               let response = await fetch(
-                  `http://192.168.0.114:5000/api/media/posts/user/${userId}`
+   let fetchPostsData = async (pageNum?: number) => {
+      let pageNumber = pageNum ?? page.current;
+      if (!hasMore) return;
+      try {
+         if (currentUser) {
+            setLoadingFetch(true);
+            let activeUserId = currentUser?.id;
+            let response = await fetch(
+               `http://192.168.148.183:5000/api/media/posts/session/${activeUserId}/${pageNumber}/${numberOfPostsPerPage}`
+            );
+            let data = await response.json();
+            if (data.status == "success") {
+               console.log(data.data);
+               // setPosts(data.data);
+               let fetchedPost: PostComponent[] = data.data;
+
+               setAllPosts((prev) =>
+                  prev ? [...prev, ...fetchedPost] : fetchedPost
                );
-               let data = await response.json();
-               if (data.status == "success") {
-                  // console.log(data.data);
-                  // setPosts(data.data);
-                  let numOfPageLinks = 1;
-                  let fetchedPost: PostComponentProps[] = data.data;
-                  if (fetchedPost.length > numberOfPostsPerPage) {
-                     numOfPageLinks = Math.ceil(
-                        fetchedPost.length / numberOfPostsPerPage
-                     );
-                  }
+               setPosts((prev) =>
+                  prev ? [...prev, ...fetchedPost] : fetchedPost
+               );
 
-                  // console.log(fetchedPost);
-                  setAllPosts(fetchedPost);
-                  setNumberOfPageLinks(numOfPageLinks);
-                  const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
-                  const lastIndex = currentIndex + numberOfPostsPerPage;
-                  setPosts(data.data.slice(currentIndex, lastIndex));
-                  // Alert.alert("Success",data.message)
-               } else {
-                  Alert.alert("Failed", data.message);
+               if (fetchedPost.length > 0) page.current++;
+               if (data.length < numberOfPostsPerPage) {
+                  setHasMore(false);
                }
-               setLoading(false);
-            } catch (err) {
-               Alert.alert("Failed", String(err));
-               setLoading(false);
+               setLoadingFetch(false);
+               // Alert.alert("Success",data.message)
+            } else {
+               Alert.alert("Failed", data.message);
+               setLoadingFetch(false);
             }
-         };
-         fetchData();
-      },
-      [route]
-   );
+         }
+      } catch (err) {
+         Alert.alert("Failed", String(err));
+         setLoadingFetch(false);
+      }
+   };
 
-   useEffect(() => {
-      const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
-      const lastIndex = currentIndex + numberOfPostsPerPage;
-      setPosts(allPosts?.slice(currentIndex, lastIndex));
-   }, [pageNumber]);
+   useEffect(function () {
+      fetchPostsData(1);
+   }, []);
 
    const handleFollow = async () => {
       setLoading(true);
       try {
          let { data } = await axios.put(
-            `http://192.168.0.114:5000/api/media/follows/`,
+            `http://192.168.148.183:5000/api/media/follows/`,
             { followerId: currentUser?.id, followingId: user?.personal.id },
             { headers: { Accept: "application/json" } }
          );
@@ -176,6 +184,31 @@ const UserProfileScreen = ({ navigation, route }: any) => {
          Alert.alert("Failed", String(err));
          setLoading(false);
       }
+   };
+
+   const handleLoadMore = () => {
+      console.log("Posts Reached end");
+      if (loadingFetch) return;
+      fetchPostsData();
+   };
+
+   const renderFooter = () => {
+      if (!loading) return null;
+      return (
+         <View
+            style={{
+               flexDirection: "row",
+               padding: 10,
+               justifyContent: "center",
+               alignItems: "center",
+               backgroundColor: "white",
+            }}>
+            <ActivityIndicator color="#cecece" size="small" />
+            <Text style={{ color: "#cecece", marginLeft: 5 }}>
+               Loading more posts
+            </Text>
+         </View>
+      );
    };
 
    if (!user) {
@@ -352,40 +385,27 @@ const UserProfileScreen = ({ navigation, route }: any) => {
             </ScrollView>
          )}
          {posts && (
-            <View>
-               <View
-                  style={{
-                     backgroundColor: "#ffffff",
-                     borderRadius: 10,
-                     width: 200,
-                     paddingHorizontal: 8,
-                  }}>
-                  <Text
-                     style={{
-                        fontFamily: "Poppins_500Medium",
-                     }}>
-                     Posts {posts.length}
-                  </Text>
-               </View>
-               {posts.map((post) => {
-                  if (post.fromId) {
+            <FlatList
+               keyExtractor={(item) => String(item.post.id)}
+               data={posts}
+               renderItem={({ item, index, separators }) => {
+                  if (item.post?.fromId) {
                      return (
                         <SharedPostComponent
-                           key={String(post.id)}
-                           {...post}
-                           navigation={navigation}
+                           key={String(item.post.id)}
+                           {...item}
                         />
                      );
+                  } else {
+                     return (
+                        <PostComponent key={String(item.post.id)} {...item} />
+                     );
                   }
-                  return (
-                     <PostComponent
-                        key={String(post.id)}
-                        {...post}
-                        navigation={navigation}
-                     />
-                  );
-               })}
-            </View>
+               }}
+               onEndReached={handleLoadMore}
+               onEndReachedThreshold={0.3}
+               ListFooterComponent={renderFooter}
+            />
          )}
       </ScrollView>
    );

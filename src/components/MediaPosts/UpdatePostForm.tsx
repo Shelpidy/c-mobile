@@ -13,12 +13,12 @@ const s3 = new AWS.S3({
 import axios from "axios";
 import { ImagePicker } from "expo-image-multiple-picker";
 import { useCurrentUser } from "../../utils/CustomHooks";
+import { useNavigation } from "@react-navigation/native";
 
-type Post = Partial<Omit<PostComponentProps, "id" | "updatedAt" | "createdAt">>;
 
-const initialState = {};
+const initialState:Partial<Post> = {};
 
-const postReducer = (state: Post = initialState, action: Action) => {
+const postReducer = (state:Partial<Post> = initialState, action: Action) => {
    switch (action.type) {
       case "TEXT":
          return { ...state, text: action.payload };
@@ -40,7 +40,7 @@ const postReducer = (state: Post = initialState, action: Action) => {
    }
 };
 
-type NPostComponentProps = PostComponentProps & { navigation: any };
+type NPostComponentProps = Post;
 
 const UpdatePostForm = (post: NPostComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
@@ -49,6 +49,7 @@ const UpdatePostForm = (post: NPostComponentProps) => {
    const [videoOpen, setVideoOpen] = useState(false);
    const currentUser = useCurrentUser();
    const theme = useTheme();
+   const navigation = useNavigation<any>()
 
    useEffect(() => {
       postDispatch({ type: "TEXT", payload: post.text });
@@ -90,7 +91,7 @@ const UpdatePostForm = (post: NPostComponentProps) => {
       postObj.images = uploadedImageURLs;
       try {
          let response = await axios.put(
-            "http://192.168.0.114:5000/api/media/posts/",
+            "http://192.168.148.183:5000/api/media/posts/",
             postObj
          );
          if (response.status === 202) {

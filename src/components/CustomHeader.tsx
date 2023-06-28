@@ -47,7 +47,7 @@ const CustomHeader = () => {
             try {
                if (currentUser) {
                   let response = await fetch(
-                     `http://192.168.0.114:5000/api/auth/users/${currentUser?.id}`,
+                     `http://192.168.148.183:5000/api/auth/users/${currentUser?.id}`,
                      { method: "GET" }
                   );
 
@@ -134,7 +134,6 @@ const CustomHeader = () => {
                <Appbar.BackAction onPress={() => navigation.goBack()} />
             )}
             <Appbar.Action
-            
                icon={() => (
                   <Ionicons
                      color={
@@ -152,9 +151,9 @@ const CustomHeader = () => {
                onPress={() => gotoNextScreen("HomeScreen")}
             />
 
-            <IconBadge 
-             onPress={() => gotoNextScreen("ConversationsScreen")}
-            value={20}>
+            <IconBadge
+               onPress={() => gotoNextScreen("ConversationsScreen")}
+               value={20}>
                <Ionicons
                   style={{ position: "absolute", top: 15 }}
                   color={
@@ -171,8 +170,8 @@ const CustomHeader = () => {
                />
             </IconBadge>
             <IconBadge
-             onPress={() => gotoNextScreen("NotificationScreen")}
-            value={10}>
+               onPress={() => gotoNextScreen("NotificationScreen")}
+               value={10}>
                <Ionicons
                   style={{ position: "absolute", top: 15 }}
                   color={

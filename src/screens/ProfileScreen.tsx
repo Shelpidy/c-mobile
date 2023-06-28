@@ -2,13 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
    Alert,
    Dimensions,
-   Image,
-   Pressable,
    ScrollView,
    StyleSheet,
    Text,
    View,
-   TextInput,
+   FlatList,
 } from "react-native";
 import {
    ActivityIndicator,
@@ -35,7 +33,7 @@ type PostComponent = {
    sharesCount: number;
    user: User;
    liked: boolean;
-   secondUser:User
+   secondUser: User;
 };
 
 const ProfileScreen = ({ navigation, route }: any) => {
@@ -43,10 +41,47 @@ const ProfileScreen = ({ navigation, route }: any) => {
    const [posts, setPosts] = useState<PostComponent[] | null>(null);
    const [allPosts, setAllPosts] = useState<PostComponent[]>([]);
    const [user, setUser] = useState<any>(null);
-   const [pageNumber, setPageNumber] = useState<number>(1);
-   const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(20);
-   const [numberOfPageLinks, setNumberOfPageLinks] = useState<number>(0);
+   const page = React.useRef<number>(1);
+   const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(5);
    const [loading, setLoading] = useState<boolean>(false);
+   const [hasMore, setHasMore] = useState(true);
+   const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
+
+   let fetchData = async (pageNum?: number) => {
+      let pageNumber = pageNum ?? page.current;
+      if (!hasMore) return;
+      let userId = route.params.userId;
+      try {
+         let response = await fetch(
+            `http://192.168.148.183:5000/api/media/posts/user/${userId}/${pageNumber}/${numberOfPostsPerPage}`
+         );
+         let data = await response.json();
+         if (data.status == "success") {
+            // console.log(data.data)
+            // setPosts(data.data);
+            let fetchedPost: PostComponent[] = data.data;
+
+            setAllPosts((prev) =>
+               prev ? [...prev, ...fetchedPost] : fetchedPost
+            );
+            setPosts((prev) =>
+               prev ? [...prev, ...fetchedPost] : fetchedPost
+            );
+
+            if (fetchedPost.length > 0) page.current++;
+            if (data.length < numberOfPostsPerPage) {
+               setHasMore(false);
+            }
+            setLoadingFetch(false);
+         } else {
+            Alert.alert("Failed", data.message);
+         }
+         setLoadingFetch(false);
+      } catch (err) {
+         Alert.alert("Failed", String(err));
+         setLoadingFetch(false);
+      }
+   };
 
    const searchPosts = (_token: string) => {
       console.log("From profile", _token);
@@ -59,15 +94,40 @@ const ProfileScreen = ({ navigation, route }: any) => {
       setPosts(newPosts);
    };
 
+   const handleLoadMore = () => {
+      console.log("Posts Reached end");
+      if (loadingFetch) return;
+      fetchData();
+   };
+
+   const renderFooter = () => {
+      if (!loading) return null;
+      return (
+         <View
+            style={{
+               flexDirection: "row",
+               padding: 10,
+               justifyContent: "center",
+               alignItems: "center",
+               backgroundColor: "white",
+            }}>
+            <ActivityIndicator color="#cecece" size="small" />
+            <Text style={{ color: "#cecece", marginLeft: 5 }}>
+               Loading more posts
+            </Text>
+         </View>
+      );
+   };
+
    useEffect(function () {
-      console.log("Fetching user");
+      console.log("Fetching user profile details");
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
             let response = await fetch(
-               `http://192.168.0.114:5000/api/auth/users/${route.params.userId}`,
+               `http://192.168.148.183:5000/api/auth/users/${route.params.userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -89,49 +149,9 @@ const ProfileScreen = ({ navigation, route }: any) => {
       fetchData();
    }, []);
 
-   useEffect(
-      function () {
-         setLoading(true);
-         let fetchData = async () => {
-            let userId = route.params.userId;
-            try {
-               let response = await fetch(
-                  `http://192.168.0.114:5000/api/media/posts/user/${userId}`
-               );
-               let data = await response.json();
-               if (data.status == "success") {
-                  // console.log(data.data)
-                  // setPosts(data.data);
-                  let fetchedPost: PostComponent[] = data.data;
-                  let numOfPageLinks = Math.ceil(
-                     fetchedPost.length / numberOfPostsPerPage
-                  );
-                  // console.log(fetchedPost);
-                  setAllPosts(fetchedPost);
-                  setNumberOfPageLinks(numOfPageLinks);
-                  const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
-                  const lastIndex = currentIndex + numberOfPostsPerPage;
-                  setPosts(data.data.slice(currentIndex, lastIndex));
-                  // Alert.alert("Success",data.message)
-               } else {
-                  Alert.alert("Failed", data.message);
-               }
-               setLoading(false);
-            } catch (err) {
-               Alert.alert("Failed", String(err));
-               setLoading(false);
-            }
-         };
-         fetchData();
-      },
-      [route]
-   );
-
-   useEffect(() => {
-      const currentIndex = numberOfPostsPerPage * (pageNumber - 1);
-      const lastIndex = currentIndex + numberOfPostsPerPage;
-      setPosts(allPosts?.slice(currentIndex, lastIndex));
-   }, [pageNumber]);
+   useEffect(function () {
+      fetchData(1);
+   }, []);
 
    if (!user) {
       return <LoadingProfileComponent />;
@@ -139,7 +159,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
 
    return (
       <ScrollView
-         style={{ flex: 1, backgroundColor: "#f6f6f6", paddingTop: 10 }}>
+         style={{ flex: 1, backgroundColor: "#fff", paddingTop: 10 }}>
          <View style={{ justifyContent: "center", alignItems: "center" }}>
             <Avatar.Image
                style={{ borderColor: theme.colors.primary }}
@@ -167,7 +187,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                   {user?.followers?.count}
                </Text>
                <Button
-                  style={{ backgroundColor: "#fff" }}
+                  style={{ backgroundColor: "#f6f6f6" }}
                   onPress={() =>
                      navigation.navigate("FollowersScreen", {
                         user: user?.personal,
@@ -179,7 +199,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         textAlign: "center",
                         fontFamily: "Poppins_400Regular",
                         color: theme.colors.secondary,
-                        fontSize: 15,
+                        fontSize: 13,
                      }}>
                      Followers
                   </Text>
@@ -197,7 +217,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                   {user?.followings?.count}
                </Text>
                <Button
-                  style={{ backgroundColor: "#fff" }}
+                  style={{ backgroundColor: "#f6f6f6" }}
                   onPress={() =>
                      navigation.navigate("FollowingsScreen", {
                         user: user?.personal,
@@ -209,7 +229,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         fontFamily: "Poppins_400Regular",
                         color: theme.colors.secondary,
                         //  color:theme.colors.secondary,
-                        fontSize: 15,
+                        fontSize: 13,
                      }}>
                      Following
                   </Text>
@@ -226,14 +246,14 @@ const ProfileScreen = ({ navigation, route }: any) => {
                   }}>
                   {user?.sales?.count}
                </Text>
-               <Button style={{ backgroundColor: "#fff" }}>
+               <Button style={{ backgroundColor: "#f6f6f6" }}>
                   <Text
                      style={{
                         // fontWeight: "bold",
                         textAlign: "center",
                         fontFamily: "Poppins_400Regular",
                         color: theme.colors.secondary,
-                        fontSize: 15,
+                        fontSize: 13,
                      }}>
                      Sales
                   </Text>
@@ -245,11 +265,11 @@ const ProfileScreen = ({ navigation, route }: any) => {
                      textAlign: "center",
                      fontFamily: "Poppins_400Regular",
                      // color:theme.colors.secondary,
-                     fontSize: 15,
+                     fontSize: 13,
                   }}>
                   {user?.affiliates?.count}
                </Text>
-               <Button style={{ backgroundColor: "#fff" }}>
+               <Button style={{ backgroundColor: "#f6f6f6" }}>
                   <Text
                      style={{
                         // fontWeight: "bold",
@@ -279,25 +299,29 @@ const ProfileScreen = ({ navigation, route }: any) => {
          {posts && posts.length > 1 && (
             <SearchForm setSearchValue={(v) => searchPosts(v)} />
          )}
-         {posts &&
-            posts.map((post) => {
-               if (post.post.fromId) {
-                  return (
-                     <SharedPostComponent
-                        key={String(post.post.id)}
-                        {...post}
-                      
-                     />
-                  );
-               }
-               return (
-                  <PostComponent
-                     key={String(post.post.id)}
-                     {...post}
-                  
-                  />
-               );
-            })}
+         {posts && (
+            <FlatList
+               keyExtractor={(item) => String(item.post.id)}
+               data={posts}
+               renderItem={({ item, index, separators }) => {
+                  if (item.post?.fromId) {
+                     return (
+                        <SharedPostComponent
+                           key={String(item.post.id)}
+                           {...item}
+                        />
+                     );
+                  } else {
+                     return (
+                        <PostComponent key={String(item.post.id)} {...item} />
+                     );
+                  }
+               }}
+               onEndReached={handleLoadMore}
+               onEndReachedThreshold={0.3}
+               ListFooterComponent={renderFooter}
+            />
+         )}
       </ScrollView>
    );
 };
