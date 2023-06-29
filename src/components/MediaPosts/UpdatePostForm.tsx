@@ -15,10 +15,9 @@ import { ImagePicker } from "expo-image-multiple-picker";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import { useNavigation } from "@react-navigation/native";
 
+const initialState: Partial<Post> = {};
 
-const initialState:Partial<Post> = {};
-
-const postReducer = (state:Partial<Post> = initialState, action: Action) => {
+const postReducer = (state: Partial<Post> = initialState, action: Action) => {
    switch (action.type) {
       case "TEXT":
          return { ...state, text: action.payload };
@@ -49,7 +48,7 @@ const UpdatePostForm = (post: NPostComponentProps) => {
    const [videoOpen, setVideoOpen] = useState(false);
    const currentUser = useCurrentUser();
    const theme = useTheme();
-   const navigation = useNavigation<any>()
+   const navigation = useNavigation<any>();
 
    useEffect(() => {
       postDispatch({ type: "TEXT", payload: post.text });

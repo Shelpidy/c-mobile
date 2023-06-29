@@ -84,26 +84,6 @@ declare type Post = {
    updatedAt: Date;
 };
 
-declare type Product = {
-   id: number;
-   productName: string;
-   category: string;
-   description: string;
-   images: string[];
-   price: string;
-   affiliateId?: number[] | null;
-   initialPrice: string | null;
-   affiliatePrice: string | null;
-   sizes: string[] | null;
-   numberAvailable: string | null;
-   rating: number | null;
-   availability: string | null;
-   userId: number;
-   createdAt: Date;
-   updatedAt: Date;
-   navigation?: any;
-   route?: any;
-};
 
 declare type User = {
    id: number;

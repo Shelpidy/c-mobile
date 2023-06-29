@@ -6,7 +6,7 @@ import {
    ScrollView,
    FlatList,
 } from "react-native";
-import React, { useEffect, useState,useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ProductComponent from "../components/Marketing/ProductComponent";
 import SearchForm from "../components/SearchForm";
 import PostProductFormNav from "../components/PostProductFormNav";
@@ -25,67 +25,65 @@ type ProductsComponentProps = {
 };
 
 type FetchedProduct = {
-   product:Product,
-   likesCount:number,
-   liked:boolean,
-   previewed:boolean,
-   previewsCount:number,
-   user:User
-}
+   product: Product;
+   likesCount: number;
+   liked: boolean;
+   previewed: boolean;
+   previewsCount: number;
+   isNew:boolean;
+   user: User;
+   affiliateId:number|string|null
+};
 
 const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
-   const [products, setProducts] = useState<FetchedProduct[]|null>(null);
+   const [products, setProducts] = useState<FetchedProduct[] | null>(null);
    const [allProducts, setAllProducts] = useState<FetchedProduct[]>([]);
-   const [pageNumber, setPageNumber] = useState<number>(1);
    const page = React.useRef<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(5);
    const [loading, setLoading] = useState<boolean>(false);
    const [hasMore, setHasMore] = useState(true);
-   const currentUser = useCurrentUser()
+   const currentUser = useCurrentUser();
 
    let fetchProducts = async (pageNum?: number) => {
       let pageNumber = pageNum ?? page.current;
-      console.log("Fetching products")
+      console.log("Fetching products");
 
       if (!hasMore) return;
-      if(!currentUser) return;
+      if (!currentUser) return;
       try {
-          console.log("UserId",currentUser?.id)
+         console.log("UserId", currentUser?.id);
          setLoading(true);
          let response = await fetch(
             `http://192.168.148.183:5000/api/marketing/products/${currentUser?.id}/${pageNumber}/${numberOfPostsPerPage}`
          );
-       
+
          if (response.status === 200) {
-            let {data} = await response.json();
-          
-            setAllProducts((prev) =>
-            prev ? [...prev, ...data] : data
-         );
-         setProducts((prev) =>
-            prev ? [...prev, ...data] : data
-         );
-         if (data.length > 0) page.current++;
-         if (data.length < numberOfPostsPerPage) {
-            setHasMore(false);
-         }
-            
+            let { data } = await response.json();
+
+            setAllProducts((prev) => (prev ? [...prev, ...data] : data));
+            setProducts((prev) => (prev ? [...prev, ...data] : data));
+            if (data.length > 0) page.current++;
+            if (data.length < numberOfPostsPerPage) {
+               setHasMore(false);
+            }
          } else {
-            let {data} = await response.json();
+            let { data } = await response.json();
             Alert.alert("Failed", data.message);
          }
          setLoading(false);
       } catch (err) {
-         console.log(err)
+         console.log(err);
          Alert.alert("Failed", String(err));
          setLoading(false);
       }
    };
 
-
-   useEffect(function () {
-      fetchProducts(1);
-   }, [currentUser]);
+   useEffect(
+      function () {
+         fetchProducts(1);
+      },
+      [currentUser]
+   );
 
    const handleLoadMore = () => {
       console.log("Products Reached end");
@@ -155,11 +153,7 @@ const MarketingScreen = ({ navigation }: ProductsComponentProps) => {
             keyExtractor={(item) => String(item.product.id)}
             indicatorStyle="white"
             renderItem={({ item, index, separators }) => (
-               <ProductComponent
-                  key={String(item.product.id)}
-                  {...item}
-                
-               />
+               <ProductComponent key={String(item.product.id)} {...item} />
             )}
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.3}

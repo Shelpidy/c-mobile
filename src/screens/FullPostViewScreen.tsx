@@ -112,8 +112,8 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
          let fetchData = async () => {
             let activeUserId = currentUser?.id;
             let postId = route.params.id;
-            console.log('PostId',postId)
-            console.log('Post',route.params)
+            console.log("PostId", postId);
+            console.log("Post", route.params);
             try {
                let { data, status } = await axios.get(
                   `http://192.168.148.183:5000/api/media/posts/${postId}/users/${activeUserId}`
@@ -226,7 +226,6 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
             setLoadingShare(false);
             setShared(true);
             setSharesCount((prev) => prev + 1);
-          
          } else {
             setLoadingShare(false);
             Alert.alert("Failed", "Post Failed");
@@ -235,7 +234,6 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
          setLoadingShare(false);
          console.log(err);
       }
-
    };
 
    const handleLike = async (postId: number) => {
@@ -380,8 +378,6 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                         justifyContent: "flex-end",
                         alignItems: "flex-end",
                         marginBottom: 2,
-                      
-                       
                      }}>
                      {currentUser?.id == post?.userId && (
                         <View>

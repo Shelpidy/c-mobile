@@ -137,11 +137,11 @@ const PostComponent = (props: PostComponentProps) => {
       try {
          setLoading(true);
          let activeUserId = currentUser?.id;
-         let { data } = await axios.put(
+         let { data, status } = await axios.put(
             `http://192.168.148.183:5000/api/media/posts/likes/`,
             { userId: activeUserId, postId: postId }
          );
-         if (data.status == "success") {
+         if (status === 202) {
             let { liked, numberOfLikes } = data.data;
             setLiked(liked);
             setLikesCount(numberOfLikes);
@@ -171,7 +171,7 @@ const PostComponent = (props: PostComponentProps) => {
             video: props.post.video,
             text: props.post.text,
             fromId: props.post.userId,
-            fromPostId:props.post.id,
+            fromPostId: props.post.id,
             shared: true,
          },
          sharedPostId: props.post.id,
@@ -295,7 +295,7 @@ const PostComponent = (props: PostComponentProps) => {
                   /> */}
                </Pressable>
                <TextShortener
-                  style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}
+                  style={{ fontFamily: "Poppins_400Regular", margin: 5 }}
                   textLength={23}
                   text={
                      user.firstName +
@@ -316,7 +316,7 @@ const PostComponent = (props: PostComponentProps) => {
                   }}>
                   {currentUser?.id == props.post?.userId && (
                      <View>
-                        <Button onPress={() => setOpenModal(true)}>
+                        <Button mode='text' onPress={() => setOpenModal(true)}>
                            <SimpleLineIcons name="options-vertical" />
                         </Button>
                      </View>

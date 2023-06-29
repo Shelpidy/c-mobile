@@ -48,9 +48,9 @@ const PostsComponent = () => {
             let response = await fetch(
                `http://192.168.148.183:5000/api/media/posts/session/${activeUserId}/${pageNumber}/${numberOfPostsPerPage}`
             );
-          
+
             if (response.status === 200) {
-               let {data} = await response.json()
+               let { data } = await response.json();
                console.log(data);
                // setPosts(data.data);
                let fetchedPost: PostComponentProps[] = data;
@@ -69,9 +69,8 @@ const PostsComponent = () => {
                setLoadingFetch(false);
                // Alert.alert("Success",data.message)
             } else {
-
-               let {message} = await response.json()
-               Alert.alert("Failed",message);
+               let { message } = await response.json();
+               Alert.alert("Failed", message);
                setLoadingFetch(false);
             }
          }

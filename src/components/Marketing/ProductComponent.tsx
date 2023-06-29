@@ -25,6 +25,7 @@ import axios from "axios";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import UpdateProductForm from "./UpdateProduct";
 import { LoadingProductComponent } from "../MediaPosts/LoadingComponents";
+import { useNavigation } from "@react-navigation/native";
 
 // type ProductComment = Omit<Commentproduct, "posterId">;
 const initialState: Partial<ProductComment> = {};
@@ -57,15 +58,17 @@ const productCommentReducer = (
 };
 
 type FetchedProductProps = {
-   product:Product,
-   likesCount:number,
-   liked:boolean,
-   previewed:boolean,
-   previewsCount:number,
-   user:User
-}
+   product: Product;
+   likesCount: number;
+   liked: boolean;
+   previewed: boolean;
+   previewsCount: number;
+   isNew:boolean;
+   user: User;
+   affiliateId:number | string | null;
+};
 
-const ProductComponent = ({product,...props}: FetchedProductProps) => {
+const ProductComponent = ({ product, ...props }: FetchedProductProps) => {
    const [postProductCommentstate, dispatchPostComment] = useReducer(
       productCommentReducer,
       initialState
@@ -74,33 +77,34 @@ const ProductComponent = ({product,...props}: FetchedProductProps) => {
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [productComments, setProductComments] = useState<ProductComment[]>([]);
    const [likesCount, setLikesCount] = useState<number>(0);
-   const [user, setUser] = useState<User|null>(null);
+   const [user, setUser] = useState<User | null>(null);
    const [liked, setLiked] = useState<boolean>(false);
+   const [affiliateId, setAffiliateId] = useState<number|string|null>(null);
    const [loading, setLoading] = useState<boolean>(false);
+   const navigation = useNavigation<any>()
    const theme = useTheme();
 
-   useEffect(
-      function () {
-         setUser(props.user)
-         setLiked(props.liked)
-         setLikesCount(props.likesCount)
-      },
-      []
-   );
-
-
+   useEffect(function () {
+      setUser(props.user);
+      setLiked(props.liked);
+      setLikesCount(props.likesCount);
+      setAffiliateId(props.affiliateId)
+   }, []);
 
    const handleLike = async (productId: number) => {
       console.log(productId);
       try {
+         setLoading(true)
          let activeUserId = currentUser?.id;
-         let { data,status } = await axios.put(
+         let { data, status } = await axios.put(
             `http://192.168.148.183:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
-         if (data.status == "success") {
-            // console.log(data.data);
-          
+         if (status === 202) {
+            let { liked, numberOfLikes } = data.data;
+            console.log( { liked, numberOfLikes } )
+            setLiked(liked);
+            setLikesCount(numberOfLikes);
 
             Alert.alert("Success", data.message);
          } else {
@@ -116,9 +120,9 @@ const ProductComponent = ({product,...props}: FetchedProductProps) => {
 
    const gotoUserProfile = () => {
       if (currentUser?.id === user?.id) {
-         product.navigation.navigate("ProfileScreen", { userId: user?.id });
+        navigation.navigate("ProfileScreen", { userId: user?.id });
       } else {
-         product.navigation.navigate("UserProfileScreen", { userId: user?.id });
+        navigation.navigate("UserProfileScreen", { userId: user?.id });
       }
    };
 
@@ -154,32 +158,36 @@ const ProductComponent = ({product,...props}: FetchedProductProps) => {
                   padding: 8,
                }}>
                <Pressable onPress={gotoUserProfile}>
-                  <Avatar.Image
-                     size={30}
-                     source={{ uri: user.profileImage }}
-                  />
+                  <Avatar.Image size={40} source={{ uri: user.profileImage }} />
                   {/* <Image
                      style={styles.profileImage}
                      source={{ uri: user.profileImage }}
                   /> */}
                </Pressable>
-
-               <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
-                  {user.firstName} {user.middleName} {user.lastName}
-               </Text>
+               
+               <TextShortener
+                  style={{ fontFamily: "Poppins_400Regular", margin: 5 }}
+                  textLength={23}
+                  text={
+                     user.firstName +
+                     " " +
+                     user.middleName +
+                     " " +
+                     user.lastName
+                  }
+               />
                <View
                   style={{
                      flex: 1,
                      justifyContent: "flex-end",
                      alignItems: "flex-end",
                      marginBottom: 2,
-                     paddingHorizontal: 1,
-                     borderRadius: 3,
+             
                   }}>
                   {currentUser?.id == product?.userId && (
                      <View>
                         <Button
-                           style={{ backgroundColor: "#f9f9f9" }}
+                           mode='text'
                            onPress={() => setOpenModal(true)}>
                            <SimpleLineIcons name="options-vertical" />
                         </Button>
@@ -223,14 +231,7 @@ const ProductComponent = ({product,...props}: FetchedProductProps) => {
             <TextShortener
                style={{ marginHorizontal: 8, fontFamily: "Poppins_300Light" }}
                text={product.description}
-               onPressViewMore={() =>
-                  product.navigation.navigate("ProductScreen", {
-                     productId: product.id,
-                     userId: product.userId,
-                     affiliateId: product?.affiliateId && product.affiliateId[0],
-                  })
-               }
-               showViewMore={true}
+               showViewMore={false}
                textLength={100}></TextShortener>
          )}
          <View>
@@ -239,72 +240,49 @@ const ProductComponent = ({product,...props}: FetchedProductProps) => {
                   styles.likeCommentAmountCon,
                   { borderColor: theme.colors.secondary },
                ]}>
-               <View
-                  style={{
-                     flexDirection: "row",
-                     alignItems: "center",
-                     justifyContent: "flex-start",
-                  }}>
-                  <Pressable
-                     disabled={loading}
-                     onPress={() => handleLike(product.id)}>
-                     <Ionicons
-                        size={30}
-                        color={theme.colors.secondary}
-                        name={liked ? "heart-sharp" : "heart-outline"}
-                     />
-                  </Pressable>
-                  {/* <IconButton
-                     disabled={loading}
-                     onPress={() => handleLike(post.id)}
-                     mode="outlined"
-                     size={20}
-                     icon={liked ? "heart" : "heart-outline"}
-                  /> */}
-                  <Text style={styles.commentAmountText}>{likesCount}</Text>
-               </View>
-               <View
-                  style={{
-                     flexDirection: "row",
-                     alignItems: "center",
-                     justifyContent: "flex-start",
-                  }}>
-                  <Pressable>
-                     <Ionicons
-                        size={30}
-                        color={theme.colors.secondary}
-                        name="chatbox-outline"
-                     />
-                  </Pressable>
-                  <Text style={styles.commentAmountText}>
-                     {productComments.length}
-                  </Text>
-               </View>
+               
+               <Button
+                  style={{backgroundColor:"#f6f6f6"}}
+                  disabled={loading}
+                  onPress={() => handleLike(product.id)}
+                  textColor={theme.colors.secondary}
+                 >
+                  <Ionicons
+                     size={16}
+                     color={theme.colors.secondary}
+                     name={liked ? "heart-sharp" : "heart-outline"}
+                  />
+                    <Text style={styles.commentAmountText}>{likesCount}</Text>
+               </Button>
                <View style={{ flex: 1 }}>
                   <Button
-                     // textColor={theme.colors.primary}
+                     textColor="#cecece"
                      onPress={() =>
-                        product.navigation.navigate("ProductScreen", {
+                       navigation.navigate("ProductScreen", {
                            productId: product.id,
                            userId: product.userId,
-                           affiliateId:
-                              product?.affiliateId && product.affiliateId[0],
+                           affiliateId:affiliateId,
                         })
                      }
                      mode="contained">
-                     Preview
+                        <Text>  Preview</Text>
+                     {
+                     props.previewsCount > 0 && <Text>
+                         {props.previewsCount}
+                     </Text>
+                     }
                   </Button>
                </View>
                {/* <Text style={styles.commentAmountText}><FontAwesome size={28} name='comments-o'/> {comments.length}</Text> */}
             </View>
 
-            <View style={{ padding: 5 }}>
+            {/* <View style={{ padding: 5 }}>
                <ProductComments
                   posterId={product.userId}
                   navigation={product?.navigation}
                   productComments={productComments}
                />
-            </View>
+            </View> */}
          </View>
       </View>
    );
@@ -370,7 +348,7 @@ const styles = StyleSheet.create({
    },
    commentAmountText: {
       fontFamily: "Poppins_200ExtraLight",
-      fontSize: 16,
+      fontSize: 14,
    },
    profileImage: {
       width: 35,

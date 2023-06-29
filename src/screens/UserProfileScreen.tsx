@@ -373,7 +373,6 @@ const UserProfileScreen = ({ navigation, route }: any) => {
          </View>
          <View style={{ alignItems: "center", marginBottom: 5 }}>
             <ProfileNavComponent
-               navigation={navigation}
                user={user?.personal}
             />
          </View>

@@ -9,11 +9,13 @@ import {
 } from "@expo/vector-icons";
 import { Button, useTheme, Card } from "react-native-paper";
 import { useCurrentUser } from "../utils/CustomHooks";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
-const ProfileNavComponent = ({ navigation, user }: any) => {
+const ProfileNavComponent = ({user}: {user:User}) => {
    const currentUser = useCurrentUser();
+   const navigation = useNavigation<any>()
    const theme = useTheme();
 
    return (
@@ -53,7 +55,7 @@ const ProfileNavComponent = ({ navigation, user }: any) => {
             </Text>
             <Button
                onPress={() =>
-                  navigation.navigate("UserProductScreen", { user })
+                  navigation.navigate("UserProductScreen", { userId:user.id })
                }>
                <Entypo name="chevron-thin-right" />
             </Button>

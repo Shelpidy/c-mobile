@@ -158,8 +158,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
    }
 
    return (
-      <ScrollView
-         style={{ flex: 1, backgroundColor: "#fff", paddingTop: 10 }}>
+      <ScrollView style={{ flex: 1, backgroundColor: "#fff", paddingTop: 10 }}>
          <View style={{ justifyContent: "center", alignItems: "center" }}>
             <Avatar.Image
                style={{ borderColor: theme.colors.primary }}
@@ -285,7 +284,6 @@ const ProfileScreen = ({ navigation, route }: any) => {
 
          <View style={{ alignItems: "center", marginBottom: 5 }}>
             <ProfileNavComponent
-               navigation={navigation}
                user={user?.personal}
             />
          </View>

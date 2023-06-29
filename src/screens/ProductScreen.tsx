@@ -36,52 +36,39 @@ import axios from "axios";
 import ProductComments from "../components/Marketing/ProductComments";
 import { useCurrentUser } from "../utils/CustomHooks";
 import UpdateProductForm from "../components/Marketing/UpdateProduct";
-
-const initialState: ProductComment = {};
+import { LoadingPostComponent, LoadingProductComponent } from "../components/MediaPosts/LoadingComponents";
 
 const { width } = Dimensions.get("window");
 
-const productCommentReducer = (
-   state: ProductComment = initialState,
-   action: Action
-) => {
-   switch (action.type) {
-      case "productID":
-         return {
-            ...state,
-            producterId: action.payload,
-         };
-      case "USERID":
-         return {
-            ...state,
-            userId: action.payload,
-         };
-      case "TEXT":
-         return {
-            ...state,
-            text: action.payload,
-         };
-      default:
-         return state;
-   }
-};
+
+type FetchedProductProps = {
+   product: Product;
+   likesCount: number;
+   liked: boolean;
+   previewed: boolean;
+   previewsCount: number;
+   user: User;
+   isNew:boolean;
+   affiliated:boolean}
+
 
 const ProductScreen = ({ navigation, route }: any) => {
-   const [productCommentState, dispatchproductComment] = useReducer(
-      productCommentReducer,
-      initialState
-   );
+
    const currentUser = useCurrentUser();
-   const [product, setproduct] = useState<ProductComponentProps | null>(null);
+   const [product, setproduct] = useState<Product | null>(null);
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [comments, setComments] = useState<ProductComment[]>([]);
-   const [likes, setLikes] = useState<ProductLike[]>([]);
-   const [producter, Setproducter] = useState<any>();
+   const [previewsCount, setPreviewsCount] = useState<number>(0);
+   const [likesCount, setLikesCount] = useState<number>(0);
+   const [user, setUser] = useState<User|null>(null);
    const [liked, setLiked] = useState<boolean>(false);
+   const [isNew, setIsNew] = useState<boolean>(false);
+   const [previewed, setPreviewed] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
    const [loading1, setLoading1] = useState<boolean>(false);
    const [loading2, setLoading2] = useState<boolean>(false);
-   const [affiliateId, setAffiliateId] = useState<any>(null);
+   const [affiliateId, setAffiliateId] = useState<number | string |null>(null);
+   const [affiliated, setAffiliated] = useState<boolean>(false);
    const theme = useTheme();
 
    useEffect(() => {
@@ -93,13 +80,22 @@ const ProductScreen = ({ navigation, route }: any) => {
       function () {
          let fetchData = async () => {
             let productId = route.params.productId;
+            let userId = currentUser?.id;
             try {
-               let { data } = await axios.get(
-                  `http://192.168.148.183:5000/api/marketing/products/${productId}`
+               let { data,status } = await axios.get(
+                  `http://192.168.148.183:5000/api/marketing/products/product/${productId}/${userId}`
                );
-               if (data.status == "success") {
+               if (status === 200) {
                   // console.log("Product", data.data);
-                  setproduct(data.data);
+                  let{product,isNew,likesCount,previewsCount,user,liked,previewed,affiliated}:FetchedProductProps = data
+                  setproduct(product);
+                  setLikesCount(likesCount);
+                  setLiked(liked);
+                  setUser(user);
+                  setPreviewed(previewed);
+                  setPreviewsCount(previewsCount);
+                  setAffiliated(affiliated);
+                  setIsNew(isNew);
                } else {
                   Alert.alert("Failed", data.message);
                }
@@ -109,82 +105,19 @@ const ProductScreen = ({ navigation, route }: any) => {
                setLoading(false);
             }
          };
-         fetchData();
+         if(currentUser){
+            fetchData();
+         }
       },
-      [route.params]
+      [currentUser]
    );
 
-   useEffect(
-      function () {
-         let fetchData = async () => {
-            let activeUserId = currentUser?.id;
-            let productId = route.params.productId;
-            try {
-               let { data } = await axios.get(
-                  `http://192.168.148.183:5000/api/marketing/products/cl/${productId}`
-               );
-               if (data.status == "success") {
-                  // console.log(data.data);
-                  let ls: any[] = data.data.likes;
-                  setComments(data.data.comments);
-                  setLikes(data.data.likes);
-                  if (ls.map((like) => like.userId).includes(activeUserId)) {
-                     setLiked(true);
-                  }
-                  // Alert.alert("Success",data.message)
-               } else {
-                  Alert.alert("Failed", data.message);
-               }
-               setLoading(false);
-            } catch (err) {
-               Alert.alert("Failed", String(err));
-               setLoading(false);
-            }
-         };
-         fetchData();
-      },
-      [currentUser, route.params]
-   );
-
-   useEffect(
-      function () {
-         console.log("Fetching user");
-         let userId = route.params.userId;
-         console.log("USERID", userId);
-         let fetchData = async () => {
-            // console.log("Fetching user")
-            //  let activeUserId = 1
-            try {
-               let response = await fetch(
-                  `http://192.168.148.183:5000/api/auth/users/${userId}`,
-                  { method: "GET" }
-               );
-               let data = await response.json();
-               if (data.status == "success") {
-                  // console.log("Users-----",data.data)
-                  Setproducter(data.data.personal);
-                  // Alert.alert("Success",data.message)
-                  setLoading(false);
-               } else {
-                  Alert.alert("Failed", data.message);
-               }
-               setLoading(false);
-            } catch (err) {
-               console.log(err);
-               Alert.alert("Failed", String(err));
-               setLoading(false);
-            }
-         };
-         fetchData();
-      },
-      [route.params]
-   );
-
+ 
    const handleProductRequest = async () => {
       if (affiliateId) {
          Alert.alert(
             "",
-            "Affiliated product can not be added to shopping cart."
+            "Affiliated product cannot be added to shopping cart."
          );
          return;
       }
@@ -228,11 +161,12 @@ const ProductScreen = ({ navigation, route }: any) => {
             requestObj
          );
          if (data.status == "success") {
-            if (currentUser) {
-               product?.affiliateId?.push(currentUser.id);
+            setAffiliated(true)
+            // if (currentUser) {
+            //    product?.affiliateId?.push(currentUser.id);
 
                Alert.alert("Success", data.message);
-            }
+            // }
 
             setLoading1(false);
          } else {
@@ -245,41 +179,41 @@ const ProductScreen = ({ navigation, route }: any) => {
       }
    };
 
-   const handleComment = async () => {
-      setLoading(true);
-      let activeUserId = currentUser?.id;
-      let commentObj = {
-         ...productCommentState,
-         productId: product?.id,
-         userId: activeUserId,
-      };
-      console.log(commentObj);
-      try {
-         let { data } = await axios.post(
-            `http://192.168.148.183:5000/api/marketing/products/comments/`,
-            commentObj
-         );
-         if (data.status == "success") {
-            console.log(data.data);
-            setComments([...comments, data.data]);
-            // dispatchproductComment({ type: "TEXT", payload: "" });
-            // Alert.alert("Success",data.message)
-         } else {
-            Alert.alert("Failed", data.message);
-         }
-         setLoading(false);
-      } catch (err) {
-         Alert.alert("Failed", String(err));
-         setLoading(false);
-      }
-   };
+   // const handleComment = async () => {
+   //    setLoading(true);
+   //    let activeUserId = currentUser?.id;
+   //    let commentObj = {
+   //       ...productCommentState,
+   //       productId: product?.id,
+   //       userId: activeUserId,
+   //    };
+   //    console.log(commentObj);
+   //    try {
+   //       let { data } = await axios.post(
+   //          `http://192.168.148.183:5000/api/marketing/products/comments/`,
+   //          commentObj
+   //       );
+   //       if (data.status == "success") {
+   //          console.log(data.data);
+   //          setComments([...comments, data.data]);
+   //          // dispatchproductComment({ type: "TEXT", payload: "" });
+   //          // Alert.alert("Success",data.message)
+   //       } else {
+   //          Alert.alert("Failed", data.message);
+   //       }
+   //       setLoading(false);
+   //    } catch (err) {
+   //       Alert.alert("Failed", String(err));
+   //       setLoading(false);
+   //    }
+   // };
 
    const handleBuy = async () => {
       try {
          setLoading2(true);
 
          let buyObj: MakePurchaseParams = {
-            affiliateId: JSON.parse(String(product?.affiliateId))[0],
+            affiliateId,
             productId: product?.id,
             userId: product?.userId,
             buyerId: currentUser?.id,
@@ -308,29 +242,12 @@ const ProductScreen = ({ navigation, route }: any) => {
       console.log(productId);
       try {
          let activeUserId = currentUser?.id;
-         let { data } = await axios.put(
+         let { data, status } = await axios.put(
             `http://192.168.148.183:5000/api/marketing/products/likes/`,
             { userId: activeUserId, productId: productId }
          );
          if (data.status == "success") {
-            console.log(data.data);
-
-            if (liked) {
-               setLikes(likes.slice(0, likes.length - 1));
-               setLiked(!liked);
-            } else {
-               setLikes([
-                  ...likes,
-                  {
-                     id: likes.length,
-                     productId: likes[0]?.productId,
-                     userId: currentUser?.id,
-                     createdAt: new Date(),
-                     updatedAt: new Date(),
-                  },
-               ]);
-               setLiked(!liked);
-            }
+            // console.log(data.data);
 
             Alert.alert("Success", data.message);
          } else {
@@ -338,6 +255,7 @@ const ProductScreen = ({ navigation, route }: any) => {
          }
          setLoading(false);
       } catch (err) {
+         console.log(err);
          Alert.alert("Failed", String(err));
          setLoading(false);
       }
@@ -345,10 +263,10 @@ const ProductScreen = ({ navigation, route }: any) => {
 
    if (!product) {
       return (
-         <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <Text>Loading...</Text>
-         </View>
+         <ScrollView>
+             <LoadingProductComponent/>
+         </ScrollView>
+  
       );
    }
 
@@ -372,7 +290,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                </View>
             </View>
          </Modal>
-         {producter && (
+         {user && (
             <View
                style={{
                   flexDirection: "row",
@@ -381,15 +299,15 @@ const ProductScreen = ({ navigation, route }: any) => {
                }}>
                <Avatar.Image
                   size={30}
-                  source={{ uri: producter.profileImage }}
+                  source={{ uri: user.profileImage }}
                />
                {/* <Image
                   style={styles.profileImage}
-                  source={{ uri: producter.profileImage }}
+                  source={{ uri: user.profileImage }}
                /> */}
                <Text style={{ fontFamily: "Poppins_600SemiBold", margin: 5 }}>
-                  {producter.firstName} {producter.middleName}{" "}
-                  {producter.lastName}
+                  {user.firstName} {user.middleName}{" "}
+                  {user.lastName}
                </Text>
                <View
                   style={{
@@ -480,7 +398,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                      icon={liked ? "heart" : "heart-outline"}
                   /> */}
                      <Text style={styles.commentAmountText}>
-                        {likes.length}
+                        {likesCount}
                      </Text>
                   </View>
                   <View
@@ -527,7 +445,7 @@ const ProductScreen = ({ navigation, route }: any) => {
 
                   {currentUser &&
                      product.userId !== currentUser.id &&
-                     !product.affiliateId?.includes(currentUser.id) && (
+                     !affiliateId && (
                         <Button
                            loading={loading1}
                            disabled={loading1}
@@ -609,9 +527,8 @@ const ProductScreen = ({ navigation, route }: any) => {
                      </View>
                   )}
                </View>
-               <Divider />
             </View>
-            <View
+            {/* <View
                style={{
                   paddingHorizontal: 15,
                   flexDirection: "row",
@@ -650,7 +567,7 @@ const ProductScreen = ({ navigation, route }: any) => {
                      size={23}
                   />
                </Pressable>
-            </View>
+            </View> */}
             {/* <View style={styles.commentBox}>
                <TextInput
           

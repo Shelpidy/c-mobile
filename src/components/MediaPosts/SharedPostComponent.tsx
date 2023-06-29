@@ -235,7 +235,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                mode="text"
                onPress={() =>
                   navigation.navigate("FullPostViewScreen", {
-                     ...props.post, 
+                     ...props.post,
                      userId: props.post.fromId,
                      id: props.post.fromPostId,
                   })
