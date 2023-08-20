@@ -13,31 +13,32 @@ import { SimpleLineIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { useCurrentUser } from "../utils/CustomHooks";
 import TextShortener from "./TextShortener";
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
 type FindFriendProps = {
    user: User;
-   navigation: any;
 };
 
-const FindFriendComponent = ({ user, navigation }: FindFriendProps) => {
+const FindFriendComponent = ({ user}: FindFriendProps) => {
    const theme = useTheme();
    const [followed, setFollowed] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
    const currentUser = useCurrentUser();
+   const navigation = useNavigation<any>()
 
    const gotoUserProfile = () => {
-      console.log(user.id);
-      navigation.navigate("UserProfileScreen", { userId: user.id });
+      console.log(user.userId);
+      navigation.navigate("UserProfileScreen", { userId: user.userId });
    };
 
    const handleFollow = async () => {
       setLoading(true);
       try {
          let { data } = await axios.put(
-            `http://192.168.148.183:5000/api/media/follows/`,
-            { followerId: currentUser?.id, followingId: user?.id },
+            `http://192.168.148.183:5000/follows/`,
+            { followerId: currentUser?.userId, followingId: user?.userId },
             { headers: { Accept: "application/json" } }
          );
          if (data.status == "success") {

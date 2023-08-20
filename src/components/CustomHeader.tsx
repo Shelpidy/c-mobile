@@ -47,7 +47,7 @@ const CustomHeader = () => {
             try {
                if (currentUser) {
                   let response = await fetch(
-                     `http://192.168.148.183:5000/api/auth/users/${currentUser?.id}`,
+                     `http://192.168.148.183:5000/api/auth/users/${currentUser?.userId}`,
                      { method: "GET" }
                   );
 
@@ -246,7 +246,7 @@ const CustomHeader = () => {
                }}>
                5
             </Badge> */}
-            <Appbar.Action
+            {/* <Appbar.Action
                icon={() => (
                   <MaterialCommunityIcons
                      color={
@@ -263,8 +263,8 @@ const CustomHeader = () => {
                   />
                )}
                onPress={() => gotoNextScreen("MarketingScreen")}
-            />
-            <Appbar.Action
+            /> */}
+            {/* <Appbar.Action
                icon={() => (
                   <Ionicons
                      color={
@@ -281,7 +281,7 @@ const CustomHeader = () => {
                   />
                )}
                onPress={() => gotoNextScreen("ProductsRequestScreen")}
-            />
+            /> */}
             <Appbar.Action
                icon={() => (
                   <Ionicons
@@ -304,7 +304,7 @@ const CustomHeader = () => {
             <Pressable
                style={{ marginTop: 9, marginRight: 10 }}
                onPress={() =>
-                  gotoNextScreen("ProfileScreen", { userId: currentUser?.id })
+                  gotoNextScreen("ProfileScreen", { userId: currentUser?.userId})
                }>
                <Avatar.Image size={30} source={{ uri: user?.profileImage }} />
                {/* <Text style={styles.profileImage}>

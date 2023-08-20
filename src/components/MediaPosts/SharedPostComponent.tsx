@@ -53,22 +53,22 @@ const s3 = new AWS.S3({
 });
 
 type NSharedPostComponentProps = {
-   post: Post;
+   blog:Blog;
    commentsCount: number;
-   user: User;
-   secondUser: User;
+   createdBy: User;
+   ownedBy: User;
    likesCount: number;
    sharesCount: number;
    liked: boolean;
 };
-const initialState: PostComment = {};
+const initialState: Partial<Comment> = {};
 
 const postCommentReducer = (
-   state: PostComment = initialState,
+   state: Partial<Comment> = initialState,
    action: Action
 ) => {
    switch (action.type) {
-      case "POSTID":
+      case "BLOGID":
          return {
             ...state,
             userId: action.payload,
@@ -97,12 +97,12 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [openShareModal, setOpenShareModal] = useState<boolean>(false);
    const [commentsCount, setCommentsCount] = useState<number>(0);
-   const [comments, setComments] = useState<PostComment[]>([]);
+   const [comments, setComments] = useState<Comment[]>([]);
    const [likesCount, setLikesCount] = useState<number>(0);
    const [sharesCount, setSharesCount] = useState<number>(0);
    const [liked, setLiked] = useState<boolean>(false);
-   const [user, setUser] = useState<User | null>(null);
-   const [secondUser, setSecondUser] = useState<User | null>(null);
+   const [createdBy, setCreatedBy] = useState<User | null>(null);
+   const [ownedBy, setOwnedBy] = useState<User | null>(null);
    const [shared, setShared] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
    const [loadingShare, setLoadingShare] = useState<boolean>(false);
@@ -116,28 +116,28 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
       setSharesCount(props.sharesCount);
       setLikesCount(props.likesCount);
       setCommentsCount(props.commentsCount);
-      setSecondUser(props.secondUser);
-      setUser(props.user);
+      setOwnedBy(props.ownedBy);
+      setCreatedBy(props.createdBy);
    }, []);
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === user?.id) {
-         navigation.navigate("ProfileScreen", { userId: user?.id });
+      if (currentUser?.userId === createdBy?.userId) {
+         navigation.navigate("ProfileScreen", { userId: createdBy?.userId});
       } else {
-         navigation.navigate("UserProfileScreen", { userId: user?.id });
+         navigation.navigate("UserProfileScreen", { userId: createdBy?.userId});
       }
    };
 
-   const handleLike = async (postId: number) => {
-      console.log(postId);
+   const handleLike = async (blogId:string) => {
+      console.log(blogId);
       try {
          setLoading(true);
-         let activeUserId = currentUser?.id;
-         let { data } = await axios.put(
-            `http://192.168.148.183:5000/api/media/posts/likes/`,
-            { userId: activeUserId, postId: postId }
+         let activeUserId = currentUser?.userId;
+         let { data, status } = await axios.put(
+            `http://192.168.148.183:5000/blogs/${blogId}/likes/`,
+            { userId: activeUserId}
          );
-         if (data.status == "success") {
+         if (status === 202) {
             let { liked, numberOfLikes } = data.data;
             setLiked(liked);
             setLikesCount(numberOfLikes);
@@ -154,13 +154,13 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
       }
    };
 
-   if (!user) {
+   if (!createdBy) {
       return <LoadingPostComponent />;
    }
 
    return (
       <View style={styles.postContainer}>
-         {user && <UserComponent _user={user} navigation={navigation} />}
+         {createdBy && <UserComponent _user={createdBy} navigation={navigation} />}
          <View
             style={{
                flex: 1,
@@ -184,12 +184,12 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                   fontFamily: "Poppins_300Light",
                   fontSize: 13,
                }}>
-               {dateAgo(props.post.createdAt)}
+               {dateAgo(props.blog.createdAt)}
             </Text>
          </View>
          <View style={{ flexDirection: "row" }}></View>
          <Divider />
-         {secondUser && (
+         {ownedBy && (
             <View
                style={{
                   flexDirection: "row",
@@ -199,18 +199,17 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                <Pressable onPress={gotoUserProfile}>
                   <Avatar.Image
                      size={45}
-                     source={{ uri: secondUser.profileImage }}
+                     source={{ uri: ownedBy.profileImage }}
                   />
                </Pressable>
 
                <Text style={{ fontFamily: "Poppins_400Regular", margin: 5 }}>
-                  {secondUser.firstName} {secondUser.middleName}{" "}
-                  {secondUser.lastName}
+                  {ownedBy.fullName}
                </Text>
             </View>
          )}
          <View>
-            {props.post?.images && <ImagesViewer images={props.post?.images} />}
+            {props.blog?.images && <ImagesViewer images={props.blog?.images} />}
 
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>
@@ -235,25 +234,25 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                mode="text"
                onPress={() =>
                   navigation.navigate("FullPostViewScreen", {
-                     ...props.post,
-                     userId: props.post.fromId,
-                     id: props.post.fromPostId,
+                     ...props.blog,
+                     userId: props.blog.fromUserId,
+                     id: props.blog.fromBlogId,
                   })
                }>
                View Post
             </Button>
          </View>
-         {props.post?.title && (
-            <Text style={styles.title}>{props.post?.title}</Text>
+         {props.blog?.title && (
+            <Text style={styles.title}>{props.blog?.title}</Text>
          )}
 
-         {props.post?.text && (
+         {props.blog?.text && (
             <View style={{ paddingHorizontal: 8 }}>
                <HTML
                   contentWidth={width}
                   baseStyle={{ fontFamily: "Poppins_300Light" }}
                   systemFonts={["Poppins_300Light", "sans-serif"]}
-                  source={{ html: props.post?.text }}
+                  source={{ html: props.blog?.text }}
                />
             </View>
          )}
@@ -262,7 +261,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
             <View style={{ paddingHorizontal: 8, marginVertical: 5 }}>
                <Text>
                   <LikesComponent
-                     postId={props.post?.id}
+                     blogId={props.blog?.blogId}
                      numberOfLikes={likesCount}
                   />
                </Text>
@@ -322,7 +321,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
             <View style={styles.likeCommentAmountCon}>
                <Button
                   disabled={loading}
-                  onPress={() => handleLike(props.post?.id)}
+                  onPress={() => handleLike(props.blog?.blogId)}
                   textColor={theme.colors.secondary}
                   style={{
                      backgroundColor: "#f6f6f6",
@@ -345,7 +344,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                   }}
                   onPress={() =>
                      navigation.navigate("FullSharedPostViewScreen", {
-                        ...props.post,
+                        ...props.blog,
                      })
                   }
                   textColor={theme.colors.secondary}

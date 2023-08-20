@@ -58,9 +58,9 @@ const ConversationComponent = ({
                // console.log("Fetching user")
                //  let activeUserId = 1
                let userIds = [conversation.senderId, conversation.recipientId];
-               let secondUserId = Number(
-                  userIds.filter((id) => Number(id) != currentUser.id)[0]
-               );
+               let secondUserId = 
+                  userIds.filter((userId) => userId != currentUser.userId)[0]
+               ;
                try {
                   let response = await fetch(
                      `http://192.168.148.183:5000/api/auth/users/${secondUserId}`,
@@ -90,7 +90,7 @@ const ConversationComponent = ({
       if (socket && conversation && currentUser) {
          socket.emit("joinRoom", {
             room: `c-${conversation.id}`,
-            userId: currentUser.id,
+            userId: currentUser.userId,
          });
       }
    }, [conversation, socket, currentUser]);
@@ -104,7 +104,7 @@ const ConversationComponent = ({
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.148.183:8080/api/userstatus/${secondUser.id}`,
+                  `http://192.168.148.183:8080/api/userstatus/${secondUser.userId}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -132,8 +132,8 @@ const ConversationComponent = ({
 
    useEffect(() => {
       if (socket && currentUser && secondUser) {
-         let secUserId = secondUser.id;
-         let activeUser = currentUser?.id;
+         let secUserId = secondUser.userId;
+         let activeUser = currentUser?.userId;
          let roomId = generateRoomId(secUserId, activeUser);
          console.log(roomId);
          console.log("Socket connecting");

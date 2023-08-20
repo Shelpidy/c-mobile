@@ -7,7 +7,7 @@ import {
    Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import Comment from "./Comment";
+import Comment from "./CommentComponent";
 import { Button, Divider, ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { useCurrentUser } from "../../utils/CustomHooks";

@@ -6,11 +6,11 @@ import { Avatar } from "react-native-paper";
 import TextShortener from "./TextShortener";
 
 type LikesComponentProps = {
-   postId: number;
+   blogId:string;
    numberOfLikes: number;
 };
 
-const LikesComponent = ({ postId, numberOfLikes }: LikesComponentProps) => {
+const LikesComponent = ({ blogId, numberOfLikes }: LikesComponentProps) => {
    const [users, setUsers] = useState<Partial<User>[] | null>(null);
    const currentUser = useCurrentUser();
    useEffect(
@@ -19,9 +19,9 @@ const LikesComponent = ({ postId, numberOfLikes }: LikesComponentProps) => {
             try {
                if (currentUser) {
                   let { data, status } = await axios.get(
-                     `http://192.168.148.183:5000/api/media/posts/likes/${postId}/${currentUser.id}`
+                     `http://192.168.148.183:5000/blogs/${blogId}/likes/`
                   );
-                  if (status == 200) {
+                  if (status === 200) {
                      setUsers(data.data.sessionUsers);
                      console.log("Liked Users", data.data.sessionUsers);
 
@@ -57,7 +57,7 @@ const LikesComponent = ({ postId, numberOfLikes }: LikesComponentProps) => {
          <View style={{ marginRight: 4 }}>
             {users.map((user) => (
                <Avatar.Image
-                  key={user.id}
+                  key={user.userId}
                   source={{ uri: user.profileImage }}
                   size={24}
                   style={{ marginRight: -8 }}

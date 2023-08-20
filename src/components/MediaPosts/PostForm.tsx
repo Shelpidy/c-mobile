@@ -26,7 +26,7 @@ const s3 = new AWS.S3({
    region: config.region,
 });
 
-type NPost = Partial<Omit<Post, "id" | "updatedAt" | "createdAt">>;
+type NPost = Partial<Omit<Blog, "blogId" | "updatedAt" | "createdAt">>;
 
 const initialState = {};
 
@@ -60,7 +60,7 @@ const PostForm = () => {
    const richText = React.useRef<any>(null);
 
    const handlePost = async () => {
-      let activeUserId = currentUser?.id;
+      let activeUserId = currentUser?.userId;
       setLoading(true);
       let postObj = { ...postState, userId: activeUserId };
       // let images = props.images?.map(image => image?.trimEnd())
@@ -93,8 +93,12 @@ const PostForm = () => {
       console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.148.183:5000/api/media/posts/",
-            finalPostObj
+            "http://192.168.148.183:5000/blogs/",
+            finalPostObj,{
+               headers:{
+                  Authorization:`Bearer token`
+               }
+            }
          );
          if (response.status === 201) {
             console.log(response.data);

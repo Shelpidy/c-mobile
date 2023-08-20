@@ -1,36 +1,23 @@
 declare type CurrentUser = {
-   id: number;
+   userId:string;
    email: string;
    accountNumber: string;
    deviceId: string;
-   followingIds: number[];
+   followingIds:string[];
 };
 
-declare type PostComment = {
-   id?: number;
-   postId?: number;
-   userId?: number;
-   text?: string;
-   createdAt?: Date;
-   updatedAt?: Date;
-};
 
-declare type CommentReply = {
-   id: number;
-   commentId: number;
+declare type Comment = {
+   commentId: string;
+   refId: string;
    userId: number;
    text: string;
    createdAt: Date;
    updatedAt: Date;
-};
-
-declare type ProductComment = {
-   id: number;
-   productId: number;
-   userId: number;
-   text: string;
-   createdAt: Date;
-   updatedAt: Date;
+   repliesCount: number;
+   likesCount: number;
+   liked: boolean;
+   createdBy: User;
 };
 
 declare type Action = {
@@ -38,47 +25,34 @@ declare type Action = {
    payload?: any;
 };
 
-declare type PostLike = {
-   id?: number;
-   postId?: number;
-   userId?: number;
+declare type Like = {
+   likeId:string;
+   refId:string;
+   userId:string;
    createdAt?: Date;
    updatedAt?: Date;
 };
 
-declare type PostShare = {
-   id?: number;
-   postId?: number;
-   userId?: number;
+declare type Share = {
+   shareId?:string;
+   refId:string;
+   userId:string;
    createdAt?: Date;
    updatedAt?: Date;
 };
 
-declare type ProductReview = {
-   id?: number;
-   productId?: number;
-   userId?: number;
-   createdAt?: Date;
-   updatedAt?: Date;
-};
-
-declare type ProductLike = {
-   id?: number;
-   productId?: number;
-   userId?: number;
-   createdAt?: Date;
-   updatedAt?: Date;
-};
-
-declare type Post = {
-   id: number;
+declare type Blog = {
+   blogId: string;
    text: string;
    title: string | null;
    images: string[] | null;
    video: string | null;
-   userId: number;
-   fromId?: number | null;
-   fromPostId?: number | null;
+   url:string|null;
+   userId: string;
+   slug:string | null;
+   summary:string | null;
+   fromUserId?: string | null;
+   fromBlogId?: string | null;
    shared?: number | null;
    createdAt: Date;
    updatedAt: Date;
@@ -86,7 +60,7 @@ declare type Post = {
 
 
 declare type User = {
-   id: number;
+   userId: string;
    firstName: string;
    middleName: string;
    lastName: string;
@@ -98,31 +72,12 @@ declare type User = {
    accountNumber: string;
    email: string;
    dob: string;
+   verified:boolean;
+   verificationRank:string;
    createdAt: Date;
    updatedAt: Date;
 };
 
-declare interface PostMarket {
-   id: number;
-}
-
-declare type Product = {
-   id: number;
-   productName: string;
-   category: string;
-   description: string;
-   images: string[];
-   price: string;
-   initialPrice: string;
-   affiliatePrice: string | null;
-   sizes: string[] | null;
-   numberAvailable: string;
-   rating: number;
-   availability: string;
-   userId: number;
-   createdAt: Date;
-   updatedAt: Date;
-};
 
 declare type ChatUser = {
    _id: number;
@@ -144,20 +99,15 @@ declare type IMessage = {
    pending?: boolean;
 };
 
-declare type MakePurchaseParams = {
-   productId: any;
-   affiliateId: any;
-   userId: any;
-   buyerId: any;
-};
+
 
 declare type CustomNotification = {
-   id: number;
-   userId: number;
+   notificationId: string;
+   userId: string;
    title: string;
    message: string;
    readStatus: boolean;
-   notificationFrom: number;
+   notificationFrom: string;
    createdAt: Date;
    notificationType: string;
    updatedAt: Date | null;
@@ -174,13 +124,4 @@ declare type Conversation = {
    updatedAt: null;
 };
 
-declare type Chat = {
-   id: number;
-   senderId: number;
-   recipientId: number;
-   lastText: string | null;
-   recipientReadStatus: boolean | null;
-   numberOfUnreadText: number | null;
-   createdAt: Date;
-   updatedAt: null;
-};
+

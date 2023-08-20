@@ -34,29 +34,33 @@ import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import TextShortener from "../TextShortener";
-import Reply from "./Reply";
 import { Skeleton } from "@rneui/themed";
 import { dateAgo } from "../../utils/util";
 
-type CommentProps = {
-   comment: PostComment;
+
+type Comment = {
+   commentId: string;
+   refId: string;
+   userId: number;
+   text: string;
+   createdAt: Date;
+   updatedAt: Date;
    repliesCount: number;
    likesCount: number;
    liked: boolean;
-   user: User;
-   posterId?: number;
+   createdBy: User;
 };
 
-type FetchReply = {
-   reply: CommentReply;
-   likesCount: number;
-   liked: boolean;
-   user: User;
+type CommentProps = {
+   comment: Comment;
+   blogOwnerId?:string;
+   size?: "normal" | "small";
 };
+
 
 const { height, width } = Dimensions.get("window");
 
-const Comment = (props: CommentProps) => {
+const CommentComponent = (props: CommentProps) => {
    const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [openRepliesModal, setOpenRepliesModal] = useState<boolean>(false);
@@ -65,8 +69,8 @@ const Comment = (props: CommentProps) => {
    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
    const [commentText, setCommentText] = useState<string>("");
    const [replyText, setReplyText] = useState<string>("");
-   const [comment, setComment] = useState<PostComment>(props.comment);
-   const [replies, setReplies] = useState<FetchReply[]>([]);
+   const [comment, setComment] = useState<Comment>(props.comment);
+   const [replies, setReplies] = useState<Comment[]>([]);
    const [likesCount, setLikesCount] = useState<number>(0);
    const [liked, setLiked] = useState<boolean>(false);
    const [repliesCount, setRepliesCount] = useState<number>(0);
@@ -84,14 +88,14 @@ const Comment = (props: CommentProps) => {
       try {
          setLoadingFetch(true);
          if (currentUser) {
-            let commentId = props.comment?.id;
+            let commentId = props.comment.commentId;
             console.log(commentId, currentUser);
             let response = await fetch(
-               `http://192.168.148.183:5000/api/media/posts/comments/${commentId}/replies/${currentUser?.id}/${pageNumber}/5`
+               `http://192.168.148.183:5000/api/blogs/comments/${commentId}?pageNumber=${pageNumber}&numberOfRecords=5`
             );
             let { data } = await response.json();
             if (response.ok) {
-               setReplies((prev) => (prev ? [...prev, ...data] : data));
+               setReplies((prev) => (prev ? [...prev, ...data ] : data));
                if (data.length > 0) {
                   page.current++;
                }
@@ -118,6 +122,124 @@ const Comment = (props: CommentProps) => {
       fetchData();
    };
 
+
+   useEffect(() => {
+      setComment(props.comment);
+      setCommentor(props.comment.createdBy);
+      setLiked(props.comment.liked);
+      setLikesCount(props.comment.likesCount);
+      setRepliesCount(props.comment.repliesCount);
+   }, []);
+
+   useEffect(
+      function () {
+         fetchData(1);
+      },
+      [currentUser, repliesCount]
+   );
+
+   const handleReplyModal = () => {
+      setOpenRepliesModal(true);
+      inputRef.current?.focus();
+   };
+
+   const handleReply = async () => {
+      setLoading(true);
+
+      let activeUserId = currentUser?.userId;
+      let replyObj = {
+         text: replyText,
+         userId: activeUserId,
+      };
+      console.log("ReplyObj", replyObj);
+      try {
+         let { data } = await axios.post(
+            `http://192.168.148.183:5000/comments/${comment.commentId}/`,
+            replyObj,{
+               headers:{
+                  Authorization:'Bear jsskssideofd4fiu8'
+               }
+            }
+         );
+         if (data.status == "success") {
+            console.log(data.data);
+            setReplies((prev) => (prev ? [data.data, ...prev] : [data.data]));
+            setReplyText("");
+            setRepliesCount((prev) => prev + 1);
+
+            // setComment(comment);
+
+            Alert.alert("Success", data.message);
+         } else {
+            Alert.alert("Failed", data.message);
+         }
+         setLoading(false);
+      } catch (err) {
+         Alert.alert("Failed", String(err));
+         setLoading(false);
+      }
+   };
+
+   const handleLike = async (commentId:string) => {
+      console.log(commentId);
+      try {
+         setLoading(true);
+         let activeUserId = currentUser?.userId;
+         let { data, status } = await axios.put(
+            `http://192.168.148.183:5000/comments/${commentId}/likes/`,
+            { userId: activeUserId}
+         );
+         if (status === 202) {
+            let { liked, numberOfLikes } = data.data;
+            setLiked(liked);
+            setLikesCount(numberOfLikes);
+
+            Alert.alert("Success", data.message);
+         } else {
+            Alert.alert("Failed", data.message);
+         }
+         setLoading(false);
+      } catch (err) {
+         console.log(err);
+         Alert.alert("Failed", String(err));
+         setLoading(false);
+      }
+   };
+
+   const handleUpdateComment = () => {
+      setLoading(true);
+      async function UpdateComment() {
+         try {
+            let putObj = { text: commentText, userId: comment?.userId };
+            let response = await axios.put(
+               "`http://192.168.148.183:5000/media/posts/comments",
+               putObj
+            );
+            if (response.status == 202) {
+               setComment({ ...comment, text: commentText });
+               Alert.alert("Success", "Comment Updated");
+            } else {
+               Alert.alert("Failed", response.data.message);
+            }
+            setLoading(false);
+         } catch (err) {
+            console.log(err);
+            Alert.alert("Failed", String(err));
+            setLoading(false);
+         }
+      }
+      UpdateComment();
+   };
+
+   const gotoUserProfile = () => {
+      if (currentUser?.userId === commentor?.userId) {
+         navigation.navigate("ProfileScreen", { userId: commentor?.userId });
+      } else {
+         navigation.navigate("UserProfileScreen", { userId: commentor?.userId });
+      }
+   };
+
+
    const renderFooter = () => {
       if (!loadingFetch) return null;
       return (
@@ -136,13 +258,9 @@ const Comment = (props: CommentProps) => {
    };
 
    const renderItem = ({ item }: any) => (
-      <Reply
-         key={String(item.reply.id)}
-         posterId={props.posterId}
-         reply={item.reply}
-         user={item.user}
-         likesCount={item.likesCount}
-         liked={item.liked}
+      <CommentComponent
+         comment={item}
+         blogOwnerId={props.blogOwnerId}
       />
    );
 
@@ -214,121 +332,7 @@ const Comment = (props: CommentProps) => {
          </View>
       </View>
    );
-   useEffect(() => {
-      setComment(props.comment);
-      setCommentor(props.user);
-      setLiked(props.liked);
-      setLikesCount(props.likesCount);
-      setRepliesCount(props.repliesCount);
-   }, []);
-
-   useEffect(
-      function () {
-         fetchData(1);
-      },
-      [currentUser, repliesCount]
-   );
-
-   const handleReplyModal = () => {
-      setOpenRepliesModal(true);
-      inputRef.current?.focus();
-   };
-
-   const handleReply = async () => {
-      setLoading(true);
-
-      let activeUserId = currentUser?.id;
-      let replyObj = {
-         text: replyText,
-         commentId: props.comment.id,
-         userId: activeUserId,
-      };
-      console.log("ReplyObj", replyObj);
-      try {
-         let { data } = await axios.post(
-            `http://192.168.148.183:5000/api/media/posts/comments/replies/`,
-            replyObj
-         );
-         if (data.status == "success") {
-            console.log(data.data);
-            setReplies((prev) => (prev ? [data.data, ...prev] : [data.data]));
-            setReplyText("");
-            setRepliesCount((prev) => prev + 1);
-
-            // setComment(comment);
-
-            Alert.alert("Success", data.message);
-         } else {
-            Alert.alert("Failed", data.message);
-         }
-         setLoading(false);
-      } catch (err) {
-         Alert.alert("Failed", String(err));
-         setLoading(false);
-      }
-   };
-
-   const handleLike = async (commentId?: number) => {
-      console.log(commentId);
-      if (commentId) {
-         try {
-            setLoading(true);
-            let activeUserId = currentUser?.id;
-            let { data } = await axios.put(
-               `http://192.168.148.183:5000/api/media/posts/comments/likes/`,
-               { userId: activeUserId, commentId: commentId }
-            );
-            if (data.status == "success") {
-               let { liked, numberOfLikes } = data.data;
-               setLiked(liked);
-               setLikesCount(numberOfLikes);
-
-               Alert.alert("Success", data.message);
-            } else {
-               Alert.alert("Failed", data.message);
-            }
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      }
-   };
-
-   const handleUpdateComment = () => {
-      setLoading(true);
-      async function UpdateComment() {
-         try {
-            let putObj = { text: commentText, id: comment?.id };
-            let response = await axios.put(
-               "`http://192.168.148.183:5000/media/posts/comments",
-               putObj
-            );
-            if (response.status == 202) {
-               setComment({ ...comment, text: commentText });
-               Alert.alert("Success", "Comment Updated");
-            } else {
-               Alert.alert("Failed", response.data.message);
-            }
-            setLoading(false);
-         } catch (err) {
-            console.log(err);
-            Alert.alert("Failed", String(err));
-            setLoading(false);
-         }
-      }
-      UpdateComment();
-   };
-
-   const gotoUserProfile = () => {
-      if (currentUser?.id === commentor?.id) {
-         navigation.navigate("ProfileScreen", { userId: commentor?.id });
-      } else {
-         navigation.navigate("UserProfileScreen", { userId: commentor?.id });
-      }
-   };
-
+ 
    return (
       <KeyboardAvoidingView style={styles.container}>
          <Modal visible={openRepliesModal}>
@@ -377,7 +381,7 @@ const Comment = (props: CommentProps) => {
                      style={{ paddingHorizontal: 10 }}
                      data={replies}
                      renderItem={renderItem}
-                     keyExtractor={(item) => String(item?.reply?.id)}
+                     keyExtractor={(item) => String(item?.commentId)}
                      onEndReached={handleLoadMore}
                      onEndReachedThreshold={0.2}
                      ListFooterComponent={renderFooter}
@@ -506,7 +510,7 @@ const Comment = (props: CommentProps) => {
                   <Pressable onPress={gotoUserProfile}>
                      <Avatar.Image
                         source={{ uri: commentor.profileImage }}
-                        size={35}
+                        size={props.size === "small" ? 28 : 35}
                      />
                      {/* <Image
                         style={styles.profileImage}
@@ -530,18 +534,18 @@ const Comment = (props: CommentProps) => {
                            justifyContent: "space-between",
                         }}>
                         <TextShortener
-                           style={styles.userFullName}
+                        
+                        style={{
+                           ...styles.userFullName,
+                           fontSize: props.size === "small" ? 12 : 14,
+                        }}
                            textLength={24}
                            text={
-                              commentor.firstName +
-                              "" +
-                              commentor.middleName +
-                              " " +
-                              commentor.lastName
+                              commentor.fullName
                            }
                         />
-                        {(currentUser?.id == commentor.id ||
-                           currentUser?.id == props?.posterId) && (
+                        {(currentUser?.userId == commentor.userId ||
+                           currentUser?.userId == props?.blogOwnerId) && (
                            <SimpleLineIcons
                               style={{ marginTop: 6 }}
                               onPress={() => setOpenModal(true)}
@@ -551,12 +555,11 @@ const Comment = (props: CommentProps) => {
                      </View>
 
                      <Text
-                        style={{
-                           fontFamily: "Poppins_300Light",
-                           paddingHorizontal: 5,
-                           fontSize: 13,
-                           color: theme.colors.secondary,
-                        }}>
+                      style={{
+                        fontFamily: "Poppins_300Light",
+                        paddingHorizontal: 5,
+                        fontSize: props.size === "small" ? 11 : 13,
+                     }}>
                         {comment?.text}
                      </Text>
                      {/* <Text>Comment Likes</Text>  */}
@@ -605,7 +608,7 @@ const Comment = (props: CommentProps) => {
                            }}
                            onPress={() => setOpenRepliesModal(true)}>
                            <Ionicons
-                              size={15}
+                              size= {props.size === "small" ? 14 : 15}
                               color={theme.colors.secondary}
                               name="chatbox-outline"
                            />
@@ -619,9 +622,9 @@ const Comment = (props: CommentProps) => {
                               fontSize: 13,
                               color: theme.colors.secondary,
                            }}
-                           onPress={() => handleLike(comment.id)}>
+                           onPress={() => handleLike(comment.commentId)}>
                            <AntDesign
-                              size={15}
+                              size={props.size === "small" ? 14 : 15}
                               name={liked ? "like1" : "like2"}
                               color={theme.colors.secondary}
                            />
@@ -630,13 +633,9 @@ const Comment = (props: CommentProps) => {
                      </View>
                      {replies.length > 0 && (
                         <View>
-                           <Reply
-                              size="small"
-                              posterId={props.posterId}
-                              likesCount={replies[0].likesCount}
-                              liked={replies[0].liked}
-                              reply={replies[0].reply}
-                              user={replies[0].user}
+                           <CommentComponent
+                              comment={replies[0]}
+                              blogOwnerId={props.blogOwnerId}
                            />
                         </View>
                      )}
@@ -648,7 +647,7 @@ const Comment = (props: CommentProps) => {
    );
 };
 
-export default Comment;
+export default CommentComponent;
 
 const styles = StyleSheet.create({
    container: {

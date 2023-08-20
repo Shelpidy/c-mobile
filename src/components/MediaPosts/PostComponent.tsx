@@ -11,8 +11,7 @@ import React, { useState, useEffect, useReducer } from "react";
 import ImagesViewer from "../ImagesViewer";
 import VideoPlayer from "../VideoPlayer";
 import TextViewer from "../TextViewer";
-import Comments from "./Comments";
-import { postComments, postLikes, users } from "../../data";
+
 import {
    TextInput,
    useTheme,
@@ -52,55 +51,26 @@ const s3 = new AWS.S3({
 });
 
 type PostComponentProps = {
-   post: Post;
+   blog: Blog;
    commentsCount: number;
    likesCount: number;
    sharesCount: number;
-   user: User;
+   createdBy: User;
+   ownedBy:User;
    liked: boolean;
 };
 
-const initialState: PostComment = {};
-
-const postCommentReducer = (
-   state: PostComment = initialState,
-   action: Action
-) => {
-   switch (action.type) {
-      case "POSTID":
-         return {
-            ...state,
-            userId: action.payload,
-         };
-      case "USERID":
-         return {
-            ...state,
-            userId: action.payload,
-         };
-      case "TEXT":
-         return {
-            ...state,
-            text: action.payload,
-         };
-      default:
-         return state;
-   }
-};
 
 const PostComponent = (props: PostComponentProps) => {
-   const [postCommentState, dispatchPostComment] = useReducer(
-      postCommentReducer,
-      initialState
-   );
    const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [openShareModal, setOpenShareModal] = useState<boolean>(false);
    const [commentsCount, setCommentsCount] = useState<number>(0);
-   const [comments, setComments] = useState<PostComment[]>([]);
+   const [comments, setComments] = useState<Comment[]>([]);
    const [likesCount, setLikesCount] = useState<number>(0);
    const [sharesCount, setSharesCount] = useState<number>(0);
    const [liked, setLiked] = useState<boolean>(false);
-   const [user, SetUser] = useState<User | null>(null);
+   const [createdBy, setCreatedBy] = useState<User | null>(null);
    const [shared, setShared] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
    const [loadingShare, setLoadingShare] = useState<boolean>(false);
@@ -121,25 +91,25 @@ const PostComponent = (props: PostComponentProps) => {
       setSharesCount(props.sharesCount);
       setLikesCount(props.likesCount);
       setCommentsCount(props.commentsCount);
-      SetUser(props.user);
+      setCreatedBy(props.createdBy);
    }, []);
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === user?.id) {
-         navigation.navigate("ProfileScreen", { userId: user?.id });
+      if (currentUser?.userId === createdBy?.userId) {
+         navigation.navigate("ProfileScreen", { userId: createdBy?.userId});
       } else {
-         navigation.navigate("UserProfileScreen", { userId: user?.id });
+         navigation.navigate("UserProfileScreen", { userId: createdBy?.userId });
       }
    };
 
-   const handleLike = async (postId: number) => {
-      console.log(postId);
+   const handleLike = async (blogId:string) => {
+      console.log(blogId);
       try {
          setLoading(true);
-         let activeUserId = currentUser?.id;
+         let activeUserId = currentUser?.userId;
          let { data, status } = await axios.put(
-            `http://192.168.148.183:5000/api/media/posts/likes/`,
-            { userId: activeUserId, postId: postId }
+            `http://192.168.148.183:5000/blogs/${blogId}/likes/`,
+            { userId: activeUserId}
          );
          if (status === 202) {
             let { liked, numberOfLikes } = data.data;
@@ -159,27 +129,26 @@ const PostComponent = (props: PostComponentProps) => {
    };
 
    const handleSharedPost = async () => {
-      let activeUserId = currentUser?.id;
+      let activeUserId = currentUser?.userId;
       setLoadingShare(true);
       setShared(false);
-      // let images = props.post.images?.map(image => image?.trimEnd())
+      // let images = props.blog.images?.map(image => image?.trimEnd())
       let postObj = {
          postObj: {
-            userId: activeUserId,
-            title: props.post.title,
-            images: JSON.parse(String(props.post.images)),
-            video: props.post.video,
-            text: props.post.text,
-            fromId: props.post.userId,
-            fromPostId: props.post.id,
+            title: props.blog.title,
+            images: JSON.parse(String(props.blog.images)),
+            video: props.blog.video,
+            text: props.blog.text,
+            fromUserId: props.blog.userId,
+            fromblogId: props.blog.blogId,
             shared: true,
          },
-         sharedPostId: props.post.id,
+         sharedblogId: props.blog.blogId,
       };
       console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.148.183:5000/api/media/posts/",
+            "http://192.168.148.183:5000/blogs/",
             postObj
          );
          if (response.status === 201) {
@@ -276,11 +245,11 @@ const PostComponent = (props: PostComponentProps) => {
                   <Button mode="text" onPress={() => setOpenShareModal(false)}>
                      <Feather size={26} name="x" />
                   </Button>
-                  <UpdatePostForm {...props.post} />
+                  <UpdatePostForm {...props.blog} />
                </View>
             </View>
          </Modal>
-         {user && (
+         {createdBy && (
             <View
                style={{
                   flexDirection: "row",
@@ -288,7 +257,7 @@ const PostComponent = (props: PostComponentProps) => {
                   padding: 8,
                }}>
                <Pressable onPress={gotoUserProfile}>
-                  <Avatar.Image size={45} source={{ uri: user.profileImage }} />
+                  <Avatar.Image size={45} source={{ uri: createdBy.profileImage }} />
                   {/* <Image
                      style={styles.profileImage}
                      
@@ -297,13 +266,7 @@ const PostComponent = (props: PostComponentProps) => {
                <TextShortener
                   style={{ fontFamily: "Poppins_400Regular", margin: 5 }}
                   textLength={23}
-                  text={
-                     user.firstName +
-                     " " +
-                     user.middleName +
-                     " " +
-                     user.lastName
-                  }
+                  text={createdBy.firstName}
                />
                <View
                   style={{
@@ -314,7 +277,7 @@ const PostComponent = (props: PostComponentProps) => {
                      paddingHorizontal: 0,
                      borderRadius: 3,
                   }}>
-                  {currentUser?.id == props.post?.userId && (
+                  {currentUser?.userId == props.blog?.userId && (
                      <View>
                         <Button mode='text' onPress={() => setOpenModal(true)}>
                            <SimpleLineIcons name="options-vertical" />
@@ -343,25 +306,25 @@ const PostComponent = (props: PostComponentProps) => {
                      fontFamily: "Poppins_300Light",
                      fontSize: 12,
                   }}>
-                  {dateAgo(props.post.createdAt)}
+                  {dateAgo(props.blog.createdAt)}
                </Text>
             </View>
 
-            {props.post.images && <ImagesViewer images={props.post.images} />}
+            {props.blog.images && <ImagesViewer images={props.blog.images} />}
             {/* {props?.video && <VideoPlayer video={props?.video}/>} */}
          </View>
 
-         {props.post.title && (
-            <Text style={styles.title}>{props.post?.title}</Text>
+         {props.blog.title && (
+            <Text style={styles.title}>{props.blog?.title}</Text>
          )}
 
-         {props.post?.text && (
+         {props.blog?.text && (
             <View style={{ paddingHorizontal: 8 }}>
                <HTML
                   contentWidth={width}
                   baseStyle={{ fontFamily: "Poppins_300Light" }}
                   systemFonts={["Poppins_300Light", "sans-serif"]}
-                  source={{ html: props.post.text }}
+                  source={{ html: props.blog.text }}
                />
             </View>
          )}
@@ -369,7 +332,7 @@ const PostComponent = (props: PostComponentProps) => {
             <View style={{ paddingHorizontal: 8, marginVertical: 4 }}>
                <Text>
                   <LikesComponent
-                     postId={props.post.id}
+                     blogId={props.blog.blogId}
                      numberOfLikes={likesCount}
                   />
                </Text>
@@ -459,7 +422,7 @@ const PostComponent = (props: PostComponentProps) => {
             <View style={styles.likeCommentAmountCon}>
                <Button
                   disabled={loading}
-                  onPress={() => handleLike(props.post.id)}
+                  onPress={() => handleLike(props.blog.blogId)}
                   textColor={theme.colors.secondary}
                   style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
                   <Ionicons
@@ -477,7 +440,7 @@ const PostComponent = (props: PostComponentProps) => {
                   }}
                   onPress={() =>
                      navigation.navigate("FullPostViewScreen", {
-                        ...props.post,
+                        ...props.blog,
                      })
                   }
                   textColor={theme.colors.secondary}
