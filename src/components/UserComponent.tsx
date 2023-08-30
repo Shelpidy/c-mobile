@@ -9,44 +9,62 @@ import {
    Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { AntDesign, EvilIcons, Fontisto } from "@expo/vector-icons";
+import { AntDesign, EvilIcons, Fontisto, MaterialIcons } from "@expo/vector-icons";
 import { Skeleton } from "@rneui/base";
 import { Avatar, Button, useTheme } from "react-native-paper";
 import TextShortener from "./TextShortener";
 import axios from "axios";
 import { useCurrentUser } from "../utils/CustomHooks";
+import { useSelector } from "react-redux";
+import moment from "moment";
+import { useNavigation } from "@react-navigation/native";
 
 type UserComponentProps = {
-   navigation: any;
    _user: User;
 };
 const { width } = Dimensions.get("window");
-const UserComponent = ({ navigation, _user }: UserComponentProps) => {
+const UserComponent = ({_user }: UserComponentProps) => {
    const [user, SetUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(false);
    const currentUser = useCurrentUser();
    const { width, height } = Dimensions.get("window");
    const [followed, setFollowed] = useState<boolean>(false);
-
+   const [lastSeen, setLastSeen] = useState<"online"|any>("");
+   const navigation = useNavigation<any>()
+   const { socket } = useSelector((state: any) => state.rootReducer);
    let theme = useTheme();
 
    useEffect(() => {
       console.log("USER COMPONENT");
-      console.log(_user.id);
+      console.log(_user.userId);
       console.log(currentUser?.followingIds);
-      if (currentUser?.followingIds?.includes(_user.id)) {
-         console.log(_user.id, currentUser?.followingIds);
+      if (currentUser?.followingIds?.includes(_user.userId)) {
+         console.log(_user.userId, currentUser?.followingIds);
          setFollowed(true);
       }
       // dispatchPostComment({ type: "", payload: "" });
       SetUser(_user);
    }, [currentUser, _user]);
 
+
+
+   useEffect(()=>{
+      socket.on(String(_user.userId), (data: any) => {
+         if (data.online) {
+            setLastSeen("online");
+         } else {
+            let lastSeenDate = moment(data.updatedAt).fromNow();
+            setLastSeen(lastSeenDate);
+         }
+      });
+
+   },[])
+
    const handleFollow = async () => {
       try {
          let { data } = await axios.put(
-            `http://192.168.148.183:5000/api/media/follows/`,
-            { followerId: currentUser?.id, followingId: user?.id },
+            `http://192.168.1.93:5000/media/follows/`,
+            { followerId: currentUser?.userId, followingId: user?.userId },
             { headers: { Accept: "application/json" } }
          );
          if (data.status == "success") {
@@ -64,10 +82,10 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
    };
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === user?.id) {
-         navigation.navigate("ProfileScreen", { userId: user?.id });
+      if (currentUser?.userId === user?.userId) {
+         navigation.navigate("ProfileScreen", { userId: user?.userId });
       } else {
-         navigation.navigate("UserProfileScreen", { userId: user?.id });
+         navigation.navigate("UserProfileScreen", { userId: user?.userId });
       }
    };
 
@@ -99,12 +117,11 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
                paddingHorizontal: 5,
                paddingVertical: 5,
             }}>
-            <Pressable onPress={gotoUserProfile}>
-               <Avatar.Image size={45} source={{ uri: user.profileImage }} />
-               {/* <Image
-                     style={styles.profileImage}
-                     source={{ uri: user.profileImage }}
-                  /> */}
+            <Pressable style={{position:"relative"}} onPress={gotoUserProfile}>
+               <Avatar.Image style={{position:"absolute",top:0,bottom:0,left:0,right:0}} size={45} source={{ uri: user.profileImage }} />
+               {
+                  lastSeen === "online"?<View style={{width:4,height:4,borderRadius:4,backgroundColor:"green",position:"absolute",bottom:0,left:"90%"}} ></View>:<Text>{lastSeen}</Text>
+               }
             </Pressable>
             <View
                style={{
@@ -118,22 +135,19 @@ const UserComponent = ({ navigation, _user }: UserComponentProps) => {
                {/* <View><Text style={{fontFamily:"Poppins_400Regular"}}>{user?.firstName} {user?.lastName}</Text> </View> */}
                <View>
                   <TextShortener
-                     text={
-                        user?.firstName +
-                        " " +
-                        user?.middleName +
-                        " " +
-                        user?.lastName
-                     }
+                     text={user.fullName}
                      style={{
                         fontFamily: "Poppins_400Regular",
                         marginHorizontal: 3,
                      }}
                      textLength={18}
                   />
+                     {
+                        user.verified && <MaterialIcons size={15} color={user.verificationRank ==='low'?"yellow":user.verificationRank==="medium"?"green":"blue"} name="verified"/>
+                     }
                </View>
                {/* <Pressable style={{marginHorizontal:5}}><Text><EvilIcons name='external-link' size={26} /></Text></Pressable> */}
-               {user.id !== currentUser?.id && (
+               {user.userId !== currentUser?.userId && (
                   <Button
                      onPress={handleFollow}
                      style={{ marginVertical: 5, alignSelf: "flex-end" }}

@@ -5,14 +5,7 @@ import jwtDecode from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import NetInfo from "@react-native-community/netinfo";
-import { io, Socket } from "socket.io-client";
-import moment from "moment";
 
-const generateRoomId = (secondUserId: any, activeUserId: any) => {
-   let maxId = Math.max(secondUserId, activeUserId);
-   let minId = Math.min(secondUserId, activeUserId);
-   return Number(`${maxId}${minId}`);
-};
 
 export const useNetworkStatus = () => {
    const [isOnline, setIsOnline] = useState<boolean | null>(false);
@@ -41,50 +34,6 @@ export const useNetworkStatus = () => {
    return isOnline;
 };
 
-export const useLastSeenOrOnlineStatus = (secondUserId: any) => {
-   const [lastSeen, setLastSeen] = useState<string | null>(null);
-   const [isConnected, setIsConnected] = useState<boolean | null>(true);
-   const [socket, setSocket] = useState<Socket | null>(null);
-   const currentUser = useCurrentUser();
-
-   useEffect(() => {
-      if (currentUser && secondUserId) {
-         let secUser = secondUserId;
-         let activeUser = currentUser?.id;
-         let roomId = generateRoomId(secUser, activeUser);
-         let newSocket = io(
-            `http://192.168.148.183:8080/?userId=${activeUser}`
-         );
-         setSocket(newSocket);
-         // cleanup function to close the socket connection when the component unmounts
-         return () => {
-            newSocket.close();
-         };
-      }
-   }, [currentUser, secondUserId]);
-
-   useEffect(() => {
-      //// Updating Online Status//////////
-      if (socket && secondUserId) {
-         socket.on("online", (data) => {
-            console.log("From Online", data);
-            if (data.userId == secondUserId) {
-               if (data.online) {
-                  setLastSeen("online");
-               } else {
-                  let lastSeenDate = moment(
-                     data.createdAt,
-                     "YYYYMMDD"
-                  ).fromNow();
-                  setLastSeen(lastSeenDate);
-               }
-            }
-         });
-      }
-   }, [socket, secondUserId]);
-
-   return lastSeen;
-};
 
 export const useCurrentUser = () => {
    const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -94,8 +43,8 @@ export const useCurrentUser = () => {
          try {
             let loginToken = await AsyncStorage.getItem("loginToken");
             if (loginToken) {
-               const decodedToken = jwtDecode(loginToken) as CurrentUser;
-               setCurrentUser(decodedToken);
+               const decodedToken:Omit<CurrentUser,'token'>= jwtDecode(loginToken);
+               setCurrentUser({...decodedToken,token:loginToken});
             }
          } catch (err) {
             console.log(err);

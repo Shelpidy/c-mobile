@@ -16,10 +16,10 @@ const PinCodeForm = () => {
    const handleCheckPassword = async () => {
       try {
          const response = await axios.post(
-            "http://192.168.148.183:5000/api/auth/users/checkpassword/",
+            "http://192.168.1.93:5000/auth/users/checkpassword/",
             {
                password,
-               userId: currentUser?.id, // Replace with the actual user ID
+               userId: currentUser?.userId, // Replace with the actual user ID
             }
          );
 
@@ -39,11 +39,11 @@ const PinCodeForm = () => {
 
       try {
          const response = await axios.put(
-            "http://192.168.148.183:5000/api/auth/users/personal/",
+            "http://192.168.1.93:5000/auth/users/personal/",
             {
                key: "pinCode",
                value: newPinCode,
-               userId: currentUser?.id, // Replace with the actual user ID
+               userId: currentUser?.userId, // Replace with the actual user ID
             }
          );
 
@@ -63,7 +63,7 @@ const PinCodeForm = () => {
    return (
       <View style={styles.container}>
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             activeOutlineColor={theme.colors.primary}
             label="Password"
             value={password}
@@ -74,7 +74,7 @@ const PinCodeForm = () => {
          />
 
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             activeOutlineColor={theme.colors.primary}
             label="New Pin Code"
             value={newPinCode}
@@ -85,7 +85,7 @@ const PinCodeForm = () => {
          />
 
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             activeOutlineColor={theme.colors.primary}
             label="Confirm Pin Code"
             value={confirmPinCode}
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
    },
    input: {
       marginBottom: 10,
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
 });
 

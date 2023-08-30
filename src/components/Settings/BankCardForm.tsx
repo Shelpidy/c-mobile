@@ -63,7 +63,7 @@ const BankCardForm = () => {
 
       try {
          const response = await axios.post(
-            "http://192.168.148.183:5000/api/auth/bcards/",
+            "http://192.168.1.93:5000/auth/bcards/",
             { ...state }
          );
          // Handle success
@@ -78,7 +78,7 @@ const BankCardForm = () => {
    return (
       <View style={styles.container}>
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             activeOutlineColor={theme.colors.primary}
             style={styles.input}
             label="Card Number"
@@ -100,7 +100,7 @@ const BankCardForm = () => {
             }
          />
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             activeOutlineColor={theme.colors.primary}
             style={styles.input}
             label="Expiry Date"
@@ -122,7 +122,7 @@ const BankCardForm = () => {
             }
          />
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             activeOutlineColor={theme.colors.primary}
             style={styles.input}
             label="CVV"
@@ -142,7 +142,7 @@ const BankCardForm = () => {
             }
          />
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             activeOutlineColor={theme.colors.primary}
             style={styles.input}
             label="Card Type"
@@ -162,7 +162,7 @@ const BankCardForm = () => {
             }
          />
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             activeOutlineColor={theme.colors.primary}
             style={styles.input}
             label="Billing Address"
@@ -184,7 +184,7 @@ const BankCardForm = () => {
             }
          />
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             activeOutlineColor={theme.colors.primary}
             style={styles.input}
             label="Cash Holder Name"
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
    },
    input: {
       marginBottom: 10,
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
    button: {
       marginTop: 16,

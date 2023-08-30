@@ -11,14 +11,14 @@ const FollowersScreen = ({ navigation, route }: any) => {
    const [loading, setLoading] = useState<boolean>(false);
 
    useEffect(function () {
-      console.log("Fetching user");
+      console.log("Fetching user's followers");
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
-         let userId = route.params.user.id;
+         let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.148.183:5000/api/media/followers/${userId}`,
+               `http://192.168.1.93:6000/follows/followers/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -39,6 +39,7 @@ const FollowersScreen = ({ navigation, route }: any) => {
       };
       fetchData();
    }, []);
+
 
    if (!users)
       return (
@@ -72,8 +73,7 @@ const FollowersScreen = ({ navigation, route }: any) => {
          {users.map((user) => {
             return (
                <UserComponent
-                  key={String(user.id)}
-                  navigation={navigation}
+                  key={String(user.userId)}
                   _user={user}
                />
             );
@@ -86,7 +86,7 @@ export default FollowersScreen;
 
 const styles = StyleSheet.create({
    container: {
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
       padding: 5,
    },
 });

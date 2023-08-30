@@ -4,14 +4,15 @@ declare type CurrentUser = {
    accountNumber: string;
    deviceId: string;
    followingIds:string[];
+   token:string;
 };
 
 
-declare type Comment = {
+declare type BlogComment = {
    commentId: string;
    refId: string;
    userId: number;
-   text: string;
+   content: string;
    createdAt: Date;
    updatedAt: Date;
    repliesCount: number;
@@ -73,14 +74,14 @@ declare type User = {
    email: string;
    dob: string;
    verified:boolean;
-   verificationRank:string;
+   verificationRank:"low"|"medium"|"high"|string;
    createdAt: Date;
    updatedAt: Date;
 };
 
 
 declare type ChatUser = {
-   _id: number;
+   _id: string|number;
    name: string;
    avatar: string;
 };
@@ -88,7 +89,7 @@ declare type ChatUser = {
 declare type IMessage = {
    _id: string | number;
    text: string;
-   createdAt: Date | number;
+   createdAt: Date;
    user: ChatUser;
    image?: string;
    video?: string;
@@ -113,10 +114,10 @@ declare type CustomNotification = {
    updatedAt: Date | null;
 };
 
-declare type Conversation = {
-   id: number;
-   senderId: number;
-   recipientId: number;
+declare type Room = {
+   roomId: string;
+   senderId: string;
+   recipientId: string;
    lastText: string | null;
    recipientReadStatus: boolean | null;
    numberOfUnreadText: number | null;

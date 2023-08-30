@@ -17,7 +17,7 @@ import ImagesViewer from "../components/ImagesViewer";
 import VideoPlayer from "../components/VideoPlayer";
 import TextViewer from "../components/TextViewer";
 import Comments from "../components/MediaPosts/Comments";
-import { postComments, postLikes, users } from "../data";
+
 import {
    useTheme,
    Button,
@@ -41,63 +41,24 @@ import { useCurrentUser } from "../utils/CustomHooks";
 import LikesComponent from "../components/LikesComponent";
 import moment from "moment";
 import HTML from "react-native-render-html";
-import { LoadingPostComponent } from "../components/MediaPosts/LoadingComponents";
+import { LoadingBlogComponent } from "../components/MediaPosts/LoadingComponents";
 import TextShortener from "../components/TextShortener";
 import { dateAgo } from "../utils/util";
 
-type FullPostComponentProps = { navigation: any; route: any };
-type PostComponentProps = {
-   post: Post;
-   commentsCount: number;
-   likesCount: number;
-   sharesCount: number;
-   liked: boolean;
-   user: User;
-};
+type FullBlogComponentProps = { navigation: any; route: any };
 
-const initialState: PostComment = {};
+const FullBlogComponent = ({ navigation, route }: FullBlogComponentProps) => {
 
-const postCommentReducer = (
-   state: PostComment = initialState,
-   action: Action
-) => {
-   switch (action.type) {
-      case "POSTID":
-         return {
-            ...state,
-            userId: action.payload,
-         };
-      case "USERID":
-         return {
-            ...state,
-            userId: action.payload,
-         };
-      case "TEXT":
-         return {
-            ...state,
-            text: action.payload,
-         };
-      default:
-         return state;
-   }
-};
-
-const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
-   const [postCommentState, dispatchPostComment] = useReducer(
-      postCommentReducer,
-      initialState
-   );
    const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [openShareModal, setOpenShareModal] = useState<boolean>(false);
    const [commentsCount, setCommentsCount] = useState<number>(0);
-   const [comments, setComments] = useState<PostComment[]>([]);
-   const [post, setPost] = useState<Post | null>(null);
+   const [blog, setBlogs] = useState<Blog | null>(null);
    const [likesCount, setLikesCount] = useState<number>(0);
    const [sharesCount, setSharesCount] = useState<number>(0);
    const [refetchId, setRefetchId] = useState<number>(0);
    const [liked, setLiked] = useState<boolean>(false);
-   const [user, setUser] = useState<any>();
+   const [createdBy, setCreatedBy] = useState<User | null>(null);
    const [shared, setShared] = useState<boolean>(false);
    const [loading, setLoading] = useState<boolean>(false);
    const [loadingShare, setLoadingShare] = useState<boolean>(false);
@@ -110,37 +71,40 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
    useEffect(
       function () {
          let fetchData = async () => {
-            let activeUserId = currentUser?.id;
-            let postId = route.params.id;
-            console.log("PostId", postId);
-            console.log("Post", route.params);
+            let activeUserId = currentUser?.userId;
+            let blogId = route.params.blogId;
+            console.log("blogId", blogId);
+            console.log("blog", route.params);
+            // setBlogs(route.params)
             try {
                let { data, status } = await axios.get(
-                  `http://192.168.148.183:5000/api/media/posts/${postId}/users/${activeUserId}`
+                  `http://192.168.1.93:6000/blogs/${blogId}`,
+                  {headers:{Authorization:`Bearer ${currentUser?.token}`}}
                );
                if (status === 200) {
                   console.log(data.data);
                   let {
-                     user,
-                     post,
+                     createdBy,
+                     blog,
                      liked,
                      likesCount,
                      sharesCount,
                      commentsCount,
+
                   } = data.data;
-                  setUser(user);
+                  setCreatedBy(createdBy)
                   setLiked(liked);
                   setLikesCount(likesCount);
                   setSharesCount(sharesCount);
                   setCommentsCount(commentsCount);
-                  setPost(post);
+                  setBlogs(blog);
 
                   // Alert.alert("Success",data.message)
                } else {
-                  Alert.alert("Failed", data.message);
+                  Alert.alert("Failed 1", data.message);
                }
             } catch (err) {
-               Alert.alert("Failed", String(err));
+               Alert.alert("Failed 2", String(err));
             }
          };
          fetchData();
@@ -157,29 +121,27 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
    // };
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === user.id) {
-         navigation.navigate("ProfileScreen", { userId: user.id });
+      if (currentUser?.userId === createdBy?.userId) {
+         navigation.navigate("ProfileScreen", { userId: createdBy?.userId});
       } else {
-         navigation.navigate("UserProfileScreen", { userId: user.id });
+         navigation.navigate("UserProfileScreen", { userId: createdBy?.userId});
       }
    };
 
    const handleComment = async () => {
       setLoading(true);
 
-      let activeUserId = currentUser?.id;
+      let activeUserId = currentUser?.userId;
       let commentObj = {
-         text: textValue,
-         postId: post?.id,
-         userId: activeUserId,
+         content: textValue,
       };
       console.log("CommentObj", commentObj);
       try {
-         let { data } = await axios.post(
-            `http://192.168.148.183:5000/api/media/posts/comments/`,
-            commentObj
+         let { data,status} = await axios.post(
+            `http://192.168.1.93:6000/blogs/${blog?.blogId}/comments/`,
+            commentObj,{headers:{Authorization:`Bearer ${currentUser?.token}`}}
          );
-         if (data.status == "success") {
+         if (status === 201) {
             // console.log(data.data);
             // setComments([...comments, data.data]);
             setTextValue("");
@@ -187,7 +149,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
 
             setRefetchId(refetchId + 1);
 
-            Alert.alert("Success", data.message);
+            // Alert.alert("Success", data.message);
          } else {
             Alert.alert("Failed", data.message);
          }
@@ -198,28 +160,25 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
       }
    };
 
-   const handleSharedPost = async () => {
-      let activeUserId = currentUser?.id;
+   const handleShareBlog = async () => {
+      let activeUserId = currentUser?.userId;
       setLoadingShare(true);
       setShared(false);
-      // let images = props.images?.map(image => image?.trimEnd())
-      let postObj = {
-         postObj: {
-            userId: activeUserId,
-            title: post?.title,
-            images: JSON.parse(String(post?.images)),
-            video: post?.video,
-            text: post?.text,
-            fromId: post?.userId,
+      // let images = props.blog.images?.map(image => image?.trimEnd())
+      let blogObj = {
+            title: blog?.title,
+            images: JSON.parse(String(blog?.images)),
+            video: blog?.video,
+            text: blog?.text,
+            fromUserId: blog?.userId,
+            fromblogId: blog?.blogId,
             shared: true,
-         },
-         sharedPostId: post?.id,
       };
-      console.log(postObj);
+      console.log(blogObj);
       try {
          let response = await axios.post(
-            "http://192.168.148.183:5000/api/media/posts/",
-            postObj
+            "http://192.168.1.93:6000/blogs/",
+            blogObj
          );
          if (response.status === 201) {
             console.log(response.data);
@@ -228,25 +187,65 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
             setSharesCount((prev) => prev + 1);
          } else {
             setLoadingShare(false);
-            Alert.alert("Failed", "Post Failed");
+            Alert.alert("Failed", "blog Failed");
          }
       } catch (err) {
          setLoadingShare(false);
          console.log(err);
       }
+
+      // console.log(blogState);
    };
 
-   const handleLike = async (postId: number) => {
-      console.log(postId);
+   // const handleShareBlog = async () => {
+   //    let activeUserId = currentUser?.userId;
+   //    setLoadingShare(true);
+   //    setShared(false);
+   //    // let images = props.images?.map(image => image?.trimEnd())
+   //    let blogObj = {
+   //       blogObj: {
+   //          userId: activeUserId,
+   //          title: blog?.title,
+   //          images: JSON.parse(String(blog?.images)),
+   //          video: blog?.video,
+   //          text: blog?.text,
+   //          fromId: blog?.userId,
+   //          shared: true,
+   //       },
+   //       sharedblogId: blog?.blogId,
+   //    };
+   //    console.log(blogObj);
+   //    try {
+   //       let response = await axios.blog(
+   //          "http://192.168.1.93:5000/media/blogs/",
+   //          blogObj
+   //       );
+   //       if (response.status === 201) {
+   //          console.log(response.data);
+   //          setLoadingShare(false);
+   //          setShared(true);
+   //          setSharesCount((prev) => prev + 1);
+   //       } else {
+   //          setLoadingShare(false);
+   //          Alert.alert("Failed", "blog Failed");
+   //       }
+   //    } catch (err) {
+   //       setLoadingShare(false);
+   //       console.log(err);
+   //    }
+   // };
+
+   const handleLike = async (blogId:string) => {
+      console.log(blogId);
       try {
          setLoading(true);
-         let activeUserId = currentUser?.id;
-         let { data } = await axios.put(
-            `http://192.168.148.183:5000/api/media/posts/likes/`,
-            { userId: activeUserId, postId: postId }
+         let activeUserId = currentUser?.userId;
+         let { data, status } = await axios.put(
+            `http://192.168.1.93:6000/blogs/${blogId}/likes/`,
+            { userId: activeUserId},{headers:{Authorization:`Bearer ${currentUser?.token}`}}
          );
-         if (data.status == "success") {
-            let { liked, numberOfLikes } = data.data;
+         if (status === 202) {
+            let { liked, likesCount:numberOfLikes } = data.data;
             setLiked(liked);
             setLikesCount(numberOfLikes);
 
@@ -262,6 +261,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
       }
    };
 
+
    const toggleEmojiPicker = () => {
       setShowEmojiPicker(!showEmojiPicker);
    };
@@ -270,13 +270,15 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
       setTextValue(textValue + emoji);
    };
 
-   if (!post) {
-      return <LoadingPostComponent />;
+   if (!blog) {
+      return <ScrollView>
+         <LoadingBlogComponent />
+      </ScrollView>;
    }
 
    return (
       <View>
-         <ScrollView style={styles.postContainer}>
+         <ScrollView style={styles.blogContainer}>
             <Modal visible={openShareModal}>
                <View
                   style={{
@@ -308,7 +310,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                         }}
                         disabled={loadingShare}
                         loading={loadingShare}
-                        onPress={handleSharedPost}
+                        onPress={handleShareBlog}
                         mode="contained">
                         <Ionicons />
                         <Ionicons
@@ -318,8 +320,8 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                         />
                         <Text>
                            {shared
-                              ? "Shared Post Successfully"
-                              : "Continue to share as a post"}
+                              ? "Shared blog Successfully"
+                              : "Continue to share as a blog"}
                         </Text>
                      </Button>
                   </View>
@@ -344,7 +346,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                   </View>
                </View>
             </Modal>
-            {user && (
+            {createdBy && (
                <View
                   style={{
                      flexDirection: "row",
@@ -354,7 +356,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                   <Pressable onPress={gotoUserProfile}>
                      <Avatar.Image
                         size={45}
-                        source={{ uri: user.profileImage }}
+                        source={{ uri: createdBy.profileImage }}
                      />
                      {/* <Image
                      style={styles.profileImage}
@@ -364,12 +366,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                   <TextShortener
                      style={{ fontFamily: "Poppins_400Regular", margin: 5 }}
                      textLength={25}
-                     text={
-                        user.firstName +
-                        "  " +
-                        user.middleName +
-                        " " +
-                        user.lastName
+                     text={createdBy?.fullName
                      }
                   />
                   <View
@@ -379,7 +376,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                         alignItems: "flex-end",
                         marginBottom: 2,
                      }}>
-                     {currentUser?.id == post?.userId && (
+                     {currentUser?.userId == blog?.userId && (
                         <View>
                            <Button onPress={() => setOpenModal(true)}>
                               <SimpleLineIcons name="options-vertical" />
@@ -399,7 +396,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                      paddingBottom: 8,
                      gap: 4,
                   }}>
-                  {/* <Text style={{textAlignVertical:"center",color:theme.colors.secondary,fontFamily:"Poppins_300Light",marginRight:2}}>posted</Text> */}
+                  {/* <Text style={{textAlignVertical:"center",color:theme.colors.secondary,fontFamily:"Poppins_300Light",marginRight:2}}>bloged</Text> */}
                   <AntDesign
                      color={theme.colors.secondary}
                      name="clockcircleo"
@@ -411,26 +408,26 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                         fontFamily: "Poppins_300Light",
                         fontSize: 12,
                      }}>
-                     {dateAgo(post.createdAt)}
+                     {dateAgo(blog.createdAt)}
                   </Text>
                </View>
-               {post?.images && <ImagesViewer images={post?.images} />}
-               {/* {post?.video && <VideoPlayer video={post?.video}/>} */}
+               {blog?.images && <ImagesViewer images={blog?.images} />}
+               {/* {blog?.video && <VideoPlayer video={blog?.video}/>} */}
             </View>
-            {post?.title && <Text style={styles.title}>{post?.title}</Text>}
+            {blog?.title && <Text style={styles.title}>{blog?.title}</Text>}
 
-            {post?.text && (
+            {blog?.text && (
                <View style={{ paddingHorizontal: 8 }}>
                   <HTML
                      contentWidth={width}
                      baseStyle={{ fontFamily: "Poppins_300Light" }}
                      systemFonts={["Poppins_300Light", "sans-serif"]}
-                     source={{ html: post.text }}
+                     source={{ html: blog.text }}
                   />
                </View>
             )}
             <View>
-               <LikesComponent postId={post.id} numberOfLikes={likesCount} />
+               <LikesComponent blogId={blog.blogId} numberOfLikes={likesCount} />
 
                <View
                   style={{
@@ -517,9 +514,9 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                <View style={styles.likeCommentAmountCon}>
                   <Button
                      disabled={loading}
-                     onPress={() => handleLike(post.id)}
+                     onPress={() => handleLike(blog.blogId)}
                      textColor={theme.colors.secondary}
-                     style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
+                     style={{ backgroundColor: theme.colors.inverseOnSurface, flex: 1 }}>
                      <Ionicons
                         size={20}
                         color={theme.colors.secondary}
@@ -535,7 +532,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                      }}
                      onPress={() => inputRef?.current?.focus()}
                      textColor={theme.colors.secondary}
-                     style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
+                     style={{ backgroundColor: theme.colors.inverseOnSurface, flex: 1 }}>
                      <Ionicons
                         size={20}
                         color={theme.colors.secondary}
@@ -545,7 +542,7 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                   <Button
                      onPress={() => setOpenShareModal(true)}
                      textColor={theme.colors.secondary}
-                     style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
+                     style={{ backgroundColor: theme.colors.inverseOnSurface, flex: 1 }}>
                      <MaterialCommunityIcons size={25} name="share-outline" />
                   </Button>
                </View>
@@ -571,22 +568,22 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                         paddingHorizontal: 25,
                      }}
                   />
-                  <Pressable
+                  <Button
+                     mode="text"
                      onPress={handleComment}
                      style={{
-                        paddingHorizontal: 20,
+                        paddingHorizontal:5,
                         height: 50,
                         alignItems: "center",
                         justifyContent: "center",
-                        borderTopRightRadius: 20,
-                        borderBottomRightRadius: 20,
+                        backgroundColor:theme.colors.inverseOnSurface
                      }}>
                      <FontAwesome
                         color={theme.colors.secondary}
                         name="send"
                         size={20}
                      />
-                  </Pressable>
+                  </Button>
                </View>
                {/* <KeyboardAvoidingView style={styles.commentBox}>
                   <TextInput
@@ -615,8 +612,8 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
                <View style={{ padding: 5, marginBottom: 10 }}>
                   <Comments
                      refetchId={refetchId}
-                     userId={post?.userId}
-                     postId={post.id}
+                     userId={blog?.userId}
+                     blogId={blog.blogId}
                   />
                </View>
             </View>
@@ -648,10 +645,10 @@ const FullPostComponent = ({ navigation, route }: FullPostComponentProps) => {
    );
 };
 
-export default FullPostComponent;
+export default FullBlogComponent;
 
 const styles = StyleSheet.create({
-   postContainer: {
+   blogContainer: {
       backgroundColor: "#ffffff",
       // marginHorizontal:6,
       marginTop: 3,

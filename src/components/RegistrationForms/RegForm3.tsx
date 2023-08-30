@@ -136,7 +136,7 @@ const Form3 = ({ navigation, setActiveTab }: Form3Props) => {
 
             <TextInput
                onChangeText={(value) => setEmail(value)}
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="Email"
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
       width: width - 40,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
    button: {
       width: width / 3,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
       marginTop: 10,
       fontFamily: "Poppins_300Light",
       marginVertical: 10,
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
 
    buttonGroup: {

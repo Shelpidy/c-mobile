@@ -16,10 +16,10 @@ const FollowingsScreen = ({ navigation, route }: any) => {
       setLoading(true);
       let fetchData = async () => {
          // console.log("Fetching user")
-         let userId = route.params.user.id;
+         let userId = route.params.userId;
          try {
             let response = await fetch(
-               `http://192.168.148.183:5000/api/media/followings/${userId}`,
+               `http://192.168.1.93:6000/follows/followings/${userId}`,
                { method: "GET" }
             );
             let data = await response.json();
@@ -73,8 +73,7 @@ const FollowingsScreen = ({ navigation, route }: any) => {
             {users?.map((user) => {
                return (
                   <UserComponent
-                     key={String(user.id)}
-                     navigation={navigation}
+                     key={String(user.userId)}
                      _user={user}
                   />
                );

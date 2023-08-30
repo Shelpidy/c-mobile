@@ -20,7 +20,7 @@ const ProfileNavComponent = ({user}: {user:User}) => {
 
    return (
       <Card mode="contained" style={styles.navs}>
-         {currentUser?.id === user?.id && (
+         {currentUser?.userId === user?.userId && (
             <View style={styles.navLink}>
                <AntDesign
                   name="setting"
@@ -39,7 +39,7 @@ const ProfileNavComponent = ({user}: {user:User}) => {
                </Button>
             </View>
          )}
-
+{/* 
          <View style={styles.navLink}>
             <Feather
                name="shopping-cart"
@@ -55,12 +55,12 @@ const ProfileNavComponent = ({user}: {user:User}) => {
             </Text>
             <Button
                onPress={() =>
-                  navigation.navigate("UserProductScreen", { userId:user.id })
+                  navigation.navigate("UserProductScreen", { userId:user.userId})
                }>
                <Entypo name="chevron-thin-right" />
             </Button>
-         </View>
-         {currentUser?.id === user?.id && (
+         </View> */}
+         {currentUser?.userId === user?.userId && (
             <View style={styles.navLink}>
                <MaterialCommunityIcons
                   name="transfer"
@@ -80,7 +80,7 @@ const ProfileNavComponent = ({user}: {user:User}) => {
                </Button>
             </View>
          )}
-         {currentUser?.id === user?.id && (
+         {currentUser?.userId === user?.userId && (
             <View style={styles.navLink}>
                <MaterialCommunityIcons
                   name="transfer"
@@ -100,7 +100,7 @@ const ProfileNavComponent = ({user}: {user:User}) => {
                </Button>
             </View>
          )}
-         {currentUser?.id === user?.id && (
+         {currentUser?.userId === user?.userId && (
             <View style={styles.navLink}>
                <MaterialIcons
                   name="account-balance"
@@ -122,7 +122,7 @@ const ProfileNavComponent = ({user}: {user:User}) => {
                </Button>
             </View>
          )}
-         {currentUser?.id === user?.id && (
+         {currentUser?.userId === user?.userId && (
             <View style={styles.navLink}>
                <AntDesign
                   name="logout"

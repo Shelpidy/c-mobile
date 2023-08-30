@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React, { useEffect } from "react";
 import { Button } from "react-native-paper";
-import PostsComponent from "../components/MediaPosts/PostsComponent";
+import BlogsComponent from "../components/MediaPosts/BlogsComponent";
 import FindFriendsComponent from "../components/FindFriendsComponent";
 import PostProductFormNav from "../components/PostProductFormNav";
 import { useCurrentUser } from "../utils/CustomHooks";
@@ -34,7 +34,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
       <ScrollView style={styles.container}>
          <PostProductFormNav page="post" navigation={navigation} />
          <FindFriendsComponent navigation={navigation} />
-         <PostsComponent />
+         <BlogsComponent />
       </ScrollView>
    );
 };

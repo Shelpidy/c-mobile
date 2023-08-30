@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React, { useState, useEffect, useReducer, useMemo } from "react";
 import { Button, TextInput, useTheme } from "react-native-paper";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Feather, MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { ImagePicker } from "expo-image-multiple-picker";
 import { useCurrentUser } from "../../utils/CustomHooks";
@@ -89,16 +89,12 @@ const PostForm = () => {
       // Update product with uploaded image URLs
       // postObj.images = uploadedImageURLs;
 
-      let finalPostObj = { postObj, sharedPostId: null };
+      // let finalPostObj = { postObj, sharedPostId: null };
       console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.148.183:5000/blogs/",
-            finalPostObj,{
-               headers:{
-                  Authorization:`Bearer token`
-               }
-            }
+            "http://192.168.1.93:6000/blogs/",
+            postObj, {headers:{Authorization:`Bearer ${currentUser?.token}`}}
          );
          if (response.status === 201) {
             console.log(response.data);
@@ -158,11 +154,14 @@ const PostForm = () => {
             marginVertical: 4,
          }}>
          <Modal visible={imageOpen}>
+            <Button onPress={()=> setImageOpen(false)} icon={()=> <Feather name="chevron-left" />}>Cancel</Button>
             <ImagePicker
+               
                onSave={chooseImage}
                onCancel={cancelImage}
                multiple
                limit={8}
+
             />
          </Modal>
          <Modal visible={videoOpen}>
@@ -178,7 +177,7 @@ const PostForm = () => {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.formContainer}>
             <TextInput
-               contentStyle={{ backgroundColor: "#f6f6f6" }}
+               contentStyle={{ backgroundColor: theme.colors.inverseOnSurface }}
                outlineStyle={{ borderColor: "#f0f0f0" }}
                onChangeText={onValueChangeTitle}
                mode="outlined"
@@ -209,7 +208,7 @@ const PostForm = () => {
                ]}
             />
             <RichEditor
-               editorStyle={{ backgroundColor: "#f6f6f6" }}
+               editorStyle={{ backgroundColor: theme.colors.inverseOnSurface }}
                initialHeight={200}
                initialContentHTML="<b>Write your content here</b>"
                ref={richText}

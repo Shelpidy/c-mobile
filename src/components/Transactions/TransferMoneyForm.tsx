@@ -29,7 +29,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
       };
       try {
          let resp = await fetch(
-            "http://192.168.148.183:5000/api/transactions/sendcommodity",
+            "http://192.168.1.93:5000/transactions/sendcommodity",
             {
                method: "POST",
                body: JSON.stringify(postObj),
@@ -60,7 +60,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
          <View style={styles.form}>
             <TextInput
                mode="outlined"
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                style={styles.input}
                label="To"
                value={transfereeAccountNumber}
@@ -71,7 +71,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
                }></TextInput>
             <TextInput
                mode="outlined"
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                value={amount}
                style={styles.input}
                onChangeText={(value) => setAmount(value)}
@@ -82,7 +82,7 @@ const TransferMoneyForm = ({ navigation }: TransferMoneyFormProps) => {
                }></TextInput>
             <TextInput
                mode="outlined"
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                style={styles.input}
                label="Password"
                // inputMode="text"
@@ -117,6 +117,6 @@ const styles = StyleSheet.create({
       width: width - 40,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
 });

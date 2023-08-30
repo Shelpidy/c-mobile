@@ -7,30 +7,30 @@ import {
    Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import PostComponent from "./PostComponent";
+import BlogComponent from "./BlogComponent";
 import axios from "axios";
-import { posts as _fetchedPost } from "../../data";
+// import { blogs as _fetchedPost } from "../../data";
 import { useCurrentUser } from "../../utils/CustomHooks";
-import SharedPostComponent from "./SharedPostComponent";
+import SharedBlogComponent from "./SharedBlogComponent";
 import { ActivityIndicator, Divider } from "react-native-paper";
-import { LoadingPostComponent } from "./LoadingComponents";
+import { LoadingBlogComponent } from "./LoadingComponents";
 import { useNavigation } from "@react-navigation/native";
 
-type PostComponentProps = {
-   post: Post;
-   user: User;
-   secondUser: User;
+type BlogComponentProps = {
+   blog: Blog;
+   createdBy: User;
+   ownedBy: User;
    commentsCount: number;
    likesCount: number;
    sharesCount: number;
    liked: boolean;
 };
 
-const PostsComponent = () => {
-   const [posts, setPosts] = useState<PostComponentProps[] | null>(null);
-   const [allPosts, setAllPosts] = useState<PostComponentProps[] | null>(null);
+const BlogsComponent = () => {
+   const [blogs, setBlogs] = useState<BlogComponentProps[] | null>(null);
+   const [allBlogs, setAllBlogs] = useState<BlogComponentProps[] | null>(null);
    const page = React.useRef<number>(1);
-   const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(5);
+   const [numberOfblogsPerPage, setNumberOfblogsPerPage] = useState<number>(5);
    const [loading, setLoading] = useState<boolean>(false);
    const [refreshing, setRefreshing] = useState<boolean>(false);
    const currentUser = useCurrentUser();
@@ -39,49 +39,52 @@ const PostsComponent = () => {
    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
 
    let fetchData = async (pageNum?: number) => {
+      console.log("Fetching posts")
       let pageNumber = pageNum ?? page.current;
       if (!hasMore) return;
       try {
          if (currentUser) {
             setLoadingFetch(true);
-            let activeUserId = currentUser?.id;
-            let response = await fetch(
-               `http://192.168.148.183:5000/api/media/posts/session/${activeUserId}/${pageNumber}/${numberOfPostsPerPage}`
+            let activeUserId = currentUser?.userId;
+            let {data,status} = await axios.get(
+               `http://192.168.1.93:6000/sessions/blogs?pageNumber=${pageNumber}&numberOfRecords=${numberOfblogsPerPage}`,
+               {headers:{Authorization:`Bearer ${currentUser?.token}`}}
+
             );
 
-            if (response.status === 200) {
-               let { data } = await response.json();
+            if (status === 200) {
+               
                console.log(data);
-               // setPosts(data.data);
-               let fetchedPost: PostComponentProps[] = data;
+               // setBlogs(data.data);
+               let fetchedPost: BlogComponentProps[] = data.data;
 
-               setAllPosts((prev) =>
+               setAllBlogs((prev) =>
                   prev ? [...prev, ...fetchedPost] : fetchedPost
                );
-               setPosts((prev) =>
+               setBlogs((prev) =>
                   prev ? [...prev, ...fetchedPost] : fetchedPost
                );
 
                if (fetchedPost.length > 0) page.current++;
-               if (data.length < numberOfPostsPerPage) {
+               if (data.data.length < numberOfblogsPerPage) {
                   setHasMore(false);
                }
                setLoadingFetch(false);
                // Alert.alert("Success",data.message)
             } else {
-               let { message } = await response.json();
-               Alert.alert("Failed", message);
+               Alert.alert("Failed", data.message);
                setLoadingFetch(false);
             }
          }
       } catch (err) {
          Alert.alert("Failed", String(err));
+         console.log(err)
          setLoadingFetch(false);
       }
    };
 
    const handleLoadMore = () => {
-      console.log("Posts Reached end");
+      console.log("blogs Reached end");
       if (loadingFetch) return;
       fetchData();
    };
@@ -99,7 +102,7 @@ const PostsComponent = () => {
             }}>
             <ActivityIndicator color="#cecece" size="small" />
             <Text style={{ color: "#cecece", marginLeft: 5 }}>
-               Loading more posts
+               Loading more blogs
             </Text>
          </View>
       );
@@ -112,29 +115,29 @@ const PostsComponent = () => {
       [currentUser]
    );
 
-   if (!posts) {
+   if (!blogs) {
       return (
          <View style={{ padding: 2 }}>
-            <LoadingPostComponent />
+            <LoadingBlogComponent />
             <Divider />
-            <LoadingPostComponent />
+            <LoadingBlogComponent />
             <Divider />
-            <LoadingPostComponent />
+            <LoadingBlogComponent />
          </View>
       );
    }
 
    return (
       <FlatList
-         keyExtractor={(item) => String(item.post.id)}
-         data={posts}
+         keyExtractor={(item) => String(item.blog.blogId)}
+         data={blogs}
          renderItem={({ item, index, separators }) => {
-            if (item.post?.fromId) {
+            if (item.blog?.fromBlogId){
                return (
-                  <SharedPostComponent key={String(item.post.id)} {...item} />
+                  <SharedBlogComponent key={String(item.blog.blogId)} {...item} />
                );
             } else {
-               return <PostComponent key={String(item.post.id)} {...item} />;
+               return <BlogComponent key={String(item.blog.blogId)} {...item} />;
             }
          }}
          onEndReached={handleLoadMore}
@@ -144,6 +147,6 @@ const PostsComponent = () => {
    );
 };
 
-export default PostsComponent;
+export default BlogsComponent;
 
 const styles = StyleSheet.create({});

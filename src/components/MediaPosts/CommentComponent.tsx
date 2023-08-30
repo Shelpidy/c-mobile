@@ -1,58 +1,43 @@
 import {
-   Modal,
-   StyleSheet,
-   Text,
-   View,
-   Image,
+   AntDesign,
+   FontAwesome,
+   Ionicons,
+   MaterialCommunityIcons,
+   SimpleLineIcons
+} from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { Skeleton } from "@rneui/themed";
+import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
+import {
    Alert,
-   Pressable,
-   TextInput,
-   TouchableHighlight,
-   KeyboardAvoidingView,
-   ScrollView,
    Dimensions,
    FlatList,
+   KeyboardAvoidingView,
+   Modal,
+   Platform,
+   Pressable,
+   ScrollView,
+   StyleSheet,
+   Text,
+   TextInput,
+   View
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
-import { users } from "../../data";
 import {
-   MaterialCommunityIcons,
-   SimpleLineIcons,
-   FontAwesome,
-   AntDesign,
-   EvilIcons,
-   Ionicons,
-} from "@expo/vector-icons";
-import {
+   ActivityIndicator,
    Avatar,
    Button,
    Divider,
    useTheme,
-   ActivityIndicator,
 } from "react-native-paper";
-import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
 import { useCurrentUser } from "../../utils/CustomHooks";
-import TextShortener from "../TextShortener";
-import { Skeleton } from "@rneui/themed";
 import { dateAgo } from "../../utils/util";
+import TextShortener from "../TextShortener";
 
 
-type Comment = {
-   commentId: string;
-   refId: string;
-   userId: number;
-   text: string;
-   createdAt: Date;
-   updatedAt: Date;
-   repliesCount: number;
-   likesCount: number;
-   liked: boolean;
-   createdBy: User;
-};
 
 type CommentProps = {
-   comment: Comment;
+   comment: BlogComment;
    blogOwnerId?:string;
    size?: "normal" | "small";
 };
@@ -69,8 +54,8 @@ const CommentComponent = (props: CommentProps) => {
    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
    const [commentText, setCommentText] = useState<string>("");
    const [replyText, setReplyText] = useState<string>("");
-   const [comment, setComment] = useState<Comment>(props.comment);
-   const [replies, setReplies] = useState<Comment[]>([]);
+   const [comment, setComment] = useState<BlogComment>(props.comment);
+   const [replies, setReplies] = useState<BlogComment[]>([]);
    const [likesCount, setLikesCount] = useState<number>(0);
    const [liked, setLiked] = useState<boolean>(false);
    const [repliesCount, setRepliesCount] = useState<number>(0);
@@ -82,6 +67,7 @@ const CommentComponent = (props: CommentProps) => {
    const navigation = useNavigation<any>();
 
    let fetchData = async (pageNum?: number) => {
+
       let pageNumber = pageNum ?? page.current;
       console.log("Replies PageNumber", pageNumber);
       if (!hasMore) return;
@@ -90,18 +76,18 @@ const CommentComponent = (props: CommentProps) => {
          if (currentUser) {
             let commentId = props.comment.commentId;
             console.log(commentId, currentUser);
-            let response = await fetch(
-               `http://192.168.148.183:5000/api/blogs/comments/${commentId}?pageNumber=${pageNumber}&numberOfRecords=5`
+            let {status,data} = await axios.get(
+               `http://192.168.1.93:6000/comments/${commentId}?pageNumber=${pageNumber}&numberOfRecords=5`,
+               {headers:{Authorization:`Bearer ${currentUser?.token}`}}
             );
-            let { data } = await response.json();
-            if (response.ok) {
-               setReplies((prev) => (prev ? [...prev, ...data ] : data));
-               if (data.length > 0) {
+            if (status === 200) {
+               setReplies((prev) => (prev ? [...prev, ...data.data ] : data.data));
+               if (data.data.length > 0) {
                   page.current++;
                }
-               console.log("Replies=>", data);
+               console.log("Replies=>", data.data);
                setLoadingFetch(false);
-               if (data.length < 5) {
+               if (data.data.length < 5) {
                   setHasMore(false);
                }
             } else {
@@ -121,7 +107,6 @@ const CommentComponent = (props: CommentProps) => {
       if (loadingFetch) return;
       fetchData();
    };
-
 
    useEffect(() => {
       setComment(props.comment);
@@ -145,30 +130,23 @@ const CommentComponent = (props: CommentProps) => {
 
    const handleReply = async () => {
       setLoading(true);
-
       let activeUserId = currentUser?.userId;
       let replyObj = {
-         text: replyText,
-         userId: activeUserId,
+         content: replyText,
       };
+
       console.log("ReplyObj", replyObj);
       try {
-         let { data } = await axios.post(
-            `http://192.168.148.183:5000/comments/${comment.commentId}/`,
-            replyObj,{
-               headers:{
-                  Authorization:'Bear jsskssideofd4fiu8'
-               }
-            }
+         let { data,status} = await axios.post(
+            `http://192.168.1.93:6000/comments/${comment.commentId}/replies/`,
+            replyObj, {headers:{Authorization:`Bearer ${currentUser?.token}`}}
          );
-         if (data.status == "success") {
+         if (status === 201) {
             console.log(data.data);
             setReplies((prev) => (prev ? [data.data, ...prev] : [data.data]));
             setReplyText("");
             setRepliesCount((prev) => prev + 1);
-
             // setComment(comment);
-
             Alert.alert("Success", data.message);
          } else {
             Alert.alert("Failed", data.message);
@@ -186,11 +164,11 @@ const CommentComponent = (props: CommentProps) => {
          setLoading(true);
          let activeUserId = currentUser?.userId;
          let { data, status } = await axios.put(
-            `http://192.168.148.183:5000/comments/${commentId}/likes/`,
-            { userId: activeUserId}
+            `http://192.168.1.93:6000/comments/${commentId}/likes/`,
+            { userId: activeUserId}, {headers:{Authorization:`Bearer ${currentUser?.token}`}}
          );
          if (status === 202) {
-            let { liked, numberOfLikes } = data.data;
+            let { liked, likesCount:numberOfLikes } = data.data;
             setLiked(liked);
             setLikesCount(numberOfLikes);
 
@@ -212,11 +190,11 @@ const CommentComponent = (props: CommentProps) => {
          try {
             let putObj = { text: commentText, userId: comment?.userId };
             let response = await axios.put(
-               "`http://192.168.148.183:5000/media/posts/comments",
+               "`http://192.168.1.93:6000/comments",
                putObj
             );
             if (response.status == 202) {
-               setComment({ ...comment, text: commentText });
+               setComment({ ...comment, content: commentText });
                Alert.alert("Success", "Comment Updated");
             } else {
                Alert.alert("Failed", response.data.message);
@@ -264,8 +242,9 @@ const CommentComponent = (props: CommentProps) => {
       />
    );
 
-   const renderSkeleton = () => (
-      <View>
+   const renderSkeleton = () => {
+      if(replies.length < 1) return null
+      return (<View>
          <View
             style={{
                flex: 1,
@@ -331,40 +310,46 @@ const CommentComponent = (props: CommentProps) => {
             />
          </View>
       </View>
-   );
+   );}
  
    return (
-      <KeyboardAvoidingView style={styles.container}>
+      <KeyboardAvoidingView style={styles.container}
+      behavior='padding' 
+      >
          <Modal visible={openRepliesModal}>
             <View
                style={{
-                  position: "relative",
+            
                   backgroundColor: "#00000099",
                }}>
-               <ScrollView
-                  style={{
-                     top: height / 7,
-                     borderTopRightRadius: 8,
+                  <View  style={{
+                        top: height * 0.1,
+                        borderTopRightRadius: 12,
                      borderTopLeftRadius: 8,
                      backgroundColor: "#fff",
-                     paddingBottom: 100,
-                  }}>
+                     overflow:"hidden",
+                     height:height
+            
+                     }}>
                   <View
                      style={{
-                        width: "100%",
-                        alignItems: "flex-end",
-                        justifyContent: "flex-end",
+                     backgroundColor: "#fff",
+                     justifyContent:"flex-end",
+                     alignItems:"flex-end",
+                     paddingVertical:6
+            
                      }}>
                      <Button onPress={() => setOpenRepliesModal(false)}>
-                        <AntDesign size={18} name="close" />
+                        <AntDesign size={20} name="close" />
                      </Button>
                   </View>
+          
                   {replies.length < 1 && (
-                     <View style={{ width: "100%", alignItems: "center" }}>
+                     <View style={{ width: "100%", alignItems: "center",paddingVertical:height*0.15}}>
                         <MaterialCommunityIcons
                            name="comment-outline"
-                           style={{ fontWeight: "normal", opacity: 0.6 }}
-                           size={200}
+                           style={{opacity: 0.6 }}
+                           size={80}
                            color={theme.colors.secondary}
                         />
                         <Text
@@ -378,7 +363,7 @@ const CommentComponent = (props: CommentProps) => {
                      </View>
                   )}
                   <FlatList
-                     style={{ paddingHorizontal: 10 }}
+                     style={{ paddingHorizontal: 10,maxHeight:height * 0.70,marginVertical:height*0.1}}
                      data={replies}
                      renderItem={renderItem}
                      keyExtractor={(item) => String(item?.commentId)}
@@ -387,13 +372,17 @@ const CommentComponent = (props: CommentProps) => {
                      ListFooterComponent={renderFooter}
                      ListEmptyComponent={renderSkeleton}
                   />
-                  <KeyboardAvoidingView
+               <View
                      style={{
-                        marginTop: 5,
+                        position:'absolute',
+                        top:height * 0.075,
+                        width:"100%",
                         paddingHorizontal: 20,
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "center",
+                        zIndex:1
+                        
                      }}>
                      <TextInput
                         multiline
@@ -407,6 +396,7 @@ const CommentComponent = (props: CommentProps) => {
                            borderBottomLeftRadius: 20,
                            height: 50,
                            paddingHorizontal: 25,
+                           zIndex:1
                         }}
                      />
                      <Button
@@ -415,12 +405,11 @@ const CommentComponent = (props: CommentProps) => {
                         mode="text"
                         onPress={handleReply}
                         style={{
-                           paddingHorizontal: 20,
+                           paddingHorizontal: 10,
                            height: 50,
                            alignItems: "center",
                            justifyContent: "center",
-                           borderTopRightRadius: 20,
-                           borderBottomRightRadius: 20,
+                           backgroundColor:theme.colors.inverseOnSurface
                         }}>
                         <FontAwesome
                            color={theme.colors.secondary}
@@ -428,9 +417,8 @@ const CommentComponent = (props: CommentProps) => {
                            size={20}
                         />
                      </Button>
-                  </KeyboardAvoidingView>
-                  <View style={{ height: height / 5 }}></View>
-               </ScrollView>
+                  </View>
+              </View>
             </View>
          </Modal>
          <Modal visible={openModal}>
@@ -476,7 +464,7 @@ const CommentComponent = (props: CommentProps) => {
                         onChangeText={(v) => setCommentText(v)}
                         style={{
                            flex: 1,
-                           backgroundColor: "#f6f6f6",
+                           backgroundColor: theme.colors.inverseOnSurface,
                            borderTopLeftRadius: 20,
                            borderBottomLeftRadius: 20,
                            height: 50,
@@ -492,7 +480,7 @@ const CommentComponent = (props: CommentProps) => {
                            justifyContent: "center",
                            borderTopRightRadius: 20,
                            borderBottomRightRadius: 20,
-                           backgroundColor: "#f6f6f6",
+                           backgroundColor: theme.colors.inverseOnSurface,
                         }}>
                         <FontAwesome
                            color={theme.colors.primary}
@@ -560,7 +548,7 @@ const CommentComponent = (props: CommentProps) => {
                         paddingHorizontal: 5,
                         fontSize: props.size === "small" ? 11 : 13,
                      }}>
-                        {comment?.text}
+                        {comment.content}
                      </Text>
                      {/* <Text>Comment Likes</Text>  */}
                      <View
@@ -612,7 +600,7 @@ const CommentComponent = (props: CommentProps) => {
                               color={theme.colors.secondary}
                               name="chatbox-outline"
                            />
-                           {repliesCount}
+                           {replies.length}
                         </Button>
                         <Button
                            disabled={loading}
@@ -634,6 +622,7 @@ const CommentComponent = (props: CommentProps) => {
                      {replies.length > 0 && (
                         <View>
                            <CommentComponent
+                              size="small"
                               comment={replies[0]}
                               blogOwnerId={props.blogOwnerId}
                            />

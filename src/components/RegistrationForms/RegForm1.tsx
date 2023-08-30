@@ -49,7 +49,7 @@ const Form1 = ({ navigation, setActiveTab }: Form1Props) => {
                onChangeText={(value) =>
                   dispatch(setPersonalInfoForm({ firstName: value }))
                }
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="FirstName"></TextInput>
@@ -57,7 +57,7 @@ const Form1 = ({ navigation, setActiveTab }: Form1Props) => {
                onChangeText={(value) =>
                   dispatch(setPersonalInfoForm({ middleName: value }))
                }
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="MiddleName"></TextInput>
@@ -65,7 +65,7 @@ const Form1 = ({ navigation, setActiveTab }: Form1Props) => {
                onChangeText={(value) =>
                   dispatch(setPersonalInfoForm({ lasttName: value }))
                }
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="LastName"></TextInput>
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
       width: width - 40,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
    button: {
       width: width - 60,

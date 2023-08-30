@@ -14,52 +14,65 @@ import {
    Button,
    useTheme,
 } from "react-native-paper";
-import PostComponent from "../components/MediaPosts/PostComponent";
+import BlogComponent from "../components/MediaPosts/BlogComponent";
 import ProfileNavComponent from "../components/ProfileNavComponent";
-import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { EvilIcons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import SearchForm from "../components/SearchForm";
-import SharedPostComponent from "../components/MediaPosts/SharedPostComponent";
+import SharedBlogComponent from "../components/MediaPosts/SharedBlogComponent";
 import {
-   LoadingPostComponent,
+   LoadingBlogComponent,
    LoadingProfileComponent,
 } from "../components/MediaPosts/LoadingComponents";
+import { useSelector } from "react-redux";
+import moment from "moment";
+import axios from "axios";
+import { useCurrentUser } from "../utils/CustomHooks";
 
 const { width, height } = Dimensions.get("window");
 
-type PostComponent = {
-   post: Post;
+type BlogComponent =  {
+   blog: Blog;
    commentsCount: number;
    likesCount: number;
    sharesCount: number;
-   user: User;
+   createdBy: User;
+   ownedBy:User;
    liked: boolean;
-   secondUser: User;
 };
 
 const ProfileScreen = ({ navigation, route }: any) => {
    const theme = useTheme();
-   const [posts, setPosts] = useState<PostComponent[] | null>(null);
-   const [allPosts, setAllPosts] = useState<PostComponent[]>([]);
+   const [posts, setPosts] = useState<BlogComponent[] | null>(null);
+   const [allPosts, setAllPosts] = useState<BlogComponent[]>([]);
    const [user, setUser] = useState<any>(null);
    const page = React.useRef<number>(1);
    const [numberOfPostsPerPage, setNumberOfPostsPerPage] = useState<number>(5);
    const [loading, setLoading] = useState<boolean>(false);
    const [hasMore, setHasMore] = useState(true);
    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
+   const [lastSeen, setLastSeen] = useState<"online"|any>("");
+   const currentUser = useCurrentUser()
+   const { socket } = useSelector((state: any) => state.rootReducer);
+
+
+   // GETTING POSTS
 
    let fetchData = async (pageNum?: number) => {
+      console.log(("Fetching user blogs"))
       let pageNumber = pageNum ?? page.current;
       if (!hasMore) return;
       let userId = route.params.userId;
+      console.log({userId})
       try {
-         let response = await fetch(
-            `http://192.168.148.183:5000/api/media/posts/user/${userId}/${pageNumber}/${numberOfPostsPerPage}`
+         let {status,data} = await axios.get(
+            `http://192.168.1.93:6000/blogs/users/${userId}?pageNumber=${pageNumber}&numberOfRecords=${numberOfPostsPerPage}`,
+            {headers:{Authorization:`Bearer ${currentUser?.token}`}}
          );
-         let data = await response.json();
-         if (data.status == "success") {
+        
+         if (status === 200) {
             // console.log(data.data)
             // setPosts(data.data);
-            let fetchedPost: PostComponent[] = data.data;
+            let fetchedPost: BlogComponent[] = data.data;
 
             setAllPosts((prev) =>
                prev ? [...prev, ...fetchedPost] : fetchedPost
@@ -78,6 +91,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
          }
          setLoadingFetch(false);
       } catch (err) {
+         console.log(err)
          Alert.alert("Failed", String(err));
          setLoadingFetch(false);
       }
@@ -88,8 +102,8 @@ const ProfileScreen = ({ navigation, route }: any) => {
       let token = _token.toLowerCase();
       let newPosts = allPosts?.filter(
          (post) =>
-            post.post?.text?.toLowerCase().includes(token) ||
-            post.post?.title?.toLowerCase().includes(token)
+            post.blog?.text?.toLowerCase().includes(token) ||
+            post.blog?.title?.toLowerCase().includes(token)
       );
       setPosts(newPosts);
    };
@@ -119,6 +133,9 @@ const ProfileScreen = ({ navigation, route }: any) => {
       );
    };
 
+
+   // FETCHING USER PROFILE INFO ////
+
    useEffect(function () {
       console.log("Fetching user profile details");
       setLoading(true);
@@ -126,13 +143,12 @@ const ProfileScreen = ({ navigation, route }: any) => {
          // console.log("Fetching user")
          //  let activeUserId = 1
          try {
-            let response = await fetch(
-               `http://192.168.148.183:5000/api/auth/users/${route.params.userId}`,
-               { method: "GET" }
+            let {status,data}  = await axios.get(
+               `http://192.168.1.93:5000/auth/users/${route.params.userId}`,
+               {headers:{Authorization:`Bearer ${currentUser?.token}`}}
             );
-            let data = await response.json();
-            if (data.status == "success") {
-               console.log("Users-----", data.data);
+            if (status === 200) {
+               console.log("User----", data.data);
                setUser(data.data);
                // Alert.alert("Success",data.message)
                setLoading(false);
@@ -153,6 +169,22 @@ const ProfileScreen = ({ navigation, route }: any) => {
       fetchData(1);
    }, []);
 
+
+
+   useEffect(()=>{
+      console.log("Socket is running",String(route.params.userId))
+      socket.on(String(route.params.userId), (data: any) => {
+         console.log("From socket",data)
+         if (data.online) {
+            setLastSeen("online");
+         } else {
+            let lastSeenDate = moment(data.updatedAt).fromNow();
+            setLastSeen(lastSeenDate);
+         }
+      });
+
+   },[socket])
+
    if (!user) {
       return <LoadingProfileComponent />;
    }
@@ -160,11 +192,13 @@ const ProfileScreen = ({ navigation, route }: any) => {
    return (
       <ScrollView style={{ flex: 1, backgroundColor: "#fff", paddingTop: 10 }}>
          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Avatar.Image
-               style={{ borderColor: theme.colors.primary }}
-               size={120}
-               source={{ uri: user?.personal?.profileImage }}
-            />
+             <View style={{position:"relative"}}>
+               <Avatar.Image size={100} source={{ uri: "https://picsum.photos/200/300"}} />
+               {
+                  lastSeen === "online" && <View style={{width:15,height:15,borderRadius:15,backgroundColor:"green",position:"absolute",bottom:2,right:15,zIndex:10}} ></View>
+               }
+            </View>
+            <View style={{flexDirection:"row",gap:3,alignItems:"center"}}>
             <Text
                style={{
                   textAlign: "center",
@@ -173,8 +207,13 @@ const ProfileScreen = ({ navigation, route }: any) => {
                }}>
                {user?.personal?.fullName}
             </Text>
+            {
+               user.personal.verificationRank && <MaterialIcons size={17} color={user.personal.verificationRank ==='low'?"orange":user.personal.verificationRank==="medium"?"green":"blue"} name="verified"/>
+            }
+            </View>
+
          </View>
-         <ScrollView horizontal style={styles.mediaContainer}>
+         <View style={styles.mediaContainer}>
             <View style={{ alignItems: "center", margin: 4 }}>
                <Text
                   style={{
@@ -186,10 +225,10 @@ const ProfileScreen = ({ navigation, route }: any) => {
                   {user?.followers?.count}
                </Text>
                <Button
-                  style={{ backgroundColor: "#f6f6f6" }}
+                  style={{ backgroundColor: theme.colors.inverseOnSurface }}
                   onPress={() =>
                      navigation.navigate("FollowersScreen", {
-                        user: user?.personal,
+                        userId: user?.personal.userId,
                      })
                   }>
                   <Text
@@ -216,10 +255,10 @@ const ProfileScreen = ({ navigation, route }: any) => {
                   {user?.followings?.count}
                </Text>
                <Button
-                  style={{ backgroundColor: "#f6f6f6" }}
+                  style={{ backgroundColor: theme.colors.inverseOnSurface }}
                   onPress={() =>
                      navigation.navigate("FollowingsScreen", {
-                        user: user?.personal,
+                        userId: user?.personal.userId,
                      })
                   }>
                   <Text
@@ -243,9 +282,9 @@ const ProfileScreen = ({ navigation, route }: any) => {
                      //  color:theme.colors.secondary,
                      fontSize: 15,
                   }}>
-                  {user?.sales?.count}
+                  {user?.totalPosts}
                </Text>
-               <Button style={{ backgroundColor: "#f6f6f6" }}>
+               <Button style={{ backgroundColor: theme.colors.inverseOnSurface }}>
                   <Text
                      style={{
                         // fontWeight: "bold",
@@ -254,7 +293,7 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         color: theme.colors.secondary,
                         fontSize: 13,
                      }}>
-                     Sales
+                     Posts
                   </Text>
                </Button>
             </View>
@@ -266,9 +305,9 @@ const ProfileScreen = ({ navigation, route }: any) => {
                      // color:theme.colors.secondary,
                      fontSize: 13,
                   }}>
-                  {user?.affiliates?.count}
+                  {user?.totalLikes}
                </Text>
-               <Button style={{ backgroundColor: "#f6f6f6" }}>
+               <Button style={{ backgroundColor: theme.colors.inverseOnSurface }}>
                   <Text
                      style={{
                         // fontWeight: "bold",
@@ -276,11 +315,11 @@ const ProfileScreen = ({ navigation, route }: any) => {
                         fontFamily: "Poppins_400Regular",
                         color: theme.colors.secondary,
                      }}>
-                     Affiliate Product
+                     Likes
                   </Text>
                </Button>
             </View>
-         </ScrollView>
+         </View>
 
          <View style={{ alignItems: "center", marginBottom: 5 }}>
             <ProfileNavComponent
@@ -290,8 +329,8 @@ const ProfileScreen = ({ navigation, route }: any) => {
 
          {!posts && (
             <ScrollView>
-               <LoadingPostComponent />
-               <LoadingPostComponent />
+               <LoadingBlogComponent />
+               <LoadingBlogComponent />
             </ScrollView>
          )}
          {posts && posts.length > 1 && (
@@ -299,19 +338,19 @@ const ProfileScreen = ({ navigation, route }: any) => {
          )}
          {posts && (
             <FlatList
-               keyExtractor={(item) => String(item.post.id)}
+               keyExtractor={(item) => String(item.blog.blogId)}
                data={posts}
                renderItem={({ item, index, separators }) => {
-                  if (item.post?.fromId) {
+                  if (item.blog?.fromBlogId) {
                      return (
-                        <SharedPostComponent
-                           key={String(item.post.id)}
+                        <SharedBlogComponent
+                           key={String(item.blog.blogId)}
                            {...item}
                         />
                      );
                   } else {
                      return (
-                        <PostComponent key={String(item.post.id)} {...item} />
+                        <BlogComponent key={String(item.blog.blogId)} {...item} />
                      );
                   }
                }}
@@ -337,10 +376,10 @@ const styles = StyleSheet.create({
    },
    mediaContainer: {
       // display: "flex",
-      // flexDirection: "row",
-      // justifyContent: "center",
+      flexDirection: "row",
+      justifyContent: "center",
       gap: 10,
-      marginTop: 0,
+      marginTop: 8,
       marginBottom: 10,
    },
    profileImage: {

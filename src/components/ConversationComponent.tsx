@@ -19,7 +19,7 @@ import { useCurrentUser } from "../utils/CustomHooks";
 import { useSelector } from "react-redux";
 
 type ConversationComponentProps = {
-   conversation: Conversation;
+   conversation: Room;
    setTopConvId: (id: any) => void;
 };
 
@@ -41,12 +41,13 @@ const ConversationComponent = ({
    const navigation = useNavigation<any>();
    // const [socket, setSocket] = useState<Socket | null>(null);
    const [lastSeen, setLastSeen] = useState<any>("");
+   const [gesture, setGesture] = useState<string>("");
    const [typing, setTyping] = useState<boolean | null>(false);
    const [recording, setRecording] = useState<boolean | null>(false);
    const [resetLastSeen, setResetLastSeen] = useState<number>(0);
    const currentUser = useCurrentUser();
    const [newConversation, setNewConversation] =
-      useState<Conversation>(conversation);
+      useState<Room>(conversation);
    const { socket } = useSelector((state: any) => state.rootReducer);
 
    //////////////////  GET SECOND USER ///////////////
@@ -63,7 +64,7 @@ const ConversationComponent = ({
                ;
                try {
                   let response = await fetch(
-                     `http://192.168.148.183:5000/api/auth/users/${secondUserId}`,
+                     `http://192.168.1.93:5000/users/${secondUserId}`,
                      { method: "GET" }
                   );
                   let data = await response.json();
@@ -89,7 +90,7 @@ const ConversationComponent = ({
    useEffect(() => {
       if (socket && conversation && currentUser) {
          socket.emit("joinRoom", {
-            room: `c-${conversation.id}`,
+            room: conversation.roomId,
             userId: currentUser.userId,
          });
       }
@@ -104,7 +105,7 @@ const ConversationComponent = ({
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.148.183:8080/api/userstatus/${secondUser.userId}`,
+                  `http://192.168.1.93:8080/userstatus/${secondUser.userId}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -146,7 +147,7 @@ const ConversationComponent = ({
          /////// Online Status listener ///////////
 
          socket.on("online", (data: any) => {
-            if (data.userId == secondUser?.id) {
+            if (data.userId == secondUser?.userId) {
                console.log("From Online", data);
                if (data.online) {
                   setLastSeen("online");
@@ -163,7 +164,8 @@ const ConversationComponent = ({
          socket.on("typing", (data: any) => {
             console.log("From Typing", { typing: data.typing });
             if (data.userId == secUserId) {
-               setTyping(data.typing);
+               setGesture(data.typing?"typing...":"")
+               // setTyping(data.typing);
             }
          });
 
@@ -172,7 +174,8 @@ const ConversationComponent = ({
          socket.on("recording", (data: any) => {
             console.log("From Recording", { recording: data.recording });
             if (data.userId == secUserId) {
-               setRecording(data.recording);
+               setGesture(data.recording?"recording...":"")
+               // setRecording(data.recording);
             }
          });
 
@@ -186,14 +189,15 @@ const ConversationComponent = ({
       }
    }, [socket, currentUser, secondUser]);
 
+
    const gotoChatScreen = async () => {
       if (
-         conversation.recipientId === currentUser?.id &&
+         conversation.recipientId === currentUser?.userId &&
          !conversation.recipientReadStatus
       ) {
          try {
             let { data, status } = await axios.put(
-               `http://192.168.148.183:8080/api/messages/chats/read/${conversation.id}/${conversation.recipientId}`
+               `http://192.168.1.93:8080/messages/chats/read/${conversation.roomId}/${conversation.recipientId}`
             );
             if (status === 202) {
                setNewConversation({
@@ -203,21 +207,25 @@ const ConversationComponent = ({
                });
                navigation.navigate("ChatScreen", {
                   user: secondUser,
-                  roomId: conversation.id,
+                  roomId: conversation.roomId,
                });
             } else {
                console.log(data.messages);
                navigation.navigate("ChatScreen", {
                   user: secondUser,
-                  roomId: conversation.id,
+                  roomId: conversation.roomId,
                });
             }
          } catch (error) {}
       }
-      navigation.navigate("ChatScreen", {
-         user: secondUser,
-         roomId: conversation.id,
-      });
+      else{
+         navigation.navigate("ChatScreen", {
+            user: secondUser,
+            roomId: conversation.roomId,
+         });
+
+      }
+    
    };
    if (!newConversation) {
       return (
@@ -243,7 +251,7 @@ const ConversationComponent = ({
       <Pressable
          onPress={gotoChatScreen}
          style={styles.container}
-         key={String(conversation.id)}>
+         key={String(conversation.roomId)}>
          <View>
             <Avatar.Image
                style={{ marginTop: 3 }}
@@ -281,7 +289,7 @@ const ConversationComponent = ({
                   }
                   style={{
                      fontFamily:
-                        currentUser?.id == newConversation.recipientId &&
+                        currentUser?.userId == newConversation.recipientId &&
                         !newConversation.recipientReadStatus
                            ? "Poppins_500Medium"
                            : "Poppins_300Light",
@@ -289,26 +297,15 @@ const ConversationComponent = ({
                   }}
                   textLength={15}
                />
-               {!recording && (
+             
                   <Text
                      style={{
                         fontFamily: "Poppins_300Light",
                         color: theme.colors.secondary,
                         marginLeft: 10,
                      }}>
-                     {typing ? "typing..." : ""}
+                     {gesture}
                   </Text>
-               )}
-               {!typing && (
-                  <Text
-                     style={{
-                        fontFamily: "Poppins_300Light",
-                        color: theme.colors.secondary,
-                        marginLeft: 10,
-                     }}>
-                     {recording ? "recording..." : ""}
-                  </Text>
-               )}
 
                <Text>{lastSeen}</Text>
             </View>
@@ -324,7 +321,7 @@ const ConversationComponent = ({
                      paddingTop: 2,
                      height: "auto",
                   }}>
-                  {currentUser?.id == newConversation.recipientId &&
+                  {currentUser?.userId == newConversation.recipientId &&
                      newConversation.numberOfUnreadText && (
                         <Badge
                            style={{
@@ -338,7 +335,7 @@ const ConversationComponent = ({
                      text={newConversation.lastText}
                      style={{
                         fontFamily:
-                           currentUser?.id == newConversation.recipientId &&
+                           currentUser?.userId == newConversation.recipientId &&
                            !newConversation.recipientReadStatus
                               ? "Poppins_500Medium"
                               : "Poppins_300Light",

@@ -7,21 +7,23 @@ import {
    Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import Comment from "./CommentComponent";
+import CommentComponent from "./CommentComponent";
 import { Button, Divider, ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import { Skeleton } from "@rneui/themed";
+import axios from "axios";
+
 
 type CommentsProps = {
-   postId: number;
-   userId?: number;
+   blogId: string;
+   userId?: string;
    refetchId: number;
 };
 
 type FetchComment = {
-   comment: PostComment;
-   repliesCount: number;
+   comment: BlogComment;
+   commentsCount: number;
    likesCount: number;
    liked: boolean;
    user: User;
@@ -29,8 +31,8 @@ type FetchComment = {
 
 const { width, height } = Dimensions.get("window");
 
-const Comments = ({ postId, userId, refetchId }: CommentsProps) => {
-   const [comments, setComments] = useState<FetchComment[] | null>(null);
+const Comments = ({ blogId, userId, refetchId }: CommentsProps) => {
+   const [comments, setComments] = useState<BlogComment[] | null>(null);
    const [loading, setLoading] = useState(false);
    const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
    const page = React.useRef<number>(1);
@@ -46,20 +48,21 @@ const Comments = ({ postId, userId, refetchId }: CommentsProps) => {
 
       try {
          setLoadingFetch(true);
-         if (currentUser && postId) {
-            let response = await fetch(
-               `http://192.168.148.183:5000/api/media/posts/${postId}/comments/${currentUser?.id}/${pageNumber}/5`
+         if (currentUser && blogId) {
+            let {data,status} = await axios.get(
+               `http://192.168.1.93:6000/blogs/${blogId}/comments?pageNumber=${pageNumber}&numberOfRecords=5`,
+               {headers:{Authorization:`Bearer ${currentUser?.token}`}}
             );
-            let { data } = await response.json();
-            if (response.ok) {
+        
+            if (status === 200) {
                setComments((prevComments) =>
-                  prevComments ? [...prevComments, ...data] : data
+                  prevComments ? [...prevComments, ...data.data] : data.data
                );
-               if (data.length > 0) {
+               if (data.data.length > 0) {
                   page.current++;
                }
-               console.log("Comments=>", data);
-               if (data.length < 5) {
+               console.log("Comments=>", data.data);
+               if (data.data.length < 5) {
                   setHasMore(false);
                }
                setLoadingFetch(false);
@@ -68,7 +71,7 @@ const Comments = ({ postId, userId, refetchId }: CommentsProps) => {
                setLoadingFetch(false);
             }
          }
-         setLoadingFetch(false);
+         // setLoadingFetch(false);
       } catch (err) {
          console.log("From Comments", String(err));
          Alert.alert("Failed", String(err));
@@ -77,8 +80,9 @@ const Comments = ({ postId, userId, refetchId }: CommentsProps) => {
    };
 
    useEffect(() => {
+      console.log("Fetching comments")
       fetchComments(1);
-   }, [currentUser, refetchComments]);
+   }, [currentUser]);
 
    const handleLoadMore = () => {
       console.log("Comments reached end");
@@ -92,7 +96,7 @@ const Comments = ({ postId, userId, refetchId }: CommentsProps) => {
          <View
             style={{
                flexDirection: "row",
-               padding: 10,
+               padding: 15,
                justifyContent: "center",
                alignItems: "center",
                backgroundColor: "white",
@@ -103,15 +107,12 @@ const Comments = ({ postId, userId, refetchId }: CommentsProps) => {
       );
    };
 
-   const renderItem = ({ item }: any) => (
-      <Comment
-         key={String(item.comment.id)}
-         posterId={userId}
-         comment={item.comment}
-         user={item.user}
-         likesCount={item.likesCount}
-         repliesCount={item.repliesCount}
-         liked={item.liked}
+   const renderItem = ({ item }:{item:BlogComment}) =>(
+      <CommentComponent
+         key={String(item.commentId)}
+         blogOwnerId={userId}
+         comment={item}
+       
       />
    );
 
@@ -187,10 +188,11 @@ const Comments = ({ postId, userId, refetchId }: CommentsProps) => {
       <FlatList
          data={comments}
          renderItem={renderItem}
-         keyExtractor={(item) => String(item?.comment?.id)}
+         keyExtractor={(item) => String(item?.commentId)}
          onEndReached={handleLoadMore}
          onEndReachedThreshold={0.3}
          ListFooterComponent={renderFooter}
+         style={{padding:8}}
          // ListEmptyComponent={renderSkeleton}
       />
    );

@@ -14,11 +14,11 @@ const FirstNameForm = () => {
 
       try {
          const response = await axios.put(
-            "http://192.168.148.183:5000/api/auth/users/personal/",
+            "http://192.168.1.93:5000/auth/users/personal/",
             {
                key: "firstName",
                value: firstName,
-               userId: currentUser?.id, // Replace with the actual user ID
+               userId: currentUser?.userId, // Replace with the actual user ID
             }
          );
 
@@ -38,7 +38,7 @@ const FirstNameForm = () => {
    return (
       <View>
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             label="First Name"
             value={firstName}
             onChangeText={setFirstName}
@@ -60,7 +60,7 @@ const FirstNameForm = () => {
 const styles = StyleSheet.create({
    input: {
       marginBottom: 10,
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
 });
 

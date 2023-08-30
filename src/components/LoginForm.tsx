@@ -4,6 +4,7 @@ import { Button, TextInput, useTheme } from "react-native-paper";
 import * as Device from "expo-device";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePushNotificationToken } from "../utils/CustomHooks";
+import axios from "axios";
 
 type LoginFormProps = {
    navigation: any;
@@ -39,40 +40,34 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                notificationToken,
             };
 
-            let response = await fetch(
-               `http://192.168.148.183:5000/api/auth/users/login/`,
-               {
-                  method: "POST",
-                  body: JSON.stringify(loginObj),
-                  headers: {
-                     "Content-Type": "application/json",
-                  },
-               }
+            let {status,data} = await axios.post(
+               `http://192.168.1.93:5000/auth/users/login/`,
+               loginObj
             );
 
-            if (response.ok) {
-               let data = await response.json();
-               console.log("Login Token", data.token);
+            if (status === 201) {
+               
+               console.log("Login Token", data);
                try {
-                  await AsyncStorage.setItem("loginToken", data.token);
+                  await AsyncStorage.setItem("loginToken", data.data.token);
                   console.log("Token set");
                   navigation.navigate("HomeStack", { screen: "HomeScreen" });
                } catch (err) {
                   console.log(err);
                }
             } else {
-               // Handle non-success status codes
-               let data = await response.json();
+              
                console.log(data);
-               if (response.status === 401) {
-                  Alert.alert("Login Failed", data.message);
+               if (status === 401) {
+                  Alert.alert("Login Failed", data.data.message);
                } else {
-                  Alert.alert("Login Failed", data.message);
+                  Alert.alert("Login Failed", data.data.message);
                }
             }
 
             setLoading(false);
          } catch (err) {
+            
             console.log(err);
             Alert.alert(
                "Login Failed",
@@ -93,8 +88,8 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                mode="outlined"
                style={styles.input}
                label="Email"
-               // outlineColor="#f6f6f6"
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               // outlineColor=theme.colors.inverseOnSurface
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                // inputMode="email"
                right={
                   <TextInput.Icon
@@ -102,10 +97,10 @@ const LoginForm = ({ navigation }: LoginFormProps) => {
                      icon="email"></TextInput.Icon>
                }></TextInput>
             <TextInput
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                onChangeText={(v) => setPassword(v)}
                mode="outlined"
-               style={styles.input}
+               style={[styles.input,{ backgroundColor: theme.colors.inverseOnSurface,}]}
                label="Password"
                // inputMode="text"
                secureTextEntry={!showPassword}
@@ -161,7 +156,7 @@ const styles = StyleSheet.create({
       width: width - 40,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor: "#f6f6f6",
+     
    },
    signinCon: {
       flexDirection: "row",

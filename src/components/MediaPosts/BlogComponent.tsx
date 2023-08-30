@@ -36,7 +36,7 @@ import TextShortener from "../TextShortener";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import LikesComponent from "../LikesComponent";
 import moment from "moment";
-import config from "../.././aws-config";
+import config from "../../aws-config";
 import AWS from "aws-sdk";
 import { Skeleton } from "@rneui/themed";
 import { useWindowDimensions } from "react-native";
@@ -50,7 +50,7 @@ const s3 = new AWS.S3({
    region: config.region,
 });
 
-type PostComponentProps = {
+type BlogComponentProps = {
    blog: Blog;
    commentsCount: number;
    likesCount: number;
@@ -61,7 +61,7 @@ type PostComponentProps = {
 };
 
 
-const PostComponent = (props: PostComponentProps) => {
+const BlogComponent = (props: BlogComponentProps) => {
    const currentUser = useCurrentUser();
    const [openModal, setOpenModal] = useState<boolean>(false);
    const [openShareModal, setOpenShareModal] = useState<boolean>(false);
@@ -108,15 +108,16 @@ const PostComponent = (props: PostComponentProps) => {
          setLoading(true);
          let activeUserId = currentUser?.userId;
          let { data, status } = await axios.put(
-            `http://192.168.148.183:5000/blogs/${blogId}/likes/`,
-            { userId: activeUserId}
+            `http://192.168.1.93:6000/blogs/${blogId}/likes/`,
+            { userId: activeUserId},{headers:{Authorization:`Bearer ${currentUser?.token}`}}
          );
          if (status === 202) {
-            let { liked, numberOfLikes } = data.data;
+            let { liked, likesCount:_likesCount } = data.data;
+            console.log(data.data)
             setLiked(liked);
-            setLikesCount(numberOfLikes);
+            setLikesCount(_likesCount);
 
-            Alert.alert("Success", data.message);
+            // Alert.alert("Success", data.message);
          } else {
             Alert.alert("Failed", data.message);
          }
@@ -134,7 +135,6 @@ const PostComponent = (props: PostComponentProps) => {
       setShared(false);
       // let images = props.blog.images?.map(image => image?.trimEnd())
       let postObj = {
-         postObj: {
             title: props.blog.title,
             images: JSON.parse(String(props.blog.images)),
             video: props.blog.video,
@@ -142,13 +142,11 @@ const PostComponent = (props: PostComponentProps) => {
             fromUserId: props.blog.userId,
             fromblogId: props.blog.blogId,
             shared: true,
-         },
-         sharedblogId: props.blog.blogId,
       };
       console.log(postObj);
       try {
          let response = await axios.post(
-            "http://192.168.148.183:5000/blogs/",
+            "http://192.168.1.93:6000/blogs/",
             postObj
          );
          if (response.status === 201) {
@@ -241,10 +239,16 @@ const PostComponent = (props: PostComponentProps) => {
                   paddingVertical: 4,
                }}>
                <View style={{ backgroundColor: "#ffffff", paddingTop: 10 }}>
-                  {/* <IconButton name='plus'/> */}
-                  <Button mode="text" onPress={() => setOpenShareModal(false)}>
-                     <Feather size={26} name="x" />
-                  </Button>
+               <View
+                     style={{
+                        width: "100%",
+                        alignItems: "flex-end",
+                        justifyContent: "flex-end",
+                     }}>
+                     <Button onPress={() => setOpenModal(false)}>
+                        <AntDesign size={18} name="close" />
+                     </Button>
+                  </View>
                   <UpdatePostForm {...props.blog} />
                </View>
             </View>
@@ -306,7 +310,7 @@ const PostComponent = (props: PostComponentProps) => {
                      fontFamily: "Poppins_300Light",
                      fontSize: 12,
                   }}>
-                  {dateAgo(props.blog.createdAt)}
+                  {moment(props.blog.createdAt).fromNow()}
                </Text>
             </View>
 
@@ -424,7 +428,7 @@ const PostComponent = (props: PostComponentProps) => {
                   disabled={loading}
                   onPress={() => handleLike(props.blog.blogId)}
                   textColor={theme.colors.secondary}
-                  style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
+                  style={{ backgroundColor: theme.colors.inverseOnSurface, flex: 1 }}>
                   <Ionicons
                      size={20}
                      color={theme.colors.secondary}
@@ -444,7 +448,7 @@ const PostComponent = (props: PostComponentProps) => {
                      })
                   }
                   textColor={theme.colors.secondary}
-                  style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
+                  style={{ backgroundColor: theme.colors.inverseOnSurface, flex: 1 }}>
                   <MaterialCommunityIcons
                      name="comment-outline"
                      size={20}
@@ -459,7 +463,7 @@ const PostComponent = (props: PostComponentProps) => {
                <Button
                   onPress={() => setOpenShareModal(true)}
                   textColor={theme.colors.secondary}
-                  style={{ backgroundColor: "#f6f6f6", flex: 1 }}>
+                  style={{ backgroundColor: theme.colors.inverseOnSurface, flex: 1 }}>
                   <MaterialCommunityIcons size={25} name="share-outline" />
                </Button>
             </View>
@@ -468,7 +472,7 @@ const PostComponent = (props: PostComponentProps) => {
    );
 };
 
-export default React.memo(PostComponent);
+export default React.memo(BlogComponent);
 
 const styles = StyleSheet.create({
    postContainer: {
@@ -476,6 +480,7 @@ const styles = StyleSheet.create({
       // marginHorizontal:6,
       marginVertical: 3,
       paddingVertical: 10,
+      paddingHorizontal:5,
    },
    commentBox: {
       flex: 1,

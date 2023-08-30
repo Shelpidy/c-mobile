@@ -74,7 +74,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
          <View style={styles.form}>
             <TextInput
                onChangeText={(value) => setPassword(value)}
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="Password"
@@ -89,7 +89,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                }></TextInput>
             <TextInput
                onChangeText={(value) => setConPassword(value)}
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="Confirm Password"
@@ -104,7 +104,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                }></TextInput>
             <TextInput
                onChangeText={(value) => setPinCode(value)}
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="Pincode"
@@ -119,7 +119,7 @@ const Form2 = ({ navigation, setActiveTab }: Form2Props) => {
                }></TextInput>
             <TextInput
                onChangeText={(value) => setConPinCode(value)}
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="Confirm Pincode"
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
       width: width - 40,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
    button: {
       width: width / 3,

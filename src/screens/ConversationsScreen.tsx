@@ -28,12 +28,12 @@ const NewConversationsScreen = () => {
    useEffect(() => {
       if (currentUser && currentPage) {
          console.log("Fetching Chats");
-         let userId = currentUser?.id;
+         let userId = currentUser?.userId;
 
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.148.183:8080/api/messages/chats/${userId}/${currentPage}/${numberOfConversationsRecord}`,
+                  `http://192.168.1.93:8080/messages/chats/${userId}/${currentPage}/${numberOfConversationsRecord}`,
                   { method: "GET" }
                );
                let { chats: newConversations, count } = await resp.json();

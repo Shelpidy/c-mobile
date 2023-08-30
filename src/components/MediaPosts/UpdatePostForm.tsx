@@ -14,10 +14,15 @@ import axios from "axios";
 import { ImagePicker } from "expo-image-multiple-picker";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import { useNavigation } from "@react-navigation/native";
+import {
+   actions,
+   RichEditor,
+   RichToolbar,
+} from "react-native-pell-rich-editor";
 
-const initialState: Partial<Post> = {};
+const initialState: Partial<Blog> = {};
 
-const postReducer = (state: Partial<Post> = initialState, action: Action) => {
+const postReducer = (state: Partial<Blog> = initialState, action: Action) => {
    switch (action.type) {
       case "TEXT":
          return { ...state, text: action.payload };
@@ -39,9 +44,9 @@ const postReducer = (state: Partial<Post> = initialState, action: Action) => {
    }
 };
 
-type NPostComponentProps = Post;
+type NBlogComponentProps = Blog;
 
-const UpdatePostForm = (post: NPostComponentProps) => {
+const UpdatePostForm = (blog: NBlogComponentProps) => {
    const [loading, setLoading] = useState<boolean>(false);
    const [postState, postDispatch] = useReducer(postReducer, initialState);
    const [imageOpen, setImageOpen] = useState(false);
@@ -49,15 +54,16 @@ const UpdatePostForm = (post: NPostComponentProps) => {
    const currentUser = useCurrentUser();
    const theme = useTheme();
    const navigation = useNavigation<any>();
+   const richText = React.useRef<any>(null);
 
    useEffect(() => {
-      postDispatch({ type: "TEXT", payload: post.text });
-      postDispatch({ type: "TITLE", payload: post.title });
-      postDispatch({ type: "TITLE", payload: post.title });
-      postDispatch({ type: "IMAGES", payload: post.images });
-      postDispatch({ type: "ID", payload: post.id });
-      postDispatch({ type: "USERID", payload: post.userId });
-   }, [post]);
+      postDispatch({ type: "TEXT", payload: blog.text });
+      postDispatch({ type: "TITLE", payload: blog.title });
+      postDispatch({ type: "TITLE", payload: blog.title });
+      postDispatch({ type: "IMAGES", payload: blog.images });
+      postDispatch({ type: "ID", payload: blog.blogId });
+      postDispatch({ type: "USERID", payload: blog.userId });
+   }, []);
 
    const handleUpdate = async () => {
       setLoading(true);
@@ -90,7 +96,7 @@ const UpdatePostForm = (post: NPostComponentProps) => {
       postObj.images = uploadedImageURLs;
       try {
          let response = await axios.put(
-            "http://192.168.148.183:5000/api/media/posts/",
+            "http://192.168.1.93:6000/blogs/",
             postObj
          );
          if (response.status === 202) {
@@ -178,13 +184,36 @@ const UpdatePostForm = (post: NPostComponentProps) => {
                value={postState.title}
             />
 
-            <TextInput
-               onChangeText={onValueChangeContent}
-               mode="outlined"
-               label="Content"
-               multiline
-               numberOfLines={5}
-               value={postState.text}
+             <Text style={{ marginTop: 5, fontFamily: "Poppins_300Light" }}>
+               Content
+            </Text>
+            <RichToolbar
+               editor={richText}
+               actions={[
+                  actions.setBold,
+                  actions.setItalic,
+                  actions.setUnderline,
+                  actions.setStrikethrough,
+                  actions.blockquote,
+                  actions.alignCenter,
+                  actions.alignFull,
+                  actions.alignLeft,
+                  actions.alignRight,
+                  actions.insertBulletsList,
+                  actions.insertOrderedList,
+                  actions.undo,
+                  actions.redo,
+                  actions.indent,
+                  actions.setSuperscript,
+                  actions.setSubscript,
+               ]}
+            />
+            <RichEditor
+               editorStyle={{ backgroundColor: theme.colors.inverseOnSurface }}
+               initialHeight={200}
+               initialContentHTML={postState.text}
+               ref={richText}
+               onChange={onValueChangeContent}
             />
             <Text
                style={{

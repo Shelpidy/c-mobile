@@ -33,10 +33,10 @@ const NotificationScreen = ({ navigation }: any) => {
          console.log("Fetching user");
 
          let fetchData = async () => {
-            let activeUserId = currentUser?.id;
+            let activeUserId = currentUser?.userId;
             try {
                let response = await fetch(
-                  `http://192.168.148.183:5000/api/notifications/${activeUserId}`,
+                  `http://192.168.1.93:5000/notifications/${activeUserId}`,
                   { method: "GET" }
                );
                let data = await response.json();

@@ -36,7 +36,7 @@ const FollowerComponent = ({
    const handleFollow = async (userId: number) => {
       try {
          let { data } = await axios.put(
-            `http://192.168.148.183:5000/api/media/follows/`,
+            `http://192.168.1.93:5000/media/follows/`,
             { followerId: 1, followingId: userId },
             { headers: { Accept: "application/json" } }
          );
@@ -55,7 +55,7 @@ const FollowerComponent = ({
    };
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === user.id) {
+      if (currentUser?.userId === user.id) {
          navigation.navigate("ProfileScreen", { userId: user.id });
       } else {
          navigation.navigate("UserProfileScreen", { userId: user.id });

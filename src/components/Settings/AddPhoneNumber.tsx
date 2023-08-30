@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Alert } from "react-native";
-import { TextInput, Button, Divider } from "react-native-paper";
+import { TextInput, Button, Divider, useTheme } from "react-native-paper";
 import axios from "axios";
 import { useCurrentUser } from "../../utils/CustomHooks";
 
@@ -8,17 +8,18 @@ const PhoneNumberForm = () => {
    const [phoneNumber, setPhoneNumber] = useState("");
    const [loading, setLoading] = useState(false);
    const currentUser = useCurrentUser();
+   const theme = useTheme()
 
    const handleAddPhoneNumber = async () => {
       setLoading(true);
 
       try {
          const response = await axios.put(
-            "http://192.168.148.183:5000/api/auth/users/contact/",
+            "http://192.168.1.93:5000/auth/users/contact/",
             {
                key: "phoneNumbers",
                value: phoneNumber,
-               userId: currentUser?.id, // Replace with the actual user ID
+               userId: currentUser?.userId, // Replace with the actual user ID
             }
          );
 
@@ -38,12 +39,12 @@ const PhoneNumberForm = () => {
    return (
       <View style={styles.container}>
          <TextInput
-            outlineStyle={{ borderColor: "#f6f6f6" }}
+            outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
             label="Phone Number"
             value={phoneNumber}
             onChangeText={setPhoneNumber}
             mode="outlined"
-            style={styles.input}
+            style={[styles.input,{backgroundColor: theme.colors.inverseOnSurface,}]}
          />
 
          <Button
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
    },
    input: {
       marginBottom: 10,
-      backgroundColor: "#f6f6f6",
+      
    },
 });
 

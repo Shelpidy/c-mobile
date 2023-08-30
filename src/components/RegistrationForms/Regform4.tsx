@@ -46,7 +46,7 @@ const Form4 = ({ navigation, setActiveTab }: Form4Props) => {
                onChangeText={(value) =>
                   dispatch(setContactInfoForm({ city: value }))
                }
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="city"
@@ -55,7 +55,7 @@ const Form4 = ({ navigation, setActiveTab }: Form4Props) => {
                onChangeText={(value) =>
                   dispatch(setContactInfoForm({ permanentAddress: value }))
                }
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="Permanent Adress"
@@ -64,7 +64,7 @@ const Form4 = ({ navigation, setActiveTab }: Form4Props) => {
                onChangeText={(value) =>
                   dispatch(setContactInfoForm({ currentAddress: value }))
                }
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="Current Address"
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
       width: width - 40,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
    button: {
       width: width / 3,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
       marginTop: 10,
       fontFamily: "Poppins_300Light",
       marginVertical: 10,
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
 
    buttonGroup: {

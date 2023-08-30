@@ -1,14 +1,23 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import PostComponent from "../components/MediaPosts/PostComponent";
-import ProductComponent from "../components/Marketing/ProductComponent";
+import BlogComponent from "../components/MediaPosts/BlogComponent";
 import FindFriendComponent from "../components/FindFriendComponent";
 import SearchForm from "../components/SearchForm";
 
+type FetchedBlog = {
+   blog: Blog;
+   createdBy: User;
+   ownedBy: User;
+   commentsCount: number;
+   likesCount: number;
+   sharesCount: number;
+   liked: boolean;
+};
+
+
 const SearchScreen = ({ navigation }: any) => {
-   const [posts, setPosts] = useState<PostComponentProps[]>([]);
-   const [products, setProducts] = useState<ProductComponentProps[]>([]);
+   const [posts, setPosts] = useState<FetchedBlog[]>([]);
    const [users, setUsers] = useState<User[]>([]);
    const [loading, setLoading] = useState<boolean>(false);
    const [searchValue, setSearchValue] = useState<string>("");
@@ -17,11 +26,10 @@ const SearchScreen = ({ navigation }: any) => {
       setLoading(true);
       try {
          let { data, status } = await axios.get(
-            `http://192.168.148.183:5000/api/search/?searchValue=${searchData}`
+            `http://192.168.1.93:5000/search/?searchValue=${searchData}`
          );
          if (status === 200) {
             setPosts(data.data.posts);
-            setProducts(data.data.products);
             setUsers(data.data.users);
          } else {
             console.log(data.data);
@@ -41,15 +49,14 @@ const SearchScreen = ({ navigation }: any) => {
    }
 
    return (
-      <ScrollView style={{ backgroundColor: "#f6f6f6", paddingTop: 5 }}>
+      <ScrollView style={{ backgroundColor: theme.colors.inverseOnSurface, paddingTop: 5 }}>
          <SearchForm setSearchValue={handleSearch} />
          <ScrollView horizontal>
             {users?.map((user) => {
                return (
                   <FindFriendComponent
-                     key={String(user.id)}
+                     key={String(user.userId)}
                      user={user}
-                     navigation={navigation}
                   />
                );
             })}
@@ -63,29 +70,9 @@ const SearchScreen = ({ navigation }: any) => {
             {posts.length >= 1 &&
                posts.map((post) => {
                   return (
-                     <PostComponent
-                        key={String(post.id)}
-                        navigation={navigation}
+                     <BlogComponent
+                        key={String(post.blog.blogId)}
                         {...post}
-                     />
-                  );
-               })}
-         </ScrollView>
-
-         <ScrollView>
-            <Text>Products</Text>
-            {products.length < 1 && (
-               <View>
-                  <Text>No Result Found For products</Text>
-               </View>
-            )}
-            {products.length >= 1 &&
-               products.map((product) => {
-                  return (
-                     <ProductComponent
-                        key={String(product.id)}
-                        {...product}
-                        navigation={navigation}
                      />
                   );
                })}

@@ -28,7 +28,7 @@ const SearchForm = ({ setSearchValue }: SearchProps) => {
                borderBottomLeftRadius: 20,
                height: 50,
                paddingHorizontal: 25,
-               borderColor: "#f6f6f6",
+               borderColor: theme.colors.inverseOnSurface,
                borderWidth: 1,
             }}
          />
@@ -42,7 +42,7 @@ const SearchForm = ({ setSearchValue }: SearchProps) => {
                borderTopRightRadius: 20,
                borderBottomRightRadius: 20,
                backgroundColor: "#ffffff",
-               borderColor: "#f6f6f6",
+               borderColor: theme.colors.inverseOnSurface,
                borderWidth: 1,
             }}>
             <EvilIcons name="search" size={30} />

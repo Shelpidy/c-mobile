@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
    },
 });
 
-export const LoadingPostComponent = () => {
+export const LoadingBlogComponent = () => {
    return (
       <View style={styles.container}>
          <View
@@ -245,8 +245,8 @@ export const LoadingProfileComponent = () => {
                height={290}
             />
          </View>
-         <LoadingPostComponent />
-         <LoadingPostComponent />
+         <LoadingBlogComponent />
+         <LoadingBlogComponent />
       </ScrollView>
    );
 };

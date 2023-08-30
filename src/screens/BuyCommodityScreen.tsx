@@ -25,7 +25,7 @@ const BuyCommodityScreen = ({ navigation }: any) => {
                   placeholder: "Enter Phonenumber",
                }}></PhoneInput>
             <TextInput
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                keyboardType="numeric"
                style={styles.input}
@@ -37,7 +37,7 @@ const BuyCommodityScreen = ({ navigation }: any) => {
                   />
                }></TextInput>
             <TextInput
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                style={styles.input}
                label="Password"
@@ -51,7 +51,7 @@ const BuyCommodityScreen = ({ navigation }: any) => {
                      }></TextInput.Icon>
                }></TextInput>
             <TextInput
-               outlineStyle={{ borderColor: "#f6f6f6" }}
+               outlineStyle={{ borderColor: theme.colors.inverseOnSurface }}
                mode="outlined"
                keyboardType="numeric"
                style={styles.input}
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
       width: width - 60,
       marginBottom: 10,
       fontFamily: "Poppins_300Light",
-      backgroundColor: "#f6f6f6",
+      backgroundColor: theme.colors.inverseOnSurface,
    },
    button: {
       width: width - 60,

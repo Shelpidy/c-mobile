@@ -38,11 +38,11 @@ import TextShortener from "../TextShortener";
 import { useCurrentUser } from "../../utils/CustomHooks";
 import LikesComponent from "../LikesComponent";
 import moment from "moment";
-import config from "../.././aws-config";
+import config from "../../aws-config";
 import AWS from "aws-sdk";
 import UserComponent from "../UserComponent";
 import HTML from "react-native-render-html";
-import { LoadingPostComponent } from "./LoadingComponents";
+import { LoadingBlogComponent } from "./LoadingComponents";
 import { useNavigation } from "@react-navigation/native";
 import { dateAgo } from "../../utils/util";
 
@@ -52,7 +52,7 @@ const s3 = new AWS.S3({
    region: config.region,
 });
 
-type NSharedPostComponentProps = {
+type NSharedBlogComponentProps = {
    blog:Blog;
    commentsCount: number;
    createdBy: User;
@@ -88,7 +88,7 @@ const postCommentReducer = (
    }
 };
 
-const SharedPostComponent = (props: NSharedPostComponentProps) => {
+const SharedBlogComponent = (props: NSharedBlogComponentProps) => {
    const [postCommentState, dispatchPostComment] = useReducer(
       postCommentReducer,
       initialState
@@ -134,7 +134,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
          setLoading(true);
          let activeUserId = currentUser?.userId;
          let { data, status } = await axios.put(
-            `http://192.168.148.183:5000/blogs/${blogId}/likes/`,
+            `http://192.168.1.93:5000/blogs/${blogId}/likes/`,
             { userId: activeUserId}
          );
          if (status === 202) {
@@ -155,12 +155,12 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
    };
 
    if (!createdBy) {
-      return <LoadingPostComponent />;
+      return <LoadingBlogComponent />;
    }
 
    return (
       <View style={styles.postContainer}>
-         {createdBy && <UserComponent _user={createdBy} navigation={navigation} />}
+         {createdBy && <UserComponent _user={createdBy}/>}
          <View
             style={{
                flex: 1,
@@ -236,7 +236,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                   navigation.navigate("FullPostViewScreen", {
                      ...props.blog,
                      userId: props.blog.fromUserId,
-                     id: props.blog.fromBlogId,
+                     blogId: props.blog.fromBlogId,
                   })
                }>
                View Post
@@ -324,7 +324,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                   onPress={() => handleLike(props.blog?.blogId)}
                   textColor={theme.colors.secondary}
                   style={{
-                     backgroundColor: "#f6f6f6",
+                     backgroundColor: theme.colors.inverseOnSurface,
                      flex: 1,
                      alignItems: "center",
                   }}>
@@ -337,7 +337,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
 
                <Button
                   contentStyle={{
-                     backgroundColor: "#f6f6f6",
+                     backgroundColor: theme.colors.inverseOnSurface,
                      flex: 1,
                      alignItems: "center",
                      flexDirection: "row",
@@ -349,7 +349,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
                   }
                   textColor={theme.colors.secondary}
                   style={{
-                     backgroundColor: "#f6f6f6",
+                     backgroundColor: theme.colors.inverseOnSurface,
                      flex: 1,
                      alignItems: "center",
                   }}>
@@ -365,7 +365,7 @@ const SharedPostComponent = (props: NSharedPostComponentProps) => {
    );
 };
 
-export default SharedPostComponent;
+export default SharedBlogComponent;
 
 const styles = StyleSheet.create({
    postContainer: {

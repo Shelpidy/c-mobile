@@ -9,7 +9,6 @@ import {
 import React, { useEffect, useState } from "react";
 import { users as commodityUsers } from "../data";
 import FindFriendComponent from "./FindFriendComponent";
-import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import axios from "axios";
 import { ActivityIndicator } from "react-native-paper";
 import { useCurrentUser } from "../utils/CustomHooks";
@@ -29,14 +28,14 @@ const FindFriendsComponent = ({ navigation }: any) => {
 
             try {
                if (currentUser) {
-                  let activeUserId = currentUser?.id;
-                  let response = await fetch(
-                     `http://192.168.148.183:5000/api/media/unfollowing/${activeUserId}`,
-                     { method: "GET" }
+                  let activeUserId = currentUser?.userId;
+                  console.log(currentUser)
+                  let {status,data} = await axios.get(
+                     `http://192.168.1.93:6000/follows/unfollowing/${activeUserId}`,
+                     {headers:{Authorization:`Bearer ${currentUser?.token}`}}
                   );
-                  let data = await response.json();
-                  if (data.status == "success") {
-                     // console.log("Users-----", data.data);
+                  if (status === 200) {
+                     console.log("Users-----", data.data);
                      setUsers(data.data?.sort(() => 0.5 - Math.random()));
                      // Alert.alert("Success",data.message)
                   } else {
@@ -69,13 +68,12 @@ const FindFriendsComponent = ({ navigation }: any) => {
       <FlatList
          data={users}
          horizontal
-         keyExtractor={(item) => String(item.id)}
+         keyExtractor={(item) => String(item.userId)}
          indicatorStyle="white"
          renderItem={({ item, index, separators }) => (
             <FindFriendComponent
-               key={String(item.id)}
+               key={String(item.userId)}
                user={item}
-               navigation={navigation}
             />
          )}
       />

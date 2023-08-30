@@ -1,4 +1,23 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import {
+   Feather,
+   FontAwesome,
+   Ionicons
+} from "@expo/vector-icons";
+import { useNavigationState } from "@react-navigation/native";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import {
+   Alert,
+   Image,
+   KeyboardAvoidingView,
+   Pressable,
+   StatusBar,
+   StyleSheet,
+   Text,
+   TextInput,
+   TouchableOpacity,
+   View
+} from "react-native";
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
 import {
    ActivityIndicator,
@@ -8,44 +27,20 @@ import {
    ProgressBar,
    useTheme,
 } from "react-native-paper";
-import {
-   View,
-   Text,
-   Platform,
-   Alert,
-   Image,
-   Pressable,
-   TextInput,
-   TextInputState,
-   StatusBar,
-   TouchableOpacity,
-} from "react-native";
-import {
-   Feather,
-   FontAwesome,
-   Ionicons,
-   MaterialIcons,
-} from "@expo/vector-icons";
-import EmojiSelector, { Categories } from "react-native-emoji-selector";
-import { io, Socket } from "socket.io-client";
-import { StyleSheet, Modal } from "react-native";
+import { Socket, io } from "socket.io-client";
 import TextShortener from "../components/TextShortener";
 import { useCurrentUser, useNetworkStatus } from "../utils/CustomHooks";
-import moment from "moment";
-import { useNavigation, useNavigationState } from "@react-navigation/native";
 // import { ImagePicker } from "expo-image-multiple-picker";
-import * as ImagePicker from "expo-image-picker";
-import config from ".././aws-config";
 import AWS from "aws-sdk";
-import { Camera } from "expo-camera";
 import {
-   Video,
+   AVPlaybackStatus,
    Audio,
    ResizeMode,
-   AVPlaybackStatus,
-   AVPlaybackStatusToSet,
+   Video
 } from "expo-av";
 import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
+import config from ".././aws-config";
 import { useSelector } from "react-redux";
 
 type ChatBoxProps = {
@@ -111,7 +106,7 @@ const ChatBox = ({
 
    const theme = useTheme();
    return (
-      <View
+      <KeyboardAvoidingView
          style={{
             paddingHorizontal: 10,
             flexDirection: "row",
@@ -134,7 +129,7 @@ const ChatBox = ({
                   justifyContent: "center",
                   borderTopLeftRadius: 20,
                   borderBottomLeftRadius: 20,
-                  backgroundColor: "#f6f6f6",
+                  backgroundColor: theme.colors.inverseOnSurface,
                }}
                onPress={openMediaPicker}>
                <Ionicons
@@ -149,7 +144,7 @@ const ChatBox = ({
                   height: 50,
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: "#f6f6f6",
+                  backgroundColor: theme.colors.inverseOnSurface,
                }}
                onPress={openVideoPicker}>
                <Ionicons
@@ -170,7 +165,7 @@ const ChatBox = ({
                style={{
                   flex: 1,
                   fontFamily: "Poppins_300Light",
-                  backgroundColor: "#f6f6f6",
+                  backgroundColor: theme.colors.inverseOnSurface,
                   height: 50,
                   paddingHorizontal: 25,
                   fontSize: 16,
@@ -186,7 +181,7 @@ const ChatBox = ({
                      justifyContent: "center",
                      borderTopRightRadius: 20,
                      borderBottomRightRadius: 20,
-                     backgroundColor: "#f6f6f6",
+                     backgroundColor: theme.colors.inverseOnSurface,
                   }}>
                   <FontAwesome
                      color={theme.colors.primary}
@@ -205,7 +200,7 @@ const ChatBox = ({
                      justifyContent: "center",
                      borderTopRightRadius: 20,
                      borderBottomRightRadius: 20,
-                     backgroundColor: "#f6f6f6",
+                     backgroundColor: theme.colors.inverseOnSurface,
                   }}>
                   <Feather
                      name="mic"
@@ -215,13 +210,12 @@ const ChatBox = ({
                </TouchableOpacity>
             )}
          </View>
-      </View>
+      </KeyboardAvoidingView>
    );
 };
 
 const ChatScreen = ({ route, navigation }: any) => {
    const [messages, setMessages] = useState<IMessage[] | null>(null);
-   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
    const theme = useTheme();
    const [fileUri, setFileUri] = useState<any>(null);
    const [textValue, setTextValue] = useState<string>("");
@@ -234,10 +228,11 @@ const ChatScreen = ({ route, navigation }: any) => {
    const currentUser = useCurrentUser();
    const [secondUser, setSecondUser] = useState<User>();
    const [sound, setSound] = useState<Audio.Sound | null>(null);
-   const [socket, setSocket] = useState<Socket | null>(null);
+   const { socket } = useSelector((state: any) => state.rootReducer);
    const isOnline = useNetworkStatus();
    const [lastSeen, setLastSeen] = useState<any>();
    const [typing, setTyping] = useState<boolean | null>(false);
+   const [gesture, setGesture] = useState<string>("");
    const [sent, setSent] = useState<boolean>(false);
    const [currentPage, setCurrentPage] = useState<number>(1);
    const [totalChats, setTotalChats] = useState<number>(0);
@@ -272,29 +267,29 @@ const ChatScreen = ({ route, navigation }: any) => {
 
    ////// RECONNECT TO SOCKET FOR CHAT ////////////////////////////
 
-   React.useEffect(() => {
-      if (currentUser) {
-         let newSocket = io(
-            `http://192.168.148.183:8080/?userId=${currentUser.id}&roomId=${route.params?.roomId}&roomType=c`
-         );
-         setSocket(newSocket);
+   // React.useEffect(() => {
+   //    if (currentUser) {
+   //       let newSocket = io(
+   //          `http://192.168.1.93:8080/?userId=${currentUser.userId}&roomId=${route.params?.roomId}`
+   //       );
+   //       setSocket(newSocket);
 
-         // cleanup function to close the socket connection when the component unmounts
-         return () => {
-            newSocket.close();
-         };
-      }
-   }, [currentUser]);
+   //       // cleanup function to close the socket connection when the component unmounts
+   //       return () => {
+   //          newSocket.close();
+   //       };
+   //    }
+   // }, [currentUser]);
 
    //////////////////// ADD USER STATUS TO AS BEING IN THIS ROOM/////////////////
 
    useEffect(() => {
       if (socket && currentUser) {
-         console.log("Activating room for ", currentUser.id);
+         console.log("Activating room for ", currentUser.userId);
          let roomId = route.params?.roomId;
          socket.emit("activeRoom", {
-            userId: currentUser.id,
-            activeRoom: `c-${roomId}`,
+            userId: currentUser.userId,
+            activeRoom: roomId,
          });
       }
    }, [socket, currentUser]);
@@ -309,7 +304,7 @@ const ChatScreen = ({ route, navigation }: any) => {
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.148.183:8080/api/userstatus/${secUserId}`,
+                  `http://192.168.1.93:8080/userstatus/${secUserId}`,
                   { method: "GET" }
                );
                if (resp.ok) {
@@ -343,7 +338,7 @@ const ChatScreen = ({ route, navigation }: any) => {
          // Perform actions when user leaves the screen
          if (socket && currentUser) {
             socket.emit("activeRoom", {
-               userId: currentUser.id,
+               userId: currentUser.userId,
                activeRoom: null,
             });
          }
@@ -362,7 +357,7 @@ const ChatScreen = ({ route, navigation }: any) => {
       //// Updating Online Status//////////
       if (socket) {
          if (isOnline && currentUser) {
-            socket.emit("online", { userId: currentUser.id, online: isOnline });
+            socket.emit("online", { userId: currentUser.userId, online: isOnline });
          }
       }
    }, [socket, isOnline, currentUser]);
@@ -372,8 +367,8 @@ const ChatScreen = ({ route, navigation }: any) => {
       if (socket) {
          if (currentUser) {
             socket.emit("typing", {
-               userId: currentUser.id,
-               online: inputFocus,
+               userId: currentUser.userId,
+               typing: inputFocus,
             });
          }
       }
@@ -381,7 +376,7 @@ const ChatScreen = ({ route, navigation }: any) => {
 
    useEffect(() => {
       let secUserId = route.params.user.id;
-      let activeUser = currentUser?.id;
+      let activeUser = currentUser?.userId;
       let roomId = route.params.roomId;
       // console.log(roomId);
       // console.log("Socket connecting");
@@ -393,7 +388,7 @@ const ChatScreen = ({ route, navigation }: any) => {
 
          ////////////////////  Chat message listener ///////////////
 
-         socket.on(`c-${roomId}`, (message: any) => {
+         socket.on(roomId, (message: any) => {
             // console.log("From Server", message);
             setMessages((previousMessages) => {
                if (previousMessages) {
@@ -407,7 +402,7 @@ const ChatScreen = ({ route, navigation }: any) => {
 
          socket.on("online", (data: any) => {
             // console.log("From Online", { online: data.online });
-            if (data.userId == secondUser?.id) {
+            if (data.userId == secondUser?.userId) {
                console.log("From Online", data);
                if (data.online) {
                   setLastSeen("online");
@@ -424,7 +419,8 @@ const ChatScreen = ({ route, navigation }: any) => {
          socket.on("typing", (data: any) => {
             // console.log("From Typing", { typing: data.typing });
             if (data.userId == secUserId) {
-               setTyping(data.typing);
+               setGesture(data.typing?"typing...":"")
+               // setTyping(data.typing);
             }
          });
 
@@ -433,7 +429,8 @@ const ChatScreen = ({ route, navigation }: any) => {
          socket.on("recording", (data: any) => {
             console.log("From Recording", { recording: data.recording });
             if (data.userId == secUserId) {
-               setSocketRecording(data.recording);
+               setGesture(data.recording?"recording...":"")
+               // setSocketRecording(data.recording);
             }
          });
       }
@@ -443,13 +440,13 @@ const ChatScreen = ({ route, navigation }: any) => {
       if (currentUser && currentPage) {
          // console.log("Fetching chats");
          let secUser = route.params.user.id;
-         let activeUser = currentUser?.id;
+         let activeUser = currentUser?.userId;
          let roomId = route.params?.roomId;
 
          let fetchData = async () => {
             try {
                let resp = await fetch(
-                  `http://192.168.148.183:8080/api/messages/${roomId}/${currentPage}/${numberOfChatsRecord}`,
+                  `http://192.168.1.93:8080/messages/${roomId}/${currentPage}/${numberOfChatsRecord}`,
                   { method: "GET" }
                );
                let { messages: chatMessages, count } = await resp.json();
@@ -552,7 +549,7 @@ const ChatScreen = ({ route, navigation }: any) => {
          });
          if (socket) {
             socket.emit("recording", {
-               userId: currentUser?.id,
+               userId: currentUser?.userId,
                recording: true,
             });
          }
@@ -570,10 +567,13 @@ const ChatScreen = ({ route, navigation }: any) => {
    ////////////////////////// stop recording //////////////////////////////////
 
    async function stopRecording() {
+      try{
+
+     
       console.log("Stopping recording..");
       if (socket) {
          socket.emit("recording", {
-            userId: currentUser?.id,
+            userId: currentUser?.userId,
             recording: false,
          });
       }
@@ -588,15 +588,18 @@ const ChatScreen = ({ route, navigation }: any) => {
          await onSend(uri, null, null);
          console.log("Recording stopped and stored at", uri);
       }
+   }catch(err){
+      console.log(err)
+   }
    }
 
    const onSend = async (_audio?: any, _video?: any, _image?: any) => {
       console.log("Onsend loading");
       let secUser = route.params.user.id;
-      let activeUser = currentUser?.id;
+      let activeUser = currentUser?.userId;
       let roomId = route.params.roomId;
       let sendData = {
-         senderId: currentUser?.id,
+         senderId: currentUser?.userId,
          recipientId: route.params.user.id,
          text: textValue,
          roomId: roomId,
@@ -605,7 +608,7 @@ const ChatScreen = ({ route, navigation }: any) => {
          audio: _audio,
       };
       console.log(sendData, roomId);
-      socket?.emit(`c-${roomId}`, sendData);
+      socket?.emit(roomId, sendData);
       setTextValue("");
       setSent(true);
    };
@@ -617,15 +620,15 @@ const ChatScreen = ({ route, navigation }: any) => {
    const handleFocus = (val: boolean) => {
       // console.log({ Focused: val });
       if (socket && currentUser) {
-         socket.emit("typing", { userId: currentUser.id, typing: val });
+         socket.emit("typing", { userId: currentUser.userId, typing: val });
       }
    };
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === secondUser?.id) {
-         navigation.navigate("ProfileScreen", { userId: secondUser?.id });
+      if (currentUser?.userId === secondUser?.userId) {
+         navigation.navigate("ProfileScreen", { userId: secondUser?.userId});
       } else {
-         navigation.navigate("UserProfileScreen", { userId: secondUser?.id });
+         navigation.navigate("UserProfileScreen", { userId: secondUser?.userId});
       }
    };
 
@@ -687,26 +690,14 @@ const ChatScreen = ({ route, navigation }: any) => {
                         alignItems: "center",
                         marginRight: 2,
                      }}>
-                     {!socketRecording && (
-                        <Text
-                           style={{
-                              fontFamily: "Poppins_300Light",
-                              color: theme.colors.inversePrimary,
-                              marginRight: 15,
-                           }}>
-                           {typing ? "typing..." : ""}
-                        </Text>
-                     )}
-                     {!typing && (
-                        <Text
-                           style={{
-                              fontFamily: "Poppins_300Light",
-                              color: theme.colors.inversePrimary,
-                              marginRight: 15,
-                           }}>
-                           {socketRecording ? "recording..." : ""}
-                        </Text>
-                     )}
+                    <Text
+                     style={{
+                        fontFamily: "Poppins_300Light",
+                        color: theme.colors.secondary,
+                        marginLeft: 10,
+                     }}>
+                     {gesture}
+                   </Text>
                      <Text
                         style={{
                            fontFamily: "Poppins_300Light",
@@ -904,9 +895,9 @@ const ChatScreen = ({ route, navigation }: any) => {
                         }
                         renderMessageImage={({ currentMessage }) => (
                            <View>
-                              <View style={{ paddingHorizontal: 5 }}>
+                              {/* <View style={{ paddingHorizontal: 5 }}>
                                  {!downloadImageProgress &&
-                                    currentUser?.id ==
+                                    currentUser?.userId ==
                                        currentMessage?.user._id && (
                                        <Button
                                           onPress={async () =>
@@ -919,7 +910,7 @@ const ChatScreen = ({ route, navigation }: any) => {
                                     )}
                                  {downloadImageProgress &&
                                     downloadImageProgress < 1 &&
-                                    currentUser?.id ==
+                                    currentUser?.userId ==
                                        currentMessage?.user._id && (
                                        <View>
                                           <Text
@@ -940,7 +931,7 @@ const ChatScreen = ({ route, navigation }: any) => {
                                           />
                                        </View>
                                     )}
-                              </View>
+                              </View> */}
                               <Image
                                  source={{ uri: currentMessage?.image }}
                                  style={{ width: 200, height: 200 }}
@@ -950,8 +941,8 @@ const ChatScreen = ({ route, navigation }: any) => {
                         renderMessageVideo={({ currentMessage }) =>
                            currentMessage && currentMessage?.video ? (
                               <View>
-                                 {!downloadVideoProgress &&
-                                    currentUser?.id ==
+                                 {/* {!downloadVideoProgress &&
+                                    currentUser?.userId ==
                                        currentMessage?.user._id && (
                                        <Button
                                           onPress={async () =>
@@ -964,7 +955,7 @@ const ChatScreen = ({ route, navigation }: any) => {
                                     )}
                                  {downloadVideoProgress &&
                                     downloadVideoProgress < 1 &&
-                                    currentUser?.id ==
+                                    currentUser?.userId ==
                                        currentMessage?.user._id && (
                                        <View>
                                           <Text
@@ -984,7 +975,7 @@ const ChatScreen = ({ route, navigation }: any) => {
                                              progress={downloadVideoProgress}
                                           />
                                        </View>
-                                    )}
+                                    )} */}
 
                                  <Video
                                     useNativeControls

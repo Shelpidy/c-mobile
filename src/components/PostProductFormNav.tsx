@@ -13,6 +13,7 @@ import { Fontisto } from "@expo/vector-icons";
 import { Skeleton } from "@rneui/base";
 import { useCurrentUser } from "../utils/CustomHooks";
 import { Avatar } from "react-native-paper";
+import axios from "axios";
 
 type PostProductFormNavProps = {
    navigation: any;
@@ -28,24 +29,21 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
    useEffect(
       function () {
          console.log("Fetching a user");
-         let user = currentUser;
+
          let fetchData = async () => {
             // console.log("Fetching user")
             //  let activeUserId = 1
-            console.log(user?.id);
+            console.log(currentUser?.userId);
             try {
                if (currentUser) {
-                  let response = await fetch(
-                     `http://192.168.148.183:5000/api/auth/users/${user?.id}`,
-                     { method: "GET" }
+                  let {data,status} = await axios.get(
+                     `http://192.168.1.93:5000/auth/users/${currentUser?.userId}`
                   );
 
-                  if (response.ok) {
-                     let data = await response.json();
+                  if (status === 200) {
                      console.log("User Top-----", data.data);
                      setUser(data.data.personal);
                   } else {
-                     let data = await response.json();
                      Alert.alert("Failed", data.message);
                   }
                }
@@ -72,7 +70,7 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
    };
 
    const gotoUserProfile = () => {
-      if (currentUser?.id === user.id) {
+      if (currentUser?.userId === user.id) {
          navigation.navigate("ProfileScreen", { userId: user.id });
       } else {
          navigation.navigate("UserProfileScreen", { userId: user.id });
@@ -92,14 +90,12 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
                height={50}
                style={{ borderRadius: 20, marginLeft: 4 }}
                animation="wave"
-               width={300}
+               width={width - 70}
             />
          </View>
       );
    }
    return (
-      <View>
-         {user && (
             <View
                style={{
                   flexDirection: "row",
@@ -149,8 +145,6 @@ const PostProductFormNav = ({ navigation, page }: PostProductFormNavProps) => {
                   </Pressable>
                </View>
             </View>
-         )}
-      </View>
    );
 };
 
